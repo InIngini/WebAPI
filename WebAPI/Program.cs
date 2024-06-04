@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
@@ -33,7 +35,7 @@ namespace WebAPI
                 // Закрыть соединение
                 connection.Close();
             }
-            
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
@@ -51,5 +53,7 @@ namespace WebAPI
 
             app.Run();
         }
+       
+
     }
 }
