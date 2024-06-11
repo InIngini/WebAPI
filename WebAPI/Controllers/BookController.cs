@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WebAPI.Controllers
 {
@@ -13,9 +16,17 @@ namespace WebAPI.Controllers
         {
             _context = context;
         }
+        //Создание книги
         [HttpPost]
-        public async Task<IActionResult> CreateBook([FromBody] Book book)
+        public async Task<IActionResult> CreateBook([FromBody] UserBookData bookdata)
         {
+            // Создание сущности книги
+            Book book = new Book
+            {
+                NameBook = bookdata.NameBook,
+                IdPicture = bookdata.IdPicture
+            };
+
             // Проверка валидности модели
             if (!ModelState.IsValid)
             {
@@ -26,9 +37,38 @@ namespace WebAPI.Controllers
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            // Возврат созданной книги
-            return CreatedAtAction(nameof(GetBook), new { id = book.IdBook }, book);
+            // Создание сущности BelongTo
+            BelongToBook belonToBook = new BelongToBook
+            {
+                IdUser = bookdata.idUser,
+                IdBook = book.IdBook,
+                TypeBelong = 0 // Установить значение по умолчанию для статуса
+            };
+
+            // Сохранение BelongTo в базе данных
+            _context.BelongToBooks.Add(belonToBook);
+            await _context.SaveChangesAsync();
+
+            // Настройка параметров сериализации
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+            // Сериализация созданной книги в JSON
+            string json = JsonSerializer.Serialize(book, options);
+
+            // Возврат созданной книги в формате JSON
+            return CreatedAtAction(nameof(GetBook), new { id = book.IdBook }, json);
         }
+
+        //вспомогательный тип
+        public class UserBookData
+        {
+            public int idUser { get; set; }
+            public string NameBook { get; set; }
+            public int? IdPicture { get; set; }
+        }
+        //Изменение книги
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
         {
@@ -50,6 +90,7 @@ namespace WebAPI.Controllers
             // Возврат обновленной книги
             return Ok(existingBook);
         }
+        //Удаление книги
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
@@ -62,12 +103,29 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
+            // Удаление связанных записей из таблицы BelongToBook
+            var belongToBookRecords = _context.BelongToBooks.Where(b => b.IdBook == id);
+            _context.BelongToBooks.RemoveRange(belongToBookRecords);
+
             // Удаление книги
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
 
             // Возврат подтверждения удаления
             return NoContent();
+        }
+        //Получить книгу
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBook(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(book);
         }
 
     }

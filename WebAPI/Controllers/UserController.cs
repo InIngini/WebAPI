@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using WebAPI.Token;
+using WebAPI;
 
 namespace WebAPI.Controllers
 {
@@ -18,73 +22,64 @@ namespace WebAPI.Controllers
         //    _logger = logger;
         //}
         private readonly Context _context;
+        private readonly ITokenService _tokenService;
 
-        public UserController(Context context)
+        public UserController(Context context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
-        //[HttpGet]
-        //public IEnumerable<User> Get()
-        //{
-        //    return Enumerable.Range(1, 1).Select(index => new User
-        //    {
-        //        IdUser = index,
-        //        Login = "ingini",
-        //        Password = string.Empty,
-        //    })
-        //    .ToArray();
-        //}
 
         //Создание пользователя
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Сохранение пользователя в базе данных
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Возврат созданного пользователя
             return CreatedAtAction(nameof(GetUser), new { id = user.IdUser }, user);
         }
-        //Вход пользователя
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
-        {
-            // Поиск пользователя в базе данных
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == loginModel.Login && u.Password == loginModel.Password);
 
-            // Если пользователь не найден, вернуть ошибку
+        //Авторизация пользователя
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginData loginData)
+        {
+            // ваш код
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == loginData.Login && u.Password == loginData.Password);
+
             if (user == null)
             {
                 return Unauthorized();
             }
 
-            // Создание JWT-токена
             var token = _tokenService.CreateToken(user);
 
-            // Возврат токена
             return Ok(new { token });
         }
-        //Получение пользователя по id
+
+        //Небольшой тип для логина и пароля
+        public class LoginData
+        {
+            public string Login { get; set; }
+            public string Password { get; set; }
+        }
+
+        //Получить пользователя
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            // Получение пользователя из базы данных
             var user = await _context.Users.FindAsync(id);
 
-            // Если пользователь не найден, вернуть ошибку
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Возврат пользователя
             return Ok(user);
         }
 

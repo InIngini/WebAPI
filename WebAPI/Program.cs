@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.IdentityModel.Tokens;
 using System.IO;
+using System.Text;
+using WebAPI.Token;
 
 namespace WebAPI
 {
@@ -36,9 +40,38 @@ namespace WebAPI
                 connection.Close();
             }
 
+            
+
             var builder = WebApplication.CreateBuilder(args);
 
+            // Регистрация контекста базы данных
+            builder.Services.AddDbContext<Context>(options =>
+                options.UseSqlServer(connectionString));
+
+            // Добавить контроллеры
             builder.Services.AddControllers();
+
+
+            // Настройка аутентификации с использованием JWT
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = "your-issuer",
+                        ValidAudience = "your-audience",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
+                    };
+                });
+            // Регистрация ITokenService
+            builder.Services.AddTransient<ITokenService, TokenService>();
+
+            // Добавление авторизации
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -46,6 +79,8 @@ namespace WebAPI
 
             app.UseHttpsRedirection();
 
+            // Использование авторизации и аутентификации
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

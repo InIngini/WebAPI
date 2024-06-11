@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.Extensions.Configuration;
 
 namespace DB
 {
