@@ -1,87 +1,85 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace WebAPI.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class SchemeController : Controller
-//    {
-//        private readonly Context _context;
+namespace WebAPI.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class SchemeController : Controller
+    {
+        private readonly Context _context;
 
-//        public SchemeController(Context context)
-//        {
-//            _context = context;
-//        }
-//        [HttpPost]
-//        public async Task<IActionResult> CreateScheme([FromBody] Scheme scheme)
-//        {
-//            // Проверка валидности модели
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        public SchemeController(Context context)
+        {
+            _context = context;
+        }
+        //Создание схемы
+        [HttpPost]
+        public async Task<IActionResult> CreateScheme([FromBody] Scheme scheme)
+        {
+            // Проверка валидности модели
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            // Сохранение схемы в базе данных
-//            _context.Schemes.Add(scheme);
-//            await _context.SaveChangesAsync();
+            // Сохранение схемы в базе данных
+            _context.Schemes.Add(scheme);
+            await _context.SaveChangesAsync();
 
-//            // Возврат созданной схемы
-//            return CreatedAtAction(nameof(GetScheme), new { id = scheme.IdScheme }, scheme);
-//        }
-//        [HttpPost]
-//        public async Task<IActionResult> AddScheme([FromBody] Scheme scheme)
-//        {
-//            // Проверка валидности модели
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+            // Возврат созданной схемы
+            return CreatedAtAction(nameof(GetScheme), new { id = scheme.IdScheme }, scheme);
+        }
+        //Изменение схемы
+        [HttpPost]
+        public async Task<IActionResult> AddScheme([FromBody] Scheme scheme)
+        {
+            // Проверка валидности модели
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            // Сохранение схемы в базе данных
-//            _context.Schemes.Add(scheme);
-//            await _context.SaveChangesAsync();
+            // Сохранение схемы в базе данных
+            _context.Schemes.Add(scheme);
+            await _context.SaveChangesAsync();
 
-//            // Возврат созданной схемы
-//            return CreatedAtAction(nameof(GetScheme), new { id = scheme.IdScheme }, scheme);
-//        }
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> DeleteScheme(int id)
-//        {
-//            // Получение схемы из базы данных
-//            var scheme = await _context.Schemes.FindAsync(id);
+            // Возврат созданной схемы
+            return CreatedAtAction(nameof(GetScheme), new { id = scheme.IdScheme }, scheme);
+        }
+        //Удаление схемы
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteScheme(int id)
+        {
+            // Получение схемы из базы данных
+            var scheme = await _context.Schemes.FindAsync(id);
 
-//            // Если схема не найдена, вернуть ошибку
-//            if (scheme == null)
-//            {
-//                return NotFound();
-//            }
+            // Если схема не найдена, вернуть ошибку
+            if (scheme == null)
+            {
+                return NotFound();
+            }
 
-//            // Если схема является главной, вернуть ошибку
-//            //if (scheme.IsMain)
-//            //{
-//            //    return BadRequest("Нельзя удалить главную схему");
-//            //}
+            // Удаление схемы
+            _context.Schemes.Remove(scheme);
+            await _context.SaveChangesAsync();
 
-//            // Удаление схемы
-//            _context.Schemes.Remove(scheme);
-//            await _context.SaveChangesAsync();
+            // Возврат подтверждения удаления
+            return NoContent();
+        }
 
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//        [HttpDelete("{idBook}")]
-//        public async Task<IActionResult> DeleteAllSchemes(int idBook)
-//        {
-//            // Получение списка схем книги
-//            var schemes = _context.Schemes.Where(s => s.IdBook == idBook);
+        //Получить схему
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetScheme(int id)
+        {
+            var scheme = await _context.Schemes.FindAsync(id);
 
-//            // Удаление всех схем
-//            _context.Schemes.RemoveRange(schemes);
-//            await _context.SaveChangesAsync();
+            if (scheme == null)
+            {
+                return NotFound();
+            }
 
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//    }
-//}
+            return Ok(scheme);
+        }
+    }
+}

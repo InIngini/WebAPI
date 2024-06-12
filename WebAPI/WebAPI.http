@@ -59,12 +59,10 @@ Content-Type: application/json
 }
 ###
 # изменение персонажа и блоков
-PUT {{WebAPI_HostAddress}}/Character/3
+PUT {{WebAPI_HostAddress}}/Character/12
 Content-Type: application/json
 
 {
-    "IdBook": 2,
-    "IdPicture": 3,
     "Name": "ќбновленное им€ персонажа",
     "Block1Question1": "ќбновленный вопрос 1",
     "Block1Question2": "ќбновленный вопрос 2",
@@ -99,6 +97,24 @@ Content-Type: application/json
 }
 ###
 # удаление персонажа, блоков и добавленных атрибутов
-DELETE {{WebAPI_HostAddress}}/Character/3
+DELETE {{WebAPI_HostAddress}}/Character/11
 
 ###
+# дл€ атрибутов
+# создание атрибута
+POST {{WebAPI_HostAddress}}/Character/12/addedattribute
+Content-Type: application/json
+
+{
+    "NumberBlock": "1",
+    "NameAttribute": "Ќовое им€"
+}
+###
+# изменение атрибута
+PUT {{WebAPI_HostAddress}}/Character/12/addedattribute/1
+Content-Type: application/json
+
+"—одержимое"
+###
+# удаление атрибута
+DELETE {{WebAPI_HostAddress}}/Character/12/addedattribute/1

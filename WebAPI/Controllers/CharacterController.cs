@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace WebAPI.Controllers
 {
@@ -35,20 +37,70 @@ namespace WebAPI.Controllers
 
             // Сохранение блоков с персонажем
             Block1 block1 = new Block1()
-            { IdCharacter=character.IdCharacter};
+            { 
+                IdCharacter=character.IdCharacter,
+                Name = String.Empty,
+                Question1 = String.Empty,
+                Question2 = String.Empty,
+                Question3 = String.Empty,
+                Question4 = String.Empty,
+                Question5 = String.Empty,
+                Question6 = String.Empty,
+
+            };
             _context.Block1s.Add(block1);
             Block2 block2 = new Block2()
-            { IdCharacter = character.IdCharacter };
+            { 
+                IdCharacter = character.IdCharacter,
+                Question1 = String.Empty,
+                Question2 = String.Empty,
+                Question3 = String.Empty,
+                Question4 = String.Empty,
+                Question5 = String.Empty,
+                Question6 = String.Empty,
+                Question7 = String.Empty,
+                Question8 = String.Empty,
+                Question9 = String.Empty,
+            };
             _context.Block2s.Add(block2);
             Block3 block3 = new Block3()
-            { IdCharacter = character.IdCharacter };
+            { 
+                IdCharacter = character.IdCharacter,
+                Question1 = String.Empty,
+                Question2 = String.Empty,
+                Question3 = String.Empty,
+                Question4 = String.Empty,
+                Question5 = String.Empty,
+                Question6 = String.Empty,
+                Question7 = String.Empty,
+                Question8 = String.Empty,
+                Question9 = String.Empty,
+                Question10 = String.Empty,
+            };
             _context.Block3s.Add(block3);
             Block4 block4 = new Block4()
-            { IdCharacter = character.IdCharacter };
+            { 
+                IdCharacter = character.IdCharacter,
+                Question1 = String.Empty,
+                Question2 = String.Empty,
+                Question3 = String.Empty,
+                Question4 = String.Empty,
+                Question5 = String.Empty,
+            };
             _context.Block4s.Add(block4);
 
-            // Возврат созданного персонажа
-            return CreatedAtAction(nameof(GetCharacter), new { id = character.IdCharacter }, character);
+            await _context.SaveChangesAsync();
+
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            string json = JsonSerializer.Serialize(character, options);
+
+            // Возврат созданного персонажа в виде JSON
+            return CreatedAtAction(nameof(GetCharacter), new { id = character.IdCharacter }, json);
         }
         //вспомогательный тип
         public class BookCharacterData
@@ -70,7 +122,6 @@ namespace WebAPI.Controllers
             }
 
             // Обновление персонажа
-            existingCharacter.IdBook = characterWithBlocks.IdBook;
             existingCharacter.IdPicture = characterWithBlocks.IdPicture;
             // Обновление блоков
             var block1 = await _context.Block1s.FindAsync(id);
@@ -112,15 +163,20 @@ namespace WebAPI.Controllers
             await _context.SaveChangesAsync();
 
             // Возврат обновленного персонажа
-            return Ok(existingCharacter);
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            string json = JsonSerializer.Serialize(existingCharacter, options);
+
+            return Ok(json);
         }
 
 
         //вспомогательный тип
         public class CharacterWithBlocks
         {
-            public int IdCharacter { get; set; }
-            public int IdBook { get; set; }
             public int? IdPicture { get; set; }
             public string Name { get; set; }
             public string Block1Question1 { get; set; }
@@ -177,6 +233,11 @@ namespace WebAPI.Controllers
             var block4 = await _context.Block4s.FindAsync(id);
             _context.Block4s.Remove(block4);
 
+            // Удаление атрибутов
+            var attributes = _context.AddedAttributes.Where(aa => aa.IdCharacter == id);
+            _context.AddedAttributes.RemoveRange(attributes);
+            await _context.SaveChangesAsync();
+
             // Удаление персонажа
             _context.Characters.Remove(character);
             await _context.SaveChangesAsync();
@@ -198,6 +259,94 @@ namespace WebAPI.Controllers
             }
 
             return Ok(character);
+        }
+
+
+        ////////////////////////////Для добавленного атрибута//////////////////////////////
+        /////Создать атрибут
+        [HttpPost("{id}/addedattribute")]
+        public async Task<IActionResult> CreateAddedAttribute(int id, [FromBody] AAData aa)
+        {
+            // Проверка валидности модели
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            AddedAttribute addedAttribute = new AddedAttribute()
+            { 
+                IdCharacter = id,
+                NameAttribute = aa.NameAttribute,
+                NumberBlock = aa.NumberBlock,
+                ContentAttribute = String.Empty,
+            };
+
+            // Сохранение атрибута в базе данных
+            _context.AddedAttributes.Add(addedAttribute);
+            await _context.SaveChangesAsync();
+
+            // Возврат созданного атрибута
+            return CreatedAtAction(nameof(GetAddedAttribute), new { id = addedAttribute.IdAttribute }, addedAttribute);
+        }
+        //вспомогательный тип
+        public class AAData
+        {
+            public int NumberBlock { get; set; }
+            public string NameAttribute { get; set; }
+        }
+        //Изменить атрибут
+        [HttpPut("{idc}/addedattribute/{ida}")]
+        public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content)
+        {
+            // Получение атрибута из базы данных
+            var existingAddedAttribute = await _context.AddedAttributes.FindAsync(ida);
+
+            // Если атрибут не найден, вернуть ошибку
+            if (existingAddedAttribute == null)
+            {
+                return NotFound();
+            }
+
+            // Обновление атрибута
+            existingAddedAttribute.ContentAttribute = content;
+
+            await _context.SaveChangesAsync();
+
+            // Возврат обновленного атрибута
+            return Ok(existingAddedAttribute);
+        }
+        //Удалить атрибут
+        [HttpDelete("{idc}/addedattribute/{ida}")]
+        public async Task<IActionResult> DeleteAddedAttribute(int ida)
+        {
+            // Получение атрибута из базы данных
+            var addedAttribute = await _context.AddedAttributes.FindAsync(ida);
+
+            // Если атрибут не найден, вернуть ошибку
+            if (addedAttribute == null)
+            {
+                return NotFound();
+            }
+
+            // Удаление атрибута
+            _context.AddedAttributes.Remove(addedAttribute);
+            await _context.SaveChangesAsync();
+
+            // Возврат подтверждения удаления
+            return NoContent();
+        }
+        //Получить атрибут
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAddedAttribute(int id)
+        {
+            var addedAttribute = await _context.AddedAttributes.FindAsync(id);
+
+            if (addedAttribute == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(addedAttribute);
         }
     }
 }
