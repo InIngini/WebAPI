@@ -1,100 +1,169 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
-//namespace WebAPI.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class EventController : Controller
-//    {
-//        private readonly Context _context;
+namespace WebAPI.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class EventController : Controller
+    {
+        private readonly Context _context;
 
-//        public EventController(Context context)
-//        {
-//            _context = context;
-//        }
-//        [HttpPost]
-//        public async Task<IActionResult> CreateEvent([FromBody] Event @event)
-//        {
-//            // Проверка валидности модели
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        public EventController(Context context)
+        {
+            _context = context;
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent([FromBody] EventData eventData)
+        {
+            // Проверка валидности модели
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            Event @event = new Event()
+            { 
+                Name = eventData.Name,
+                Content = eventData.Content,
+                Time = eventData.Time,
 
-//            // Сохранение события в базе данных
-//            _context.Events.Add(@event);
-//            await _context.SaveChangesAsync();
+            };
+            if (eventData.IdCharacter != null)
+            {
+                foreach (var idCharacter in eventData.IdCharacter)
+                {
+                    var character = await _context.Characters.FindAsync(idCharacter);
+                    if (character != null)
+                    {
+                        @event.IdCharacters.Add(character);
+                    }
+                }
+            }
+            // Сохранение связи в базе данных
+            _context.Events.Add(@event);
+            await _context.SaveChangesAsync();
 
-//            // Возврат созданного события
-//            return CreatedAtAction(nameof(GetEvent), new { id = @event.IdEvent }, @event);
-//        }
-//        [HttpPut("{id}")]
-//        public async Task<IActionResult> UpdateEvent(int id, [FromBody] Event @event)
-//        {
-//            // Получение события из базы данных
-//            var existingEvent = await _context.Events.FindAsync(id);
+            var timeline = await _context.Timelines
+                .Where(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
+                .FirstOrDefaultAsync();
+            // Добавление связи в главную схему
+            timeline.IdEvents.Add(@event);
 
-//            // Если событие не найдено, вернуть ошибку
-//            if (existingEvent == null)
-//            {
-//                return NotFound();
-//            }
+            await _context.SaveChangesAsync();
 
-//            // Обновление события
-//            existingEvent.Name = @event.Name;
-//            existingEvent.Content = @event.Content;
-//            existingEvent.Time = @event.Time;
 
-//            await _context.SaveChangesAsync();
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-//            // Возврат обновленного события
-//            return Ok(existingEvent);
-//        }
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> DeleteEvent(int id)
-//        {
-//            // Получение события из базы данных
-//            var @event = await _context.Events.FindAsync(id);
+            string json = JsonSerializer.Serialize(@event, options);
+            // Возврат созданной связи
+            return CreatedAtAction(nameof(GetEvent), new { id = @event.IdEvent }, json);
+        }
+        public class EventData
+        {
+            public int? IdBook { get; set; }
+            public string Name { get; set; }
+            public string Content { get; set; }
+            public string Time { get; set; }
+            public int[]? IdCharacter {  get; set; }
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
+        {
+            // Получение события из базы данных
+            var @event = await _context.Events.FindAsync(id);
 
-//            // Если событие не найдено, вернуть ошибку
-//            if (@event == null)
-//            {
-//                return NotFound();
-//            }
+            // Если событие не найдено, вернуть ошибку
+            if (@event == null)
+            {
+                return NotFound();
+            }
 
-//            // Удаление события
-//            _context.Events.Remove(@event);
-//            await _context.SaveChangesAsync();
+            // Обновление события
+            @event.Name = eventData.Name;
+            @event.Content = eventData.Content;
+            @event.Time = eventData.Time;
+            if (eventData.IdCharacter != null)
+            {
+                _context.Entry(@event).Collection(e => e.IdCharacters).Load();
+                // Удаление существующих связей персонажей с событием
+                foreach (var character in @event.IdCharacters.ToList())
+                {
+                    @event.IdCharacters.Remove(character);
+                }
 
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//        [HttpDelete("{idBook}")]
-//        public async Task<IActionResult> DeleteAllEvents(int idBook)
-//        {
-//            // Получение списка событий книги
-//            var events = _context.Events.Where(e => e.IdBook == idBook);
+                foreach (var idCharacter in eventData.IdCharacter)
+                {
+                    var character = await _context.Characters.FindAsync(idCharacter);
+                    if (character != null)
+                    {
+                        @event.IdCharacters.Add(character);
+                    }
+                }
+            }
 
-//            // Удаление всех событий
-//            _context.Events.RemoveRange(events);
-//            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//        [HttpDelete("{idCharacter}")]
-//        public async Task<IActionResult> DeleteEventsForCharacter(int idCharacter)
-//        {
-//            // Получение списка событий персонажа
-//            var events = _context.Events.Where(e => e.IdCharacter == idCharacter);
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-//            // Удаление всех событий
-//            _context.Events.RemoveRange(events);
-//            await _context.SaveChangesAsync();
+            string json = JsonSerializer.Serialize(@event, options);
+            // Возврат обновленного события
+            return Ok(json);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            // Получение события из базы данных
+            var @event = await _context.Events.FindAsync(id);
 
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//    }
-//}
+            // Если событие не найдено, вернуть ошибку
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            // Получение всех схем
+            var timelines = await _context.Timelines.ToListAsync();
+
+            // Удаление `IdConnection` удаляемой связи из схем
+            foreach (var timeline in timelines)
+            {
+                var @event1 = timeline.IdEvents.FirstOrDefault(c => c.IdEvent == id);
+                if (@event1 != null)
+                {
+                    timeline.IdEvents.Remove(@event1);
+                }
+            }
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
+            // Удаление события
+            _context.Events.Remove(@event);
+            await _context.SaveChangesAsync();
+
+            // Возврат подтверждения удаления
+            return NoContent();
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEvent(int id)
+        {
+            var @event = await _context.Events.FindAsync(id);
+
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(@event);
+        }
+    }
+}

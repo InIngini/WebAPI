@@ -238,10 +238,35 @@ namespace WebAPI.Controllers
             _context.AddedAttributes.RemoveRange(attributes);
             await _context.SaveChangesAsync();
 
+            // Удалить все изображения
+            var gallery = _context.Galleries.Where(aa => aa.IdCharacter == id);
+
+            // Перебрать найденные записи
+            foreach (var item in gallery)
+            {
+                // Получить значение idPicture из текущей записи
+                var idPicture = item.IdPicture;
+
+                // Удалить запись из таблицы Picture по полученному значению idPicture
+                var picture = _context.Pictures.Find(idPicture);
+                if (picture != null)
+                {
+                    _context.Pictures.Remove(picture);
+                }
+
+                // Удалить текущую запись из таблицы Gallery
+                _context.Galleries.Remove(item);
+            }
+
+            // Сохранить изменения в базе данных
+            await _context.SaveChangesAsync();
+
+
             // Удаление персонажа
             _context.Characters.Remove(character);
             await _context.SaveChangesAsync();
 
+            
             // Возврат подтверждения удаления
             return NoContent();
         }

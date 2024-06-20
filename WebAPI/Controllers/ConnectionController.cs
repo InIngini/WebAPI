@@ -1,107 +1,115 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
-//namespace WebAPI.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class ConnectionController : Controller
-//    {
-//        private readonly Context _context;
+namespace WebAPI.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class ConnectionController : Controller
+    {
+        private readonly Context _context;
 
-//        public ConnectionController(Context context)
-//        {
-//            _context = context;
-//        }
-//        [HttpPost]
-//        public async Task<IActionResult> CreateConnection([FromBody] Connection connection)
-//        {
-//            // Проверка валидности модели
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        public ConnectionController(Context context)
+        {
+            _context = context;
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateConnection([FromBody] ConnectionData connectionData)
+        {
+            // Проверка валидности модели
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            Connection connection = new Connection()
+            { 
+                TypeConnection = connectionData.TypeConnection,
+                IdCharacter1 = connectionData.IdCharacter1,
+                IdCharacter2 = connectionData.IdCharacter2,
+            };
+            // Сохранение связи в базе данных
+            _context.Connections.Add(connection);
+            await _context.SaveChangesAsync();
 
-//            // Сохранение связи в базе данных
-//            _context.Connections.Add(connection);
-//            await _context.SaveChangesAsync();
+            var scheme = await _context.Schemes
+                .Where(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
+                .FirstOrDefaultAsync();
+            // Добавление связи в главную схему
+            scheme.IdConnections.Add(connection);
 
-//            // Возврат созданной связи
-//            return CreatedAtAction(nameof(GetConnection), new { id = connection.IdConnection }, connection);
-//        }
-
-//        [HttpPut("{id}")]
-//        public async Task<IActionResult> UpdateConnection(int id, [FromBody] Connection connection)
-//        {
-//            // Получение связи из базы данных
-//            var existingConnection = await _context.Connections.FindAsync(id);
-
-//            // Если связь не найдена, вернуть ошибку
-//            if (existingConnection == null)
-//            {
-//                return NotFound();
-//            }
-
-//            // Обновление связи
-//            existingConnection.TypeConnection = connection.TypeConnection;
-//            existingConnection.IdCharacter1 = connection.IdCharacter1;
-//            existingConnection.IdCharacter2 = connection.IdCharacter2;
-
-//            await _context.SaveChangesAsync();
-
-//            // Возврат обновленной связи
-//            return Ok(existingConnection);
-//        }
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> DeleteConnection(int id)
-//        {
-//            // Получение связи из базы данных
-//            var connection = await _context.Connections.FindAsync(id);
-
-//            // Если связь не найдена, вернуть ошибку
-//            if (connection == null)
-//            {
-//                return NotFound();
-//            }
-
-//            // Удаление связи
-//            _context.Connections.Remove(connection);
-//            await _context.SaveChangesAsync();
-            
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-//        [HttpDelete("{idBook}")]
-//        public async Task<IActionResult> DeleteAllConnections(int idBook)
-//        {
-//            // Получение списка связей книги
-
-//            //поменять на джоин
-
-//            //var connections = _context.Connections.Where(c => c.IdBook == idBook);
-
-//            //// Удаление всех связей
-//            //_context.Connections.RemoveRange(connections);
-//            //await _context.SaveChangesAsync();
-
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
-
-//        [HttpDelete("{idCharacter}")]
-//        public async Task<IActionResult> DeleteConnectionsForCharacter(int idCharacter)
-//        {
-//            // Получение списка связей персонажа
-//            var connections = _context.Connections.Where(c => c.IdCharacter1 == idCharacter || c.IdCharacter2 == idCharacter);
-
-//            // Удаление всех связей
-//            _context.Connections.RemoveRange(connections);
-//            await _context.SaveChangesAsync();
-
-//            // Возврат подтверждения удаления
-//            return NoContent();
-//        }
+            await _context.SaveChangesAsync();
 
 
-//    }
-//}
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            string json = JsonSerializer.Serialize(connection, options);
+            // Возврат созданной связи
+            return CreatedAtAction(nameof(GetConnection), new { id = connection.IdConnection }, json);
+        }
+        public class ConnectionData
+        {
+            public int IdBook { get; set; }
+            public int IdCharacter1 { get; set; }
+            public int IdCharacter2 { get; set; }
+            public int TypeConnection { get; set; }
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteConnection(int id)
+        {
+            // Получение связи из базы данных
+            var connection = await _context.Connections.FindAsync(id);
+
+            // Если связь не найдена, вернуть ошибку
+            if (connection == null)
+            {
+                return NotFound();
+            }
+
+            // Получение схем, связанных со связью, и удаление их оттуда
+            // Получение всех схем
+            var schemes = await _context.Schemes.ToListAsync();
+
+            // Удаление `IdConnection` удаляемой связи из схем
+            foreach (var scheme in schemes)
+            {
+                var connection1 = scheme.IdConnections.FirstOrDefault(c => c.IdConnection == id);
+                if (connection1 != null)
+                {
+                    scheme.IdConnections.Remove(connection1);
+                }
+            }
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
+
+
+            // Удаление связи
+            _context.Connections.Remove(connection);
+            await _context.SaveChangesAsync();
+
+            // Возврат подтверждения удаления
+            return NoContent();
+        }
+        //Получить схему
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetConnection(int id)
+        {
+            var connection = await _context.Connections.FindAsync(id);
+
+            if (connection == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(connection);
+        }
+
+    }
+}

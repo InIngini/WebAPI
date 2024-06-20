@@ -49,6 +49,24 @@ namespace WebAPI.Controllers
             _context.BelongToBooks.Add(belonToBook);
             await _context.SaveChangesAsync();
 
+            // Создание главной схемы 
+            Scheme scheme = new Scheme()
+            {
+                NameScheme = "Главная схема",
+                IdBook = book.IdBook,
+            };
+            _context.Schemes.Add(scheme);
+            await _context.SaveChangesAsync();
+
+            // Создание главного таймлайна
+            Timeline timeline = new Timeline()
+            {
+                NameTimeline = "Главный таймлайн",
+                IdBook = book.IdBook,
+            };
+            _context.Timelines.Add(timeline);
+            await _context.SaveChangesAsync();
+
             // Настройка параметров сериализации
             var options = new JsonSerializerOptions
             {
@@ -106,6 +124,21 @@ namespace WebAPI.Controllers
             // Удаление связанных записей из таблицы BelongToBook
             var belongToBookRecords = _context.BelongToBooks.Where(b => b.IdBook == id);
             _context.BelongToBooks.RemoveRange(belongToBookRecords);
+            await _context.SaveChangesAsync();
+
+            //Удаление всех схем
+
+
+            //Удаление всех таймлайнов
+
+
+            //Удаление всех персонажей, блоков и добавленных атрибутов
+
+
+
+            //Удаление всех изображений
+
+
 
             // Удаление книги
             _context.Books.Remove(book);
