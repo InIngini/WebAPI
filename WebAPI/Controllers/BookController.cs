@@ -126,18 +126,87 @@ namespace WebAPI.Controllers
             _context.BelongToBooks.RemoveRange(belongToBookRecords);
             await _context.SaveChangesAsync();
 
+
+
             //Удаление всех схем
+            // Получение главной схемы
+            var mainScheme = _context.Schemes
+                .Where(s => s.IdBook == book.IdBook && s.NameScheme == "Главная схема")
+                .FirstOrDefault();
+
+
+            // Если главная схема не найдена, вернуть ошибку
+            if (mainScheme == null)
+            {
+                return NotFound();
+            }
+
+            // Получение всех связей, принадлежащих главной схеме
+            var connections = _context.Connections.Where(c => c.IdSchemes.Contains(mainScheme));
+
+            // Удаление всех связей, принадлежащих главной схеме
+            _context.Connections.RemoveRange(connections);
+
+            // Удаление всех схем
+            var schemes = _context.Schemes.Where(s => s.IdBook == book.IdBook);
+            _context.Schemes.RemoveRange(schemes);
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
 
 
             //Удаление всех таймлайнов
+            // Получение таймлайна с указанным названием
+            var timeline = _context.Timelines
+                .Where(t => t.IdBook == book.IdBook && t.NameTimeline == "Главный таймлайн")
+                .FirstOrDefault();
+
+            // Если таймлайн не найден, вернуть ошибку
+            if (timeline == null)
+            {
+                return NotFound();
+            }
+
+            // Получение всех событий, принадлежащих указанному таймлайну
+            var events = _context.Events.Where(e => e.IdTimelines.Contains(timeline));
+
+            // Удаление всех событий, принадлежащих указанному таймлайну
+            _context.Events.RemoveRange(events);
+
+            // Получение всех таймлайнов и удаление их
+            var timelines = _context.Timelines.Where(t => t.IdBook == book.IdBook);
+            _context.Timelines.RemoveRange(timelines);
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
 
 
             //Удаление всех персонажей, блоков и добавленных атрибутов
+            // Создание экземпляра CharacterController
+            var characterController = new CharacterController(_context);
+
+            // Получение всех персонажей, связанных с книгой
+            var characters = _context.Characters.Where(c => c.IdBook == id);
+
+            // Удаление всех персонажей
+            foreach (var character in characters)
+            {
+                // Вызов метода DeleteCharacter для каждого персонажа
+                await characterController.DeleteCharacter(character.IdCharacter);
+            }
 
 
+            //Удаление обложки книги
+            var pictureObloshka = _context.Pictures.Find(book.IdPicture);
+            if (pictureObloshka != null)
+            {
+                _context.Pictures.Remove(pictureObloshka);
+            }
 
-            //Удаление всех изображений
-
+            // Сохранить изменения в базе данных
+            await _context.SaveChangesAsync();
 
 
             // Удаление книги
@@ -160,6 +229,7 @@ namespace WebAPI.Controllers
 
             return Ok(book);
         }
+
 
     }
 }

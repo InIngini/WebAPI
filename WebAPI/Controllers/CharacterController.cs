@@ -258,8 +258,45 @@ namespace WebAPI.Controllers
                 _context.Galleries.Remove(item);
             }
 
+            var pictureAvatar = _context.Pictures.Find(character.IdPicture);
+            if (pictureAvatar != null)
+            {
+                _context.Pictures.Remove(pictureAvatar);
+            }
+
             // Сохранить изменения в базе данных
             await _context.SaveChangesAsync();
+
+
+
+            // Удаление связи
+            // Получение всех связей, связанных с указанным персонажем
+            var connections = _context.Connections.Where(c => c.IdCharacter1 == character.IdCharacter || c.IdCharacter2 == character.IdCharacter);
+
+            // Удаление всех связей, связанных с указанным персонажем
+            _context.Connections.RemoveRange(connections);
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
+
+            // Удаление событий
+            // Получение всех событий, в которых участвует указанный персонаж
+            var events = _context.Events.Where(e => e.IdCharacters.Contains(character));
+
+            // Для каждого события проверяем, участвуют ли в нем еще какие-либо персонажи
+            foreach (var e in events)
+            {
+                if (e.IdCharacters.Count() <= 1)
+                {
+                    // Если в событии участвует только указанный персонаж, удаляем его
+                    _context.Events.Remove(e);
+                }
+            }
+
+            // Сохранение изменений в базе данных
+            await _context.SaveChangesAsync();
+
 
 
             // Удаление персонажа

@@ -15,8 +15,8 @@ namespace DB
         public Context() 
         {
             //Database.EnsureDeleted();
-            //Database.EnsureCreated();
-            Database.Migrate();
+            Database.EnsureCreated();
+            //Database.Migrate();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

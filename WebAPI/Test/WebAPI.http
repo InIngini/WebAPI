@@ -1,9 +1,5 @@
 @WebAPI_HostAddress = http://localhost:5153
 
-GET {{WebAPI_HostAddress}}/user/
-Accept: application/json
-
-###
 # для юзера
 # создание юзера
 POST {{WebAPI_HostAddress}}/user/register
@@ -13,6 +9,10 @@ Content-Type: application/json
   "login": "username", 
   "password": "password" 
 }
+
+###
+GET {{WebAPI_HostAddress}}/user/1
+Accept: application/json
 
 ###
 # авторизация юзера
@@ -35,6 +35,9 @@ Content-Type: application/json
 }
 
 ###
+GET {{WebAPI_HostAddress}}/Book/1
+Accept: application/json
+###
 # изменение книги (1 - id книги)
 PUT {{WebAPI_HostAddress}}/Book/1
 Content-Type: application/json
@@ -54,12 +57,12 @@ POST {{WebAPI_HostAddress}}/Character
 Content-Type: application/json
 
 {
-    "IdBook": 3
+    "IdBook": 1
 
 }
 ###
 # изменение персонажа и блоков
-PUT {{WebAPI_HostAddress}}/Character/3
+PUT {{WebAPI_HostAddress}}/Character/1
 Content-Type: application/json
 
 {
@@ -97,7 +100,7 @@ Content-Type: application/json
 }
 ###
 # удаление персонажа, блоков и добавленных атрибутов
-DELETE {{WebAPI_HostAddress}}/Character/1
+DELETE {{WebAPI_HostAddress}}/Character/3
 
 ###
 # для атрибутов
@@ -126,7 +129,7 @@ POST {{WebAPI_HostAddress}}/Scheme
 Content-Type: application/json
 
 {
-    "IdBook": "3",
+    "IdBook": "1",
     "NameScheme": "Новое имя"
 }
 ###
@@ -135,20 +138,20 @@ POST {{WebAPI_HostAddress}}/Connection
 Content-Type: application/json
 
 {
-    "IdBook": "3",
-    "IdCharacter1": "3",
-    "IdCharacter2": "4",
+    "IdBook": "1",
+    "IdCharacter1": "1",
+    "IdCharacter2": "2",
     "TypeConnection": "1"
 }
 ###
 # добавление связи
-PUT {{WebAPI_HostAddress}}/Scheme/5
+PUT {{WebAPI_HostAddress}}/Scheme/2
 Content-Type: application/json
 
-"5"
+"2"
 ###
 # удаление атрибута
-DELETE {{WebAPI_HostAddress}}/Scheme/5
+DELETE {{WebAPI_HostAddress}}/Scheme/2
 
 ###
 # для таймлайна и событий
@@ -157,7 +160,7 @@ POST {{WebAPI_HostAddress}}/Timeline
 Content-Type: application/json
 
 {
-    "IdBook": "3",
+    "IdBook": "1",
     "NameTimeline": "Новое имя"
 }
 ###
@@ -166,11 +169,11 @@ POST {{WebAPI_HostAddress}}/Event
 Content-Type: application/json
 
 {
-    "IdBook": "3",
+    "IdBook": "1",
     "Name": "Новое имя",
     "Content": "Какой-то контент",
     "Time": "10.06.2024-20.06.2024",
-    "IdCharacter": [3,4]
+    "IdCharacter": [1,2]
 }
 ###
 # создание события
@@ -181,17 +184,17 @@ Content-Type: application/json
     "Name": "Новое имя",
     "Content": "Какой-то",
     "Time": "10.06.2024-20.06.2024",
-    "IdCharacter": [3]
+    "IdCharacter": [2]
 }
 ###
 # добавление события в таймлайн
-PUT {{WebAPI_HostAddress}}/Timeline/4
+PUT {{WebAPI_HostAddress}}/Timeline/2
 Content-Type: application/json
 
 "1"
 ###
 # удаление таймлайна
-DELETE {{WebAPI_HostAddress}}/Timeline/3
+DELETE {{WebAPI_HostAddress}}/Timeline/2
 
 ###
 # для изображений и галереи
@@ -209,9 +212,8 @@ POST {{WebAPI_HostAddress}}/Gallery
 Content-Type: application/json
 
 {
-    "IdCharacter": "3",
-    "IdPicture": "2",
-
+    "IdCharacter": "1",
+    "IdPicture": "1"
 }
 ###
 # удаление таймлайна
