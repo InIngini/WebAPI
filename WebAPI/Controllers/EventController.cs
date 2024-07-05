@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/Timeline/[controller]")]
     public class EventController : Controller
     {
         private readonly Context _context;
@@ -156,14 +156,47 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-
+            var @event = await _context.Events
+                .Where(c => c.IdEvent == id)
+                .Select(c => new
+                {
+                    c.Name,
+                    c.Time,
+                    c.Content,
+                    Characters = c.IdCharacters.Select(a => new
+                    {
+                        a.IdPicture,
+                        a.IdCharacter,
+                        a.Block1.Name
+                    }),
+                })
+                .FirstOrDefaultAsync();
             if (@event == null)
             {
                 return NotFound();
             }
 
             return Ok(@event);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllEvent([FromBody] int id)
+        {
+            var @events = await _context.Events
+                .Where(c => c.IdTimelines.Any(s => s.IdTimeline == id))
+                .Select(c => new
+                {
+                    c.IdEvent,
+                    c.Name,
+                    c.Time
+                })
+                .ToListAsync();
+
+            if (@events == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(@events);
         }
     }
 }

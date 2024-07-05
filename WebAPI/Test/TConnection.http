@@ -1,0 +1,20 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для связи
+# создание связи
+POST {{WebAPI_HostAddress}}/User/Book/Scheme/Connection
+Content-Type: application/json
+
+{
+    "IdBook": "1",
+    "IdCharacter1": "1",
+    "IdCharacter2": "5",
+    "TypeConnection": "2"
+}
+
+###
+GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/all
+Content-Type: application/json
+
+"1"

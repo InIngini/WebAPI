@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/[controller]")]
     public class CharacterController : Controller
     {
         private readonly Context _context;
@@ -307,13 +308,71 @@ namespace WebAPI.Controllers
             // Возврат подтверждения удаления
             return NoContent();
         }
-        
+
 
         //Получить персонажа
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCharacter(int id)
         {
-            var character = await _context.Characters.FindAsync(id);
+            var character = await _context.Characters
+                .Where(c => c.IdCharacter == id)
+                .Select(c => new
+                {
+                    NameCharacter = c.Block1.Name,
+                    IdPicture = c.IdPicture,
+                    Block1 = new
+                    {
+                        c.Block1.Name,
+                        c.Block1.Question1,
+                        c.Block1.Question2,
+                        c.Block1.Question3,
+                        c.Block1.Question4,
+                        c.Block1.Question5,
+                        c.Block1.Question6
+                    },
+                    Block2 = new
+                    {
+                        c.Block2.Question1,
+                        c.Block2.Question2,
+                        c.Block2.Question3,
+                        c.Block2.Question4,
+                        c.Block2.Question5,
+                        c.Block2.Question6,
+                        c.Block2.Question7,
+                        c.Block2.Question8,
+                        c.Block2.Question9
+                    },
+                    Block3 = new
+                    {
+                        c.Block3.Question1,
+                        c.Block3.Question2,
+                        c.Block3.Question3,
+                        c.Block3.Question4,
+                        c.Block3.Question5,
+                        c.Block3.Question6,
+                        c.Block3.Question7,
+                        c.Block3.Question8,
+                        c.Block3.Question9,
+                        c.Block3.Question10
+                    },
+                    Block4 = new
+                    {
+                        c.Block4.Question1,
+                        c.Block4.Question2,
+                        c.Block4.Question3,
+                        c.Block4.Question4,
+                        c.Block4.Question5
+                    },
+                    Attributes = c.AddedAttributes.Select(a => new
+                    {
+                        a.IdAttribute,
+                        a.NumberBlock,
+                        a.NameAttribute,
+                        a.ContentAttribute
+                    }),
+
+                })
+                .FirstOrDefaultAsync();
 
             if (character == null)
             {
@@ -323,6 +382,23 @@ namespace WebAPI.Controllers
             return Ok(character);
         }
 
+        //Получить всех персонажей
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllCharacter([FromBody] int id)
+        {
+
+            var characters = _context.Characters
+                .Where(c => c.IdBook == id)
+                .Select(c => new
+                {
+                    c.IdCharacter,
+                    NameCharacter = c.Block1.Name,
+                    IdPicture = c.IdPicture
+                })
+                .AsEnumerable();
+
+            return Ok(characters);
+        }
 
         ////////////////////////////Для добавленного атрибута//////////////////////////////
         /////Создать атрибут
@@ -398,7 +474,7 @@ namespace WebAPI.Controllers
             return NoContent();
         }
         //Получить атрибут
-        [HttpGet("{id}")]
+        [HttpGet("addedattribute/{id}")]
         public async Task<IActionResult> GetAddedAttribute(int id)
         {
             var addedAttribute = await _context.AddedAttributes.FindAsync(id);

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/Character/[controller]")]
     public class GalleryController : Controller
     {
         private readonly Context _context;
@@ -85,6 +85,26 @@ namespace WebAPI.Controllers
             }
 
             return Ok(galery);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllGallery([FromBody] int id)
+        {
+            var gallery = _context.Galleries
+                .Where(g => g.IdCharacter == id)
+                .Select(g => new
+                {
+                    g.IdCharacter,
+                    g.IdPicture,
+                    g.IdPictureNavigation.Picture1
+                })
+                .AsEnumerable();
+
+            if (gallery == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(gallery);
         }
     }
 }

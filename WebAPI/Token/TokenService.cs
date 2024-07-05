@@ -18,8 +18,8 @@ namespace WebAPI.Token
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, user.Login),
-            // Добавьте другие необходимые утверждения
+                new Claim(ClaimTypes.Name, user.Login),
+                // Добавьте другие необходимые утверждения
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]));

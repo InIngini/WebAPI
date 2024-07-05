@@ -1,0 +1,20 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для галереи
+# добавление изображения в галерею 
+POST {{WebAPI_HostAddress}}/User/Book/Gallery
+Content-Type: application/json
+
+{
+    "IdCharacter": "1",
+    "IdPicture": "1"
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Character/Gallery/all
+Content-Type: application/json
+
+"1"
+###
+# удаление галереии
+DELETE {{WebAPI_HostAddress}}/User/Book/Gallery/1

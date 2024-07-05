@@ -1,0 +1,26 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для схемы
+# создание схемы (подсхемы получается)
+POST {{WebAPI_HostAddress}}/User/Book/Scheme
+Content-Type: application/json
+
+{
+    "IdBook": "1",
+    "NameScheme": "Новое имя"
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Scheme/all
+Content-Type: application/json
+
+"1"
+###
+# изменение связи
+PUT {{WebAPI_HostAddress}}/User/Book/Scheme/2
+Content-Type: application/json
+
+"2"
+###
+# удаление схемы
+DELETE {{WebAPI_HostAddress}}/User/Book/Scheme/2

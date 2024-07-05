@@ -1,0 +1,82 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для персонажа и блоков
+# создание персонажа и блоков
+POST {{WebAPI_HostAddress}}/User/Book/Character
+Content-Type: application/json
+
+{
+    "IdBook": 1
+
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Character/all
+Content-Type: application/json
+
+"1"
+###
+GET {{WebAPI_HostAddress}}/User/Book/Character/1
+Accept: application/json
+
+###
+# изменение персонажа и блоков
+PUT {{WebAPI_HostAddress}}/User/Book/Character/1
+Content-Type: application/json
+
+{
+    "Name": "Обновленное имя персонажа",
+    "Block1Question1": "Обновленный вопрос 1",
+    "Block1Question2": "Обновленный вопрос 2",
+    "Block1Question3": "Обновленный вопрос 3",
+    "Block1Question4": "Обновленный вопрос 4",
+    "Block1Question5": "Обновленный вопрос 5",
+    "Block1Question6": "Обновленный вопрос 6",
+    "Block2Question1": "Обновленный вопрос 7",
+    "Block2Question2": "Обновленный вопрос 8",
+    "Block2Question3": "Обновленный вопрос 9",
+    "Block2Question4": "Обновленный вопрос 10",
+    "Block2Question5": "Обновленный вопрос 11",
+    "Block2Question6": "Обновленный вопрос 12",
+    "Block2Question7": "Обновленный вопрос 13",
+    "Block2Question8": "Обновленный вопрос 14",
+    "Block2Question9": "Обновленный вопрос 15",
+    "Block3Question1": "Обновленный вопрос 16",
+    "Block3Question2": "Обновленный вопрос 17",
+    "Block3Question3": "Обновленный вопрос 18",
+    "Block3Question4": "Обновленный вопрос 19",
+    "Block3Question5": "Обновленный вопрос 20",
+    "Block3Question6": "Обновленный вопрос 21",
+    "Block3Question7": "Обновленный вопрос 22",
+    "Block3Question8": "Обновленный вопрос 23",
+    "Block3Question9": "Обновленный вопрос 24",
+    "Block3Question10": "Обновленный вопрос 25",
+    "Block4Question1": "Обновленный вопрос 26",
+    "Block4Question2": "Обновленный вопрос 27",
+    "Block4Question3": "Обновленный вопрос 28",
+    "Block4Question4": "Обновленный вопрос 29",
+    "Block4Question5": "Обновленный вопрос 30"
+}
+###
+# удаление персонажа, блоков и добавленных атрибутов
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/3
+
+###
+# для атрибутов
+# создание атрибута
+POST {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute
+Content-Type: application/json
+
+{
+    "NumberBlock": "1",
+    "NameAttribute": "Новое имя"
+}
+###
+# изменение атрибута
+PUT {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
+Content-Type: application/json
+
+"Содержимое"
+###
+# удаление атрибута
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1

@@ -1,0 +1,26 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для таймлайна
+# создание подтаймлайна
+POST {{WebAPI_HostAddress}}/User/Book/Timeline
+Content-Type: application/json
+
+{
+    "IdBook": "1",
+    "NameTimeline": "Новое имя"
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/all
+Content-Type: application/json
+
+"1"
+###
+# добавление события в таймлайн
+PUT {{WebAPI_HostAddress}}/User/Book/Timeline/2
+Content-Type: application/json
+
+"1"
+###
+# удаление таймлайна
+DELETE {{WebAPI_HostAddress}}/User/Book/Timeline/2

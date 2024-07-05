@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/Scheme/[controller]")]
     public class ConnectionController : Controller
     {
         private readonly Context _context;
@@ -97,11 +97,22 @@ namespace WebAPI.Controllers
             // Возврат подтверждения удаления
             return NoContent();
         }
-        //Получить схему
+        //Получить связь
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConnection(int id)
         {
-            var connection = await _context.Connections.FindAsync(id);
+            var connection = await _context.Connections
+                .Where(c => c.IdConnection == id)
+                .Select(c => new
+                {
+                    c.TypeConnection,
+                    c.IdCharacter1,
+                    Character1 = c.IdCharacter1Navigation.Block1.Name,
+                    c.IdCharacter2,
+                    Character2 = c.IdCharacter2Navigation.Block1.Name,
+
+                })
+                .FirstOrDefaultAsync();
 
             if (connection == null)
             {
@@ -109,6 +120,29 @@ namespace WebAPI.Controllers
             }
 
             return Ok(connection);
+        }
+        //Получить все связи схемы
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllConnection([FromBody] int id)
+        {
+            var connections = await _context.Connections
+                .Where(c => c.IdSchemes.Any(s => s.IdScheme == id))
+                .Select(c => new
+                {
+                    c.TypeConnection,
+                    c.IdCharacter1,
+                    Character1 = c.IdCharacter1Navigation.Block1.Name,
+                    c.IdCharacter2,
+                    Character2 = c.IdCharacter2Navigation.Block1.Name,
+                })
+                .ToListAsync();
+
+            if (connections == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(connections);
         }
 
     }

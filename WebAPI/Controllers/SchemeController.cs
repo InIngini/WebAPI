@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/[controller]")]
     public class SchemeController : Controller
     {
         private readonly Context _context;
@@ -106,7 +107,14 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetScheme(int id)
         {
-            var scheme = await _context.Schemes.FindAsync(id);
+            var scheme = await _context.Schemes
+                .Where(c => c.IdScheme == id)
+                .Select(c => new
+                {
+                    c.IdScheme,
+                    c.NameScheme,
+                })
+                .FirstOrDefaultAsync();
 
             if (scheme == null)
             {
@@ -114,6 +122,27 @@ namespace WebAPI.Controllers
             }
 
             return Ok(scheme);
+        }
+
+        //Получить список схем
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllScheme([FromBody] int id)
+        {
+            var schemes = await _context.Schemes
+                .Where(c => c.IdBook == id)
+                .Select(c => new
+                {
+                    c.IdScheme,
+                    c.NameScheme
+                })
+                .ToListAsync();
+
+            if (schemes == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(schemes);
         }
     }
 }

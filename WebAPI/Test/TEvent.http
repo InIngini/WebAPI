@@ -1,0 +1,35 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для события
+# создание события
+POST {{WebAPI_HostAddress}}/User/Book/Timeline/Event
+Content-Type: application/json
+
+{
+    "IdBook": "1",
+    "Name": "Новое имя",
+    "Content": "Какой-то контент",
+    "Time": "10.06.2024-20.06.2024",
+    "IdCharacter": [1,2]
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/all
+Content-Type: application/json
+
+"1"
+###
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+Accept: application/json
+
+###
+# изменение события
+PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+Content-Type: application/json
+
+{
+    "Name": "Новое имя",
+    "Content": "Какой-то",
+    "Time": "10.06.2024-20.06.2024",
+    "IdCharacter": [2]
+}

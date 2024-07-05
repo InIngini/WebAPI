@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using WebAPI.Token;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/[controller]")]
     public class BookController : Controller
     {
         private readonly Context _context;
+        private readonly ITokenValidator _tokenValidator;
 
-        public BookController(Context context)
+        public BookController(Context context, ITokenValidator tokenValidator)
         {
             _context = context;
+            _tokenValidator = tokenValidator;
         }
         //Создание книги
         [HttpPost]
@@ -230,6 +234,34 @@ namespace WebAPI.Controllers
             return Ok(book);
         }
 
+        //Получить книгу
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllBook([FromBody] string token)
+        {
+            var userId = _tokenValidator.ValidateToken(token);
 
+            if (userId > 0)
+            {
+                var user = await _context.Books.FindAsync(userId);
+
+                var userBooks = await _context.BelongToBooks
+                    .Where(b => b.IdUser == userId)
+                    .Select(b => b.IdBookNavigation)
+                    .ToListAsync();
+
+                var bookDtos = userBooks.Select(b => new
+                {
+                    IdBook = b.IdBook,
+                    NameBook = b.NameBook,
+                    IdPicture = b.IdPicture
+                }).ToList();
+
+                return Ok(bookDtos);
+            }
+            else
+            {
+                return Unauthorized("Invalid token");
+            }
+        }
     }
 }

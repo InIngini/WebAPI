@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/[controller]")]
     public class PictureController : Controller
     {
         private readonly Context _context;

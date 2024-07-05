@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("User/Book/[controller]")]
     public class TimelineController : Controller
     {
         private readonly Context _context;
@@ -104,7 +105,14 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTimeline(int id)
         {
-            var timeline = await _context.Timelines.FindAsync(id);
+            var timeline = await _context.Timelines
+                .Where(c => c.IdBook == id)
+                .Select(c => new
+                {
+                    c.IdTimeline,
+                    c.NameTimeline
+                })
+                .FirstOrDefaultAsync();
 
             if (timeline == null)
             {
@@ -112,6 +120,25 @@ namespace WebAPI.Controllers
             }
 
             return Ok(timeline);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllTimeline([FromBody] int id)
+        {
+            var timelines = _context.Timelines
+                .Where(c => c.IdBook == id)
+                .Select(c => new
+                {
+                    c.IdTimeline,
+                    c.NameTimeline
+                })
+                .AsEnumerable();
+
+            if (timelines == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(timelines);
         }
     }
 }

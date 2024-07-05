@@ -23,25 +23,14 @@ namespace WebAPI
         public static string connectionString;
         public static void Main(string[] args)
         {
+            // Получаем путь до файла бд
             var dataDirectory = Path.GetDirectoryName(Directory.GetCurrentDirectory());
             var databasePath = Path.Combine(dataDirectory, "DB\\bin\\Debug\\net8.0\\DB\\DB.mdf");
 
             connectionString = $@"Data Source=(localdb)\MSSQLLocalDB;AttachDbFileName={databasePath};Integrated Security=True;";
             
-            using (var connection = new SqlConnection(connectionString))
-            {
-                // Открыть соединение
-                connection.Open();
-
-                // Выполнить команды SQL
-                // ...
-
-                // Закрыть соединение
-                connection.Close();
-            }
-
             
-
+            // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
             // Регистрация контекста базы данных
@@ -67,8 +56,10 @@ namespace WebAPI
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
                     };
                 });
-            // Регистрация ITokenService
+            // Регистрация ITokenService и ITokenValidator
             builder.Services.AddTransient<ITokenService, TokenService>();
+            builder.Services.AddScoped<ITokenValidator, TokenValidator>();
+
 
             // Добавление авторизации
             builder.Services.AddAuthorization();
