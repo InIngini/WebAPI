@@ -3,19 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.BLL.DTO;
+using WebAPI.BLL.Interfaces;
+using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("User/Book/[controller]")]
-    public class TimelineController : Controller
+    public class TimelineController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly ITimelineService _timelineService;
 
-        public TimelineController(Context context)
+        public TimelineController(ITimelineService timelineService)
         {
-            _context = context;
+            _timelineService = timelineService;
         }
+
         //Создание схемы
         [HttpPost]
         public async Task<IActionResult> CreateTimeline([FromBody] TimelineData timelinedata)
@@ -31,63 +35,18 @@ namespace WebAPI.Controllers
                 NameTimeline = timelinedata.NameTimeline,
             };
             // Сохранение схемы в базе данных
-            _context.Timelines.Add(timeline);
-            await _context.SaveChangesAsync();
+            var createdTimeline = await _timelineService.CreateTimeline(timeline);
 
             // Возврат созданной схемы
-            return CreatedAtAction(nameof(GetTimeline), new { id = timeline.IdTimeline }, timeline);
-
-        }
-        //вспомогательный тип
-        public class TimelineData
-        {
-            public int IdBook { get; set; }
-            public string NameTimeline { get; set; }
+            return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.IdTimeline }, createdTimeline);
         }
 
         //Добавление связей в схему
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent)
         {
-            // Получение книги из базы данных
-            var timeline = await _context.Timelines.FindAsync(id);
-
-            // Если книга не найдена, вернуть ошибку
-            if (timeline == null)
-            {
-                return NotFound();
-            }
-
-            // Поиск соединения по указанному идентификатору
-            var @event = await _context.Events.FindAsync(idEvent);
-
-            // Если соединение не найдено, вернуть ошибку
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            // Добавление соединения в схему
-            timeline.IdEvents.Add(@event);
-
-            await _context.SaveChangesAsync();
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-
-            string json = JsonSerializer.Serialize(timeline, options);
-
-            // Возврат обновленной книги
-            return Ok(json);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTimeline(int id)
-        {
             // Получение таймлайна из базы данных
-            var timeline = await _context.Timelines.FindAsync(id);
+            var timeline = await _timelineService.GetTimeline(id);
 
             // Если таймлайн не найден, вернуть ошибку
             if (timeline == null)
@@ -95,9 +54,46 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Удаление таймлайна
-            _context.Timelines.Remove(timeline);
-            await _context.SaveChangesAsync();
+            // Поиск события по указанному идентификатору
+            var @event = _unitOfWork.Events.FindAsync(idEvent);
+
+            // Если событие не найдено, вернуть ошибку
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            // Добавление события в таймлайн
+            timeline.IdEvents.Add(@event);
+
+            // Обновление таймлайна в базе данных
+            var updatedTimeline = await _timelineService.UpdateTimeline(timeline);
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            string json = JsonSerializer.Serialize(updatedTimeline, options);
+
+            // Возврат обновленного таймлайна
+            return Ok(json);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTimeline(int id)
+        {
+            // Получение таймлайна из базы данных
+            var timeline = await _timelineService.GetTimeline(id);
+
+            // Если таймлайн не найден, вернуть ошибку
+            if (timeline == null)
+            {
+                return NotFound();
+            }
+
+            // Удаление таймлайна из базы данных
+            await _timelineService.DeleteTimeline(id);
 
             // Возврат подтверждения удаления
             return NoContent();
@@ -105,14 +101,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTimeline(int id)
         {
-            var timeline = await _context.Timelines
-                .Where(c => c.IdBook == id)
-                .Select(c => new
-                {
-                    c.IdTimeline,
-                    c.NameTimeline
-                })
-                .FirstOrDefaultAsync();
+            var timeline = await _timelineService.GetTimeline(id);
 
             if (timeline == null)
             {
@@ -124,14 +113,7 @@ namespace WebAPI.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllTimeline([FromBody] int id)
         {
-            var timelines = _context.Timelines
-                .Where(c => c.IdBook == id)
-                .Select(c => new
-                {
-                    c.IdTimeline,
-                    c.NameTimeline
-                })
-                .AsEnumerable();
+            var timelines = await _timelineService.GetAllTimelines(id);
 
             if (timelines == null)
             {
@@ -142,3 +124,4 @@ namespace WebAPI.Controllers
         }
     }
 }
+

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using WebAPI.BLL.DTO;
+using WebAPI.BLL.Interfaces;
+using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
@@ -10,12 +13,13 @@ namespace WebAPI.Controllers
     [Route("User/Book/Timeline/[controller]")]
     public class EventController : Controller
     {
-        private readonly Context _context;
+        private readonly IEventService _eventService;
 
-        public EventController(Context context)
+        public EventController(IEventService eventService)
         {
-            _context = context;
+            _eventService = eventService;
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateEvent([FromBody] EventData eventData)
         {
@@ -25,7 +29,7 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
             Event @event = new Event()
-            { 
+            {
                 Name = eventData.Name,
                 Content = eventData.Content,
                 Time = eventData.Time,
@@ -43,14 +47,13 @@ namespace WebAPI.Controllers
                 }
             }
             // Сохранение связи в базе данных
-            _context.Events.Add(@event);
-            await _context.SaveChangesAsync();
+            var createdEvent = await _eventService.CreateEvent(@event);
 
             var timeline = await _context.Timelines
                 .Where(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
                 .FirstOrDefaultAsync();
             // Добавление связи в главную схему
-            timeline.IdEvents.Add(@event);
+            timeline.IdEvents.Add(createdEvent);
 
             await _context.SaveChangesAsync();
 
@@ -60,23 +63,16 @@ namespace WebAPI.Controllers
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 
-            string json = JsonSerializer.Serialize(@event, options);
+            string json = JsonSerializer.Serialize(createdEvent, options);
             // Возврат созданной связи
-            return CreatedAtAction(nameof(GetEvent), new { id = @event.IdEvent }, json);
+            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.IdEvent }, json);
         }
-        public class EventData
-        {
-            public int? IdBook { get; set; }
-            public string Name { get; set; }
-            public string Content { get; set; }
-            public string Time { get; set; }
-            public int[]? IdCharacter {  get; set; }
-        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
         {
             // Получение события из базы данных
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await _eventService.GetEvent(id);
 
             // Если событие не найдено, вернуть ошибку
             if (@event == null)
@@ -107,22 +103,23 @@ namespace WebAPI.Controllers
                 }
             }
 
-            await _context.SaveChangesAsync();
+            var updatedEvent = await _eventService.UpdateEvent(@event);
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 
-            string json = JsonSerializer.Serialize(@event, options);
+            string json = JsonSerializer.Serialize(updatedEvent, options);
             // Возврат обновленного события
             return Ok(json);
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             // Получение события из базы данных
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await _eventService.GetEvent(id);
 
             // Если событие не найдено, вернуть ошибку
             if (@event == null)
@@ -130,47 +127,17 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Получение всех схем
-            var timelines = await _context.Timelines.ToListAsync();
-
-            // Удаление `IdConnection` удаляемой связи из схем
-            foreach (var timeline in timelines)
-            {
-                var @event1 = timeline.IdEvents.FirstOrDefault(c => c.IdEvent == id);
-                if (@event1 != null)
-                {
-                    timeline.IdEvents.Remove(@event1);
-                }
-            }
-
-            // Сохранение изменений в базе данных
-            await _context.SaveChangesAsync();
-
-            // Удаление события
-            _context.Events.Remove(@event);
-            await _context.SaveChangesAsync();
+            await _eventService.DeleteEvent(id);
 
             // Возврат подтверждения удаления
             return NoContent();
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEvent(int id)
         {
-            var @event = await _context.Events
-                .Where(c => c.IdEvent == id)
-                .Select(c => new
-                {
-                    c.Name,
-                    c.Time,
-                    c.Content,
-                    Characters = c.IdCharacters.Select(a => new
-                    {
-                        a.IdPicture,
-                        a.IdCharacter,
-                        a.Block1.Name
-                    }),
-                })
-                .FirstOrDefaultAsync();
+            var @event = await _eventService.GetEvent(id);
+
             if (@event == null)
             {
                 return NotFound();
@@ -178,25 +145,18 @@ namespace WebAPI.Controllers
 
             return Ok(@event);
         }
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllEvent([FromBody] int id)
-        {
-            var @events = await _context.Events
-                .Where(c => c.IdTimelines.Any(s => s.IdTimeline == id))
-                .Select(c => new
-                {
-                    c.IdEvent,
-                    c.Name,
-                    c.Time
-                })
-                .ToListAsync();
 
-            if (@events == null)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllEvents()
+        {
+            var events = await _eventService.GetAllEvents();
+
+            if (events == null)
             {
                 return NotFound();
             }
 
-            return Ok(@events);
+            return Ok(events);
         }
     }
 }

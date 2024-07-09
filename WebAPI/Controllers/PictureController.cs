@@ -1,18 +1,23 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.BLL.Interfaces;
+using WebAPI.BLL.DTO;
+using WebAPI.BLL.Interfaces;
+using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("User/[controller]")]
-    public class PictureController : Controller
+    public class PictureController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly IPictureService _pictureService;
 
-        public PictureController(Context context)
+        public PictureController(IPictureService pictureService)
         {
-            _context = context;
+            _pictureService = pictureService;
         }
+
         [HttpPost]
         public async Task<IActionResult> CreatePicture([FromBody] Picture picture)
         {
@@ -23,17 +28,17 @@ namespace WebAPI.Controllers
             }
 
             // Сохранение картинки в базе данных
-            _context.Pictures.Add(picture);
-            await _context.SaveChangesAsync();
+            var createdPicture = await _pictureService.CreatePicture(picture);
 
             // Возврат созданной картинки
-            return CreatedAtAction(nameof(GetPicture), new { id = picture.IdPicture }, picture);
+            return CreatedAtAction(nameof(GetPicture), new { id = createdPicture.IdPicture }, createdPicture);
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id)
         {
             // Получение картинки из базы данных
-            var picture = await _context.Pictures.FindAsync(id);
+            var picture = await _pictureService.GetPicture(id);
 
             // Если картинка не найдена, вернуть ошибку
             if (picture == null)
@@ -42,18 +47,16 @@ namespace WebAPI.Controllers
             }
 
             // Удаление картинки
-            _context.Pictures.Remove(picture);
-            await _context.SaveChangesAsync();
-
-
+            await _pictureService.DeletePicture(id);
 
             // Возврат подтверждения удаления
             return NoContent();
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPicture(int id)
         {
-            var picture = await _context.Pictures.FindAsync(id);
+            var picture = await _pictureService.GetPicture(id);
 
             if (picture == null)
             {
@@ -63,4 +66,5 @@ namespace WebAPI.Controllers
             return Ok(picture);
         }
     }
+
 }

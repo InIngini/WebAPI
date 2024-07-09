@@ -10,7 +10,7 @@ using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System.Text;
-using WebAPI.Token;
+using WebAPI.BLL.Token;
 
 namespace WebAPI
 {

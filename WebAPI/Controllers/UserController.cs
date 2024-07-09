@@ -4,8 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using WebAPI.Token;
+using WebAPI.BLL.Token;
 using WebAPI;
+using WebAPI.BLL.DTO;
+using WebAPI.BLL.Interfaces;
+using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
@@ -15,73 +18,42 @@ namespace WebAPI.Controllers
     //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
     public class UserController : ControllerBase
     {
-        //private readonly ILogger<UserController> _logger;
+        private readonly IUserService _userService;
 
-        //public UserController(ILogger<UserController> logger)
-        //{
-        //    _logger = logger;
-        //}
-        private readonly Context _context;
-        private readonly ITokenService _tokenService;
-
-        public UserController(Context context, ITokenService tokenService)
+        public UserController(IUserService userService)
         {
-            _context = context;
-            _tokenService = tokenService;
+            _userService = userService;
         }
 
         //Создание пользователя
         [HttpPost("register")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var createdUser = await _userService.CreateUser(user);
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.IdUser }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.IdUser }, user);
         }
 
         //Авторизация пользователя
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginData loginData)
         {
-            // ваш код
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == loginData.Login && u.Password == loginData.Password);
+            var user = await _userService.Login(loginData);
 
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var token = _tokenService.CreateToken(user);
+            var token = user.Token;
 
             return Ok(new { token });
-        }
-
-        //Небольшой тип для логина и пароля
-        public class LoginData
-        {
-            public string Login { get; set; }
-            public string Password { get; set; }
         }
 
         //Получить пользователя
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var user = await _userService.GetUser(id);
 
             return Ok(user);
         }
 
     }
 }
+

@@ -3,19 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.BLL.DTO;
+using WebAPI.BLL.Interfaces;
+using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("User/Book/[controller]")]
-    public class SchemeController : Controller
+    public class SchemeController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly ISchemeService _schemeService;
 
-        public SchemeController(Context context)
+        public SchemeController(ISchemeService schemeService)
         {
-            _context = context;
+            _schemeService = schemeService;
         }
+
         //Создание схемы
         [HttpPost]
         public async Task<IActionResult> CreateScheme([FromBody] SchemeData schemedata)
@@ -31,34 +35,28 @@ namespace WebAPI.Controllers
                 NameScheme = schemedata.NameScheme,
             };
             // Сохранение схемы в базе данных
-            _context.Schemes.Add(scheme);
-            await _context.SaveChangesAsync();
+            var createdScheme = await _schemeService.CreateScheme(scheme);
 
             // Возврат созданной схемы
-            return CreatedAtAction(nameof(GetScheme), new { id = scheme.IdScheme }, scheme);
+            return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.IdScheme }, createdScheme);
 
         }
-        //вспомогательный тип
-        public class SchemeData
-        {
-            public int IdBook { get; set; }
-            public string NameScheme { get; set; }
-        }
+
         //Добавление связей в схему
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] int idConnection)
+        public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection)
         {
-            // Получение книги из базы данных
-            var scheme = await _context.Schemes.FindAsync(id);
+            // Получение схемы из базы данных
+            var scheme = await _schemeService.GetScheme(id);
 
-            // Если книга не найдена, вернуть ошибку
+            // Если схема не найдена, вернуть ошибку
             if (scheme == null)
             {
                 return NotFound();
             }
 
             // Поиск соединения по указанному идентификатору
-            var connection = await _context.Connections.FindAsync(idConnection);
+            var connection = _unitOfWork.Connections.FindAsync(idConnection);
 
             // Если соединение не найдено, вернуть ошибку
             if (connection == null)
@@ -68,26 +66,25 @@ namespace WebAPI.Controllers
 
             // Добавление соединения в схему
             scheme.IdConnections.Add(connection);
-
-            await _context.SaveChangesAsync();
+            // Обновление схемы в базе данных
+            var updatedScheme = await _schemeService.UpdateScheme(scheme);
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 
-            string json = JsonSerializer.Serialize(scheme, options);
+            string json = JsonSerializer.Serialize(updatedScheme, options);
 
-            // Возврат обновленной книги
+            // Возврат обновленной схемы
             return Ok(json);
         }
 
-        //Удаление схемы
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteScheme(int id)
         {
             // Получение схемы из базы данных
-            var scheme = await _context.Schemes.FindAsync(id);
+            var scheme = await _schemeService.GetScheme(id);
 
             // Если схема не найдена, вернуть ошибку
             if (scheme == null)
@@ -95,26 +92,16 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Удаление схемы
-            _context.Schemes.Remove(scheme);
-            await _context.SaveChangesAsync();
+            // Удаление схемы из базы данных
+            await _schemeService.DeleteScheme(id);
 
             // Возврат подтверждения удаления
             return NoContent();
         }
-
-        //Получить схему
         [HttpGet("{id}")]
         public async Task<IActionResult> GetScheme(int id)
         {
-            var scheme = await _context.Schemes
-                .Where(c => c.IdScheme == id)
-                .Select(c => new
-                {
-                    c.IdScheme,
-                    c.NameScheme,
-                })
-                .FirstOrDefaultAsync();
+            var scheme = await _schemeService.GetScheme(id);
 
             if (scheme == null)
             {
@@ -123,19 +110,10 @@ namespace WebAPI.Controllers
 
             return Ok(scheme);
         }
-
-        //Получить список схем
         [HttpGet("all")]
         public async Task<IActionResult> GetAllScheme([FromBody] int id)
         {
-            var schemes = await _context.Schemes
-                .Where(c => c.IdBook == id)
-                .Select(c => new
-                {
-                    c.IdScheme,
-                    c.NameScheme
-                })
-                .ToListAsync();
+            var schemes = await _schemeService.GetAllSchemes(id);
 
             if (schemes == null)
             {
@@ -146,3 +124,4 @@ namespace WebAPI.Controllers
         }
     }
 }
+
