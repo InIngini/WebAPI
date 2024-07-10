@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -22,8 +23,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<Timeline> CreateTimeline(Timeline timeline)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(timeline);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(timeline, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -34,8 +37,20 @@ namespace WebAPI.BLL.Services
             return timeline;
         }
 
-        public async Task<Timeline> UpdateTimeline(Timeline timeline)
+        public async Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent)
         {
+            // Поиск события по указанному идентификатору
+            var @event = _unitOfWork.Events.Get(idEvent);
+
+            // Если событие не найдено, вернуть ошибку
+            if (@event == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            // Добавление события в таймлайн
+            timeline.IdEvents.Add(@event);
+
             _unitOfWork.Timelines.Update(timeline);
             _unitOfWork.Save();
 
@@ -71,7 +86,8 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook)
         {
-            var timelines = await _unitOfWork.Timelines.Find(t => t.IdBook == idBook).ToListAsync();
+            var timelines = _unitOfWork.Timelines.Find(t => t.IdBook == idBook)
+                                                 .ToList();
 
             return timelines;
         }

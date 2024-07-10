@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace WebAPI.BLL.Services
@@ -23,8 +24,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<AddedAttribute> CreateAddedAttribute(AddedAttribute addedAttribute)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(addedAttribute);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(addedAttribute, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -72,7 +75,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter)
         {
-            var addedAttributes = await _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == idCharacter).ToListAsync();
+            var addedAttributes = _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == idCharacter).ToList();
 
             return addedAttributes;
         }

@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using WebAPI.DAL.Entities;
 using WebAPI.DAL.EF;
+using Microsoft.Extensions.Configuration;
+
 
 namespace WebAPI.BLL.Token
 {

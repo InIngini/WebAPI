@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Entities;
+using WebAPI;
 
 namespace WebAPI.DAL.EF;
 
@@ -46,17 +47,8 @@ public partial class Context : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Получаем путь до файла бд
-        var dataDirectory = Path.GetDirectoryName(Directory.GetCurrentDirectory());
-        var databasePath = Path.Combine(dataDirectory, "DB\\bin\\Debug\\net8.0\\DB\\DB.mdf");
-
-        // Рассчитываем строку подключения
-        var connectionString = $@"Data Source=(localdb)\MSSQLLocalDB;AttachDbFileName={databasePath};Integrated Security=True;";
-
-        // Настраиваем параметры подключения
-        optionsBuilder.UseSqlServer(connectionString);
-    }
+    #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer(ConnectionString.connectionString);
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

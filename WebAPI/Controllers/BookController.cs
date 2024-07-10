@@ -25,12 +25,6 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] UserBookData bookdata)
         {
-            // Создание сущности книги
-            Book book = new Book
-            {
-                NameBook = bookdata.NameBook,
-                IdPicture = bookdata.IdPicture
-            };
 
             // Проверка валидности модели
             if (!ModelState.IsValid)
@@ -39,7 +33,7 @@ namespace WebAPI.Controllers
             }
 
             // Сохранение книги в базе данных
-            var createdBook = await _bookService.CreateBook(book);
+            var createdBook = await _bookService.CreateBook(bookdata);
 
             // Настройка параметров сериализации
             var options = new JsonSerializerOptions
@@ -89,11 +83,6 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Удаление связанных записей из таблицы BelongToBook
-            var belongToBookRecords = _context.BelongToBooks.Where(b => b.IdBook == id);
-            _context.BelongToBooks.RemoveRange(belongToBookRecords);
-            await _context.SaveChangesAsync();
-
             await _bookService.DeleteBook(id);
 
             // Возврат подтверждения удаления
@@ -116,7 +105,7 @@ namespace WebAPI.Controllers
 
         //Получение всех книг для пользователя
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllBooksForUser([FromBody] string userId)
+        public async Task<IActionResult> GetAllBooksForUser([FromBody] int userId)
         {
             var books = await _bookService.GetAllBooksForUser(userId);
 

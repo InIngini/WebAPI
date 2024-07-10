@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -22,8 +23,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<Scheme> CreateScheme(Scheme scheme)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(scheme);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(scheme, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -34,8 +37,21 @@ namespace WebAPI.BLL.Services
             return scheme;
         }
 
-        public async Task<Scheme> UpdateScheme(Scheme scheme)
+        public async Task<Scheme> UpdateScheme(Scheme scheme, int idConnection)
         {
+
+            // Поиск соединения по указанному идентификатору
+            var connection = _unitOfWork.Connections.Get(idConnection);
+
+            // Если соединение не найдено, вернуть ошибку
+            if (connection == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            // Добавление соединения в схему
+            scheme.IdConnections.Add(connection);
+
             _unitOfWork.Schemes.Update(scheme);
             _unitOfWork.Save();
 
@@ -71,7 +87,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook)
         {
-            var schemes = await _unitOfWork.Schemes.Find(s => s.IdBook == idBook).ToListAsync();
+            var schemes = _unitOfWork.Schemes.Find(s => s.IdBook == idBook).ToList();
 
             return schemes;
         }

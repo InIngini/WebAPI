@@ -10,7 +10,7 @@ namespace WebAPI.BLL.Interfaces
     public interface ITimelineService
     {
         Task<Timeline> CreateTimeline(Timeline timeline);
-        Task<Timeline> UpdateTimeline(Timeline timeline);
+        Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent);
         Task<Timeline> DeleteTimeline(int id);
         Task<Timeline> GetTimeline(int id);
         Task<IEnumerable<Timeline>> GetAllTimelines(int idBook);

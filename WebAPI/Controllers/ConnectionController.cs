@@ -28,27 +28,11 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Connection connection = new Connection()
-            {
-                TypeConnection = connectionData.TypeConnection,
-                IdCharacter1 = connectionData.IdCharacter1,
-                IdCharacter2 = connectionData.IdCharacter2,
-            };
             // Сохранение связи в базе данных
-            var createdConnection = await _connectionService.CreateConnection(connection);
-
-            var scheme = await _context.Schemes
-                .Where(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
-                .FirstOrDefaultAsync();
-            // Добавление связи в главную схему
-            scheme.IdConnections.Add(createdConnection);
-
-            await _context.SaveChangesAsync();
-
+            var createdConnection = await _connectionService.CreateConnection(connectionData);
 
             var options = new JsonSerializerOptions
             {
-
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 

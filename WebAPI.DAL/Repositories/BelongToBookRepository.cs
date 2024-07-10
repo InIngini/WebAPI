@@ -46,7 +46,7 @@ namespace WebAPI.DAL.Repositories
 
         public void Delete(int id)
         {
-            BelongToBook belongToBook = db.BelongToBooks.Find(id);
+            BelongToBook belongToBook = db.BelongToBooks.SingleOrDefault(b => b.IdBook == id);
             if (belongToBook != null)
                 db.BelongToBooks.Remove(belongToBook);
         }

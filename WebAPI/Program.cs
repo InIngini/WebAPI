@@ -10,7 +10,12 @@ using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System.Text;
+using WebAPI.BLL.Interfaces;
+using WebAPI.BLL.Services;
 using WebAPI.BLL.Token;
+using WebAPI.DAL.EF;
+using WebAPI.DAL.Interfaces;
+using WebAPI.DAL.Repositories;
 
 namespace WebAPI
 {
@@ -20,22 +25,17 @@ namespace WebAPI
         //AttachDbFileName=C:\Users\vorob\source\repos\WebAPI\DB\bin\Debug\net8.0\DB\DB.mdf;Integrated Security=True;"
         //Microsoft.EntityFrameworkCore.SqlServer - писала в консольку для получения классов 
 
-        public static string connectionString;
         public static void Main(string[] args)
         {
-            // Получаем путь до файла бд
-            var dataDirectory = Path.GetDirectoryName(Directory.GetCurrentDirectory());
-            var databasePath = Path.Combine(dataDirectory, "DB\\bin\\Debug\\net8.0\\DB\\DB.mdf");
-
-            connectionString = $@"Data Source=(localdb)\MSSQLLocalDB;AttachDbFileName={databasePath};Integrated Security=True;";
             
+            ConnectionString.ConnectString();
             
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
             // Регистрация контекста базы данных
             builder.Services.AddDbContext<Context>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(ConnectionString.connectionString));
 
             // Добавить контроллеры
             builder.Services.AddControllers();
@@ -60,6 +60,8 @@ namespace WebAPI
             builder.Services.AddTransient<ITokenService, TokenService>();
             builder.Services.AddScoped<ITokenValidator, TokenValidator>();
 
+            // Вызов метода ConfigureServices
+            ConfigureServices(builder.Services);
 
             // Добавление авторизации
             builder.Services.AddAuthorization();
@@ -79,7 +81,21 @@ namespace WebAPI
 
             app.Run();
         }
-       
 
+        public static void ConfigureServices(IServiceCollection services)
+        {
+            // Регистрация сервисов
+            services.AddTransient<IUnitOfWork, EFUnitOfWork>();
+            services.AddTransient<IAddedAttributeService, AddedAttributeService>();
+            services.AddTransient<IBookService, BookService>();
+            services.AddTransient<ICharacterService, CharacterService>();
+            services.AddTransient<IConnectionService, ConnectionService>();
+            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IGalleryService, GalleryService>();
+            services.AddTransient<IPictureService, PictureService>();
+            services.AddTransient<ISchemeService, SchemeService>();
+            services.AddTransient<ITimelineService, TimelineService>();
+            services.AddTransient<IUserService, UserService>();
+        }
     }
 }

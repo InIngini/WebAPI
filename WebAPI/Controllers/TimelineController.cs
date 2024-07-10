@@ -45,6 +45,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent)
         {
+            
             // Получение таймлайна из базы данных
             var timeline = await _timelineService.GetTimeline(id);
 
@@ -53,21 +54,9 @@ namespace WebAPI.Controllers
             {
                 return NotFound();
             }
-
-            // Поиск события по указанному идентификатору
-            var @event = _unitOfWork.Events.FindAsync(idEvent);
-
-            // Если событие не найдено, вернуть ошибку
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            // Добавление события в таймлайн
-            timeline.IdEvents.Add(@event);
-
+            
             // Обновление таймлайна в базе данных
-            var updatedTimeline = await _timelineService.UpdateTimeline(timeline);
+            var updatedTimeline = await _timelineService.UpdateTimeline(timeline, idEvent);
 
             var options = new JsonSerializerOptions
             {

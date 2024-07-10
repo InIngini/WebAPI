@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 
 namespace WebAPI.BLL.Interfaces
 {
     public interface IBookService
     {
-        Task<Book> CreateBook(Book book);
+        Task<Book> CreateBook(UserBookData userbook);
         Task<Book> UpdateBook(Book book);
         Task<Book> DeleteBook(int id);
         Task<Book> GetBook(int id);

@@ -9,6 +9,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Token;
 using WebAPI.DAL.Entities;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -25,7 +26,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<User> CreateUser(User user)
         {
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(user);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(user, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -38,7 +42,8 @@ namespace WebAPI.BLL.Services
 
         public async Task<UserTokenData> Login(LoginData loginData)
         {
-            var user = _unitOfWork.Users.Find(u => u.Login == loginData.Login && u.Password == loginData.Password).FirstOrDefaultAsync();
+            var user = _unitOfWork.Users.Find(u => u.Login == loginData.Login && u.Password == loginData.Password)
+                                              .FirstOrDefault();
 
             if (user == null)
             {

@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -22,8 +23,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<Gallery> CreateGallery(Gallery gallery)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(gallery);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(gallery, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -56,12 +59,10 @@ namespace WebAPI.BLL.Services
 
             // Удаление записи из галереи
             _unitOfWork.Galleries.Delete(idPicture);
-
             _unitOfWork.Save();
 
             // Удаление картинки из галереи
             _unitOfWork.Pictures.Delete(idPicture);
-
             _unitOfWork.Save();
 
             return gallery;
@@ -81,7 +82,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Gallery>> GetAllGalleries(int idCharacter)
         {
-            var galleries = await _unitOfWork.Galleries.Find(g => g.IdCharacter == idCharacter).ToListAsync();
+            var galleries = _unitOfWork.Galleries.Find(g => g.IdCharacter == idCharacter).ToList();
 
             return galleries;
         }

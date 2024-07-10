@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -22,8 +23,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<Character> CreateCharacter(Character character)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(character);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(character, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
@@ -90,9 +93,54 @@ namespace WebAPI.BLL.Services
             return character;
         }
 
-        public async Task<Character> UpdateCharacter(Character character)
+        public async Task<Character> UpdateCharacter(CharacterWithBlocks characterWithBlocks)
         {
+            // Получение персонажа из базы данных
+            var character = _unitOfWork.Characters.Get(characterWithBlocks.IdCharacter);
+            character.IdPicture = characterWithBlocks.IdPicture;
+            // Обновление персонажа
             _unitOfWork.Characters.Update(character);
+
+            // Обновление блоков
+            var block1 = _unitOfWork.Block1s.Get(character.IdCharacter);
+            block1.Name = characterWithBlocks.Name;
+            block1.Question1 = characterWithBlocks.Block1Question1;
+            block1.Question2 = characterWithBlocks.Block1Question2;
+            block1.Question3 = characterWithBlocks.Block1Question3;
+            block1.Question4 = characterWithBlocks.Block1Question4;
+            block1.Question5 = characterWithBlocks.Block1Question5;
+            block1.Question6 = characterWithBlocks.Block1Question6;
+
+            var block2 = _unitOfWork.Block2s.Get(character.IdCharacter);
+            block2.Question1 = characterWithBlocks.Block2Question1;
+            block2.Question2 = characterWithBlocks.Block2Question2;
+            block2.Question3 = characterWithBlocks.Block2Question3;
+            block2.Question4 = characterWithBlocks.Block2Question4;
+            block2.Question5 = characterWithBlocks.Block2Question5;
+            block2.Question6 = characterWithBlocks.Block2Question6;
+            block2.Question7 = characterWithBlocks.Block2Question7;
+            block2.Question8 = characterWithBlocks.Block2Question8;
+            block2.Question9 = characterWithBlocks.Block2Question9;
+
+            var block3 = _unitOfWork.Block3s.Get(character.IdCharacter);
+            block3.Question1 = characterWithBlocks.Block3Question1;
+            block3.Question2 = characterWithBlocks.Block3Question2;
+            block3.Question3 = characterWithBlocks.Block3Question3;
+            block3.Question4 = characterWithBlocks.Block3Question4;
+            block3.Question5 = characterWithBlocks.Block3Question5;
+            block3.Question6 = characterWithBlocks.Block3Question6;
+            block3.Question7 = characterWithBlocks.Block3Question7;
+            block3.Question8 = characterWithBlocks.Block3Question8;
+            block3.Question9 = characterWithBlocks.Block3Question9;
+            block3.Question10 = characterWithBlocks.Block3Question10;
+
+            var block4 = _unitOfWork.Block1s.Get(character.IdCharacter);
+            block4.Question1 = characterWithBlocks.Block4Question1;
+            block4.Question2 = characterWithBlocks.Block4Question2;
+            block4.Question3 = characterWithBlocks.Block4Question3;
+            block4.Question4 = characterWithBlocks.Block4Question4;
+            block4.Question5 = characterWithBlocks.Block4Question5;
+            
             _unitOfWork.Save();
 
             return character;
@@ -107,7 +155,58 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
 
-            _unitOfWork.Characters.Delete(id);
+            // Удаление всех блоков персонажа
+            var block1s = _unitOfWork.Block1s.Find(b => b.IdCharacter == character.IdCharacter);
+            foreach (var block in block1s)
+            {
+                // Удаление блока
+                _unitOfWork.Block1s.Delete(block.IdCharacter);
+            }
+            var block2s = _unitOfWork.Block2s.Find(b => b.IdCharacter == character.IdCharacter);
+            foreach (var block in block2s)
+            {
+                // Удаление блока
+                _unitOfWork.Block2s.Delete(block.IdCharacter);
+            }
+            var block3s = _unitOfWork.Block3s.Find(b => b.IdCharacter == character.IdCharacter);
+            foreach (var block in block3s)
+            {
+                // Удаление блока
+                _unitOfWork.Block3s.Delete(block.IdCharacter);
+            }
+            var block4s = _unitOfWork.Block4s.Find(b => b.IdCharacter == character.IdCharacter);
+            foreach (var block in block4s)
+            {
+                // Удаление блока
+                _unitOfWork.Block4s.Delete(block.IdCharacter);
+            }
+            // Удаление всех добавленных атрибутов блока
+            var addedAttributes = _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == character.IdCharacter);
+            foreach (var addedAttribute in addedAttributes)
+            {
+                _unitOfWork.AddedAttributes.Delete(addedAttribute.IdAttribute);
+            }
+
+            // Удаление всех записей в галерее
+            var galleryItems = _unitOfWork.Galleries.Find(gi => gi.IdCharacter == id);
+            foreach (var galleryItem in galleryItems)
+            {
+                // Удаление всех изображений
+                var image = _unitOfWork.Pictures.Get(galleryItem.IdPicture);
+                _unitOfWork.Pictures.Delete(image.IdPicture);
+                _unitOfWork.Galleries.Delete(galleryItem.IdPicture);
+            }
+
+            // Удаление аватарки
+            if (character.IdPicture != null)
+            {
+                int idP = (int)character.IdPicture;
+                var imageavatar = _unitOfWork.Pictures.Get(idP);
+                _unitOfWork.Pictures.Delete(imageavatar.IdPicture);
+            }
+            
+            // Удаление персонажа
+            _unitOfWork.Characters.Delete(character.IdCharacter);
             _unitOfWork.Save();
 
             return character;
@@ -127,7 +226,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Character>> GetAllCharacters(int idBook)
         {
-            var characters = await _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToListAsync();
+            var characters = _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToList();
 
             return characters;
         }

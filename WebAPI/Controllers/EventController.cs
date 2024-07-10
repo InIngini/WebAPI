@@ -28,35 +28,9 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Event @event = new Event()
-            {
-                Name = eventData.Name,
-                Content = eventData.Content,
-                Time = eventData.Time,
-
-            };
-            if (eventData.IdCharacter != null)
-            {
-                foreach (var idCharacter in eventData.IdCharacter)
-                {
-                    var character = await _context.Characters.FindAsync(idCharacter);
-                    if (character != null)
-                    {
-                        @event.IdCharacters.Add(character);
-                    }
-                }
-            }
+            
             // Сохранение связи в базе данных
-            var createdEvent = await _eventService.CreateEvent(@event);
-
-            var timeline = await _context.Timelines
-                .Where(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
-                .FirstOrDefaultAsync();
-            // Добавление связи в главную схему
-            timeline.IdEvents.Add(createdEvent);
-
-            await _context.SaveChangesAsync();
-
+            var createdEvent = await _eventService.CreateEvent(eventData);
 
             var options = new JsonSerializerOptions
             {
@@ -80,30 +54,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Обновление события
-            @event.Name = eventData.Name;
-            @event.Content = eventData.Content;
-            @event.Time = eventData.Time;
-            if (eventData.IdCharacter != null)
-            {
-                _context.Entry(@event).Collection(e => e.IdCharacters).Load();
-                // Удаление существующих связей персонажей с событием
-                foreach (var character in @event.IdCharacters.ToList())
-                {
-                    @event.IdCharacters.Remove(character);
-                }
-
-                foreach (var idCharacter in eventData.IdCharacter)
-                {
-                    var character = await _context.Characters.FindAsync(idCharacter);
-                    if (character != null)
-                    {
-                        @event.IdCharacters.Add(character);
-                    }
-                }
-            }
-
-            var updatedEvent = await _eventService.UpdateEvent(@event);
+            var updatedEvent = await _eventService.UpdateEvent(eventData,id);
 
             var options = new JsonSerializerOptions
             {
@@ -147,9 +98,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllEvents()
+        public async Task<IActionResult> GetAllEvents([FromBody] int id)
         {
-            var events = await _eventService.GetAllEvents();
+            var events = await _eventService.GetAllEvents(id);
 
             if (events == null)
             {

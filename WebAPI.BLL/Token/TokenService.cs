@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebAPI.DAL.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.BLL.Token
 {

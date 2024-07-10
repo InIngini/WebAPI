@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
         {
             _characterService = characterService;
             _addedAttributeService = addedAttributeService;
-    }
+        }
 
         //Создание персонажа и блоков
         [HttpPost]
@@ -56,59 +56,13 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithBlocks characterWithBlocks)
         {
-            // Получение персонажа из базы данных
-            var existingCharacter = await _characterService.GetCharacter(id);
+            var existingCharacter = _characterService.UpdateCharacter(characterWithBlocks);
 
             // Если персонаж не найден, вернуть ошибку
             if (existingCharacter == null)
             {
                 return NotFound();
             }
-
-            // Обновление персонажа
-            existingCharacter.IdPicture = characterWithBlocks.IdPicture;
-            // Обновление блоков
-            var block1 = await _context.Block1s.FindAsync(id);
-            block1.Name = characterWithBlocks.Name;
-            block1.Question1 = characterWithBlocks.Block1Question1;
-            block1.Question2 = characterWithBlocks.Block1Question2;
-            block1.Question3 = characterWithBlocks.Block1Question3;
-            block1.Question4 = characterWithBlocks.Block1Question4;
-            block1.Question5 = characterWithBlocks.Block1Question5;
-            block1.Question6 = characterWithBlocks.Block1Question6;
-            _context.Entry(block1).State = EntityState.Modified;
-            var block2 = await _context.Block2s.FindAsync(id);
-            block2.Question1 = characterWithBlocks.Block2Question1;
-            block2.Question2 = characterWithBlocks.Block2Question2;
-            block2.Question3 = characterWithBlocks.Block2Question3;
-            block2.Question4 = characterWithBlocks.Block2Question4;
-            block2.Question5 = characterWithBlocks.Block2Question5;
-            block2.Question6 = characterWithBlocks.Block2Question6;
-            block2.Question7 = characterWithBlocks.Block2Question7;
-            block2.Question8 = characterWithBlocks.Block2Question8;
-            block2.Question9 = characterWithBlocks.Block2Question9;
-            _context.Entry(block2).State = EntityState.Modified;
-            var block3 = await _context.Block3s.FindAsync(id);
-            block3.Question1 = characterWithBlocks.Block3Question1;
-            block3.Question2 = characterWithBlocks.Block3Question2;
-            block3.Question3 = characterWithBlocks.Block3Question3;
-            block3.Question4 = characterWithBlocks.Block3Question4;
-            block3.Question5 = characterWithBlocks.Block3Question5;
-            block3.Question6 = characterWithBlocks.Block3Question6;
-            block3.Question7 = characterWithBlocks.Block3Question7;
-            block3.Question8 = characterWithBlocks.Block3Question8;
-            block3.Question9 = characterWithBlocks.Block3Question9;
-            block3.Question10 = characterWithBlocks.Block3Question10;
-            _context.Entry(block3).State = EntityState.Modified;
-            var block4 = await _context.Block4s.FindAsync(id);
-            block4.Question1 = characterWithBlocks.Block4Question1;
-            block4.Question2 = characterWithBlocks.Block4Question2;
-            block4.Question3 = characterWithBlocks.Block4Question3;
-            block4.Question4 = characterWithBlocks.Block4Question4;
-            block4.Question5 = characterWithBlocks.Block4Question5;
-            _context.Entry(block4).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
 
             var options = new JsonSerializerOptions
             {

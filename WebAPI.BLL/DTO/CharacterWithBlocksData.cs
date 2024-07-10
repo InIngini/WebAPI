@@ -2,6 +2,7 @@
 {
     public class CharacterWithBlocks
     {
+        public int IdCharacter { get; set; }
         public int? IdPicture { get; set; }
         public string Name { get; set; }
         public string Block1Question1 { get; set; }

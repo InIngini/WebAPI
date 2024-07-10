@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -20,15 +21,32 @@ namespace WebAPI.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Connection> CreateConnection(Connection connection)
+        public async Task<Connection> CreateConnection(ConnectionData connectionData)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(connectionData);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(connectionData, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
 
+            Connection connection = new Connection()
+            {
+                TypeConnection = connectionData.TypeConnection,
+                IdCharacter1 = connectionData.IdCharacter1,
+                IdCharacter2 = connectionData.IdCharacter2,
+            };
+
+            var scheme = _unitOfWork.Schemes
+                            .Find(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
+                            .FirstOrDefault();
+
             _unitOfWork.Connections.Create(connection);
+            _unitOfWork.Save();
+
+            // Добавление связи в главную схему
+            scheme.IdConnections.Add(connection);
             _unitOfWork.Save();
 
             return connection;
@@ -46,7 +64,7 @@ namespace WebAPI.BLL.Services
             }
 
             // Получение схем, связанных со связью, и удаление их оттуда
-            var schemes = await _unitOfWork.Schemes.GetAll().ToListAsync();
+            var schemes = _unitOfWork.Schemes.Find(c => c.IdConnections.Any(s => s.IdConnection == id)).ToList();
 
             // Удаление IdConnection удаляемой связи из схем
             foreach (var scheme in schemes)
@@ -57,7 +75,6 @@ namespace WebAPI.BLL.Services
                     scheme.IdConnections.Remove(connection1);
                 }
             }
-
             // Сохранение изменений в базе данных
             _unitOfWork.Save();
 
@@ -82,7 +99,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Connection>> GetAllConnections(int idScheme)
         {
-            var connections = await _unitOfWork.Connections.Find(c => c.IdSchemes.Any(s => s.IdScheme == idScheme)).ToListAsync();
+            var connections = _unitOfWork.Connections.Find(c => c.IdSchemes.Any(s => s.IdScheme == idScheme)).ToList();
 
             return connections;
         }

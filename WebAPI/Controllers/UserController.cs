@@ -38,11 +38,11 @@ namespace WebAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginData loginData)
         {
-            var user = await _userService.Login(loginData);
+            var userToken = await _userService.Login(loginData);
 
-            var token = user.Token;
+            //var token = user.Token;
 
-            return Ok(new { token });
+            return Ok(new { userToken });
         }
 
         //Получить пользователя

@@ -8,6 +8,8 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace WebAPI.BLL.Services
 {
@@ -20,22 +22,73 @@ namespace WebAPI.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Event> CreateEvent(Event @event)
+        public async Task<Event> CreateEvent(EventData eventData)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(eventData);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(eventData, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
 
+            Event @event = new Event()
+            {
+                Name = eventData.Name,
+                Content = eventData.Content,
+                Time = eventData.Time,
+
+            };
+            if (eventData.IdCharacter != null)
+            {
+                foreach (var idCharacter in eventData.IdCharacter)
+                {
+                    var character = _unitOfWork.Characters.Get(idCharacter);
+                    if (character != null)
+                    {
+                        @event.IdCharacters.Add(character);
+                    }
+                }
+            }
             _unitOfWork.Events.Create(@event);
+            _unitOfWork.Save();
+
+            var timeline = _unitOfWork.Timelines
+                            .Find(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
+                            .SingleOrDefault();
+            // Добавление связи в главную схему
+            timeline.IdEvents.Add(@event);
             _unitOfWork.Save();
 
             return @event;
         }
 
-        public async Task<Event> UpdateEvent(Event @event)
+        public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
+            Event @event = _unitOfWork.Events.Get(id);
+            // Обновление события
+            @event.Name = eventData.Name;
+            @event.Content = eventData.Content;
+            @event.Time = eventData.Time;
+
+            if (eventData.IdCharacter != null)
+            {
+                // Удаление существующих связей персонажей с событием
+                foreach (var character in @event.IdCharacters.ToList())
+                {
+                    @event.IdCharacters.Remove(character);
+                }
+                // Добавление новых
+                foreach (var idCharacter in eventData.IdCharacter)
+                {
+                    var character = _unitOfWork.Characters.Get(idCharacter);
+                    if (character != null)
+                    {
+                        @event.IdCharacters.Add(character);
+                    }
+                }
+            }
+
             _unitOfWork.Events.Update(@event);
             _unitOfWork.Save();
 
@@ -51,8 +104,8 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
 
-            // Получение всех схем
-            var timelines = await _unitOfWork.Timelines.ToListAsync();
+            // Получение всех таймлайнов, связанных с событием
+            var timelines = _unitOfWork.Timelines.Find(t => t.IdEvents.Any(e => e.IdEvent == id)).ToList();
 
             // Удаление IdConnection удаляемой связи из схем
             foreach (var timeline in timelines)
@@ -82,9 +135,9 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
-        public async Task<IEnumerable<Event>> GetAllEvents()
+        public async Task<IEnumerable<Event>> GetAllEvents(int id)
         {
-            var events = await _unitOfWork.Events.GetAll().ToListAsync();
+            var events = _unitOfWork.Events.Find(e => e.IdTimelines.Any(e => e.IdTimeline == id)).ToList();
 
             return events;
         }

@@ -55,19 +55,9 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            // Поиск соединения по указанному идентификатору
-            var connection = _unitOfWork.Connections.FindAsync(idConnection);
-
-            // Если соединение не найдено, вернуть ошибку
-            if (connection == null)
-            {
-                return NotFound();
-            }
-
-            // Добавление соединения в схему
-            scheme.IdConnections.Add(connection);
             // Обновление схемы в базе данных
-            var updatedScheme = await _schemeService.UpdateScheme(scheme);
+            var updatedScheme = await _schemeService.UpdateScheme(scheme,idConnection);
+            
 
             var options = new JsonSerializerOptions
             {

@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace WebAPI.BLL.Services
@@ -21,13 +22,21 @@ namespace WebAPI.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Book> CreateBook(Book book)
+        public async Task<Book> CreateBook(UserBookData userbook)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(userbook);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(userbook, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
+
+            Book book = new Book()
+            { 
+                NameBook = userbook.NameBook,
+                IdPicture = userbook.IdPicture
+            };
 
             _unitOfWork.Books.Create(book);
             _unitOfWork.Save();
@@ -35,9 +44,9 @@ namespace WebAPI.BLL.Services
             // Создание сущности BelongTo
             BelongToBook belongToBook = new BelongToBook
             {
-                IdUser = bookdata.idUser,
+                IdUser = userbook.idUser,
                 IdBook = book.IdBook,
-                TypeBelong = 0 // Установить значение по умолчанию для статуса
+                TypeBelong = 0 // автор
             };
 
             // Сохранение BelongTo в базе данных
@@ -82,6 +91,64 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
 
+            // Удаление связанных записей из таблицы BelongToBook
+            _unitOfWork.BelongToBooks.Delete(id);
+            _unitOfWork.Save();
+
+            // Удаление всех схем книги
+            var schemes = _unitOfWork.Schemes.Find(s => s.IdBook == id);
+            foreach (var scheme in schemes)
+            {
+                if (scheme.NameScheme == "Главная схема")
+                {
+                    // Удаление всех связей схемы
+                    var connections = _unitOfWork.Connections.Find(c => c.IdSchemes.Any(s => s.IdScheme == scheme.IdScheme));
+                    foreach (var connection in connections)
+                    {
+                        _unitOfWork.Connections.Delete(connection.IdConnection);
+                    }
+                }
+                // Удаление схемы
+                _unitOfWork.Schemes.Delete(scheme.IdScheme);
+            }
+            _unitOfWork.Save();
+
+            // Удаление всех таймлайнов книги
+            var timelines = _unitOfWork.Timelines.Find(s => s.IdBook == id);
+            foreach (var timeline in timelines)
+            {
+                if (timeline.NameTimeline == "Главый таймлайн")
+                {
+                    // Удаление всех связей схемы
+                    var events = _unitOfWork.Events.Find(c => c.IdTimelines.Any(s => s.IdTimeline == timeline.IdTimeline));
+                    foreach (var @event in events)
+                    {
+                        _unitOfWork.Connections.Delete(@event.IdEvent);
+                    }
+                }
+                // Удаление схемы
+                _unitOfWork.Timelines.Delete(timeline.IdTimeline);
+            }
+            _unitOfWork.Save();
+
+            // Удаление обложки
+            if (book.IdPicture != null)
+            {
+                int idP = (int)book.IdPicture;
+                var image = _unitOfWork.Pictures.Get(idP);
+                _unitOfWork.Pictures.Delete(image.IdPicture);
+            }
+            _unitOfWork.Save();
+
+            // Удаление всех персонажей книги
+            var characters = _unitOfWork.Characters.Find(c => c.IdBook == id);
+            CharacterService characterService = new CharacterService(_unitOfWork);
+            foreach (var character in characters)
+            {
+                characterService.DeleteCharacter(character.IdCharacter);
+            }
+
+            // Удаление книги
             _unitOfWork.Books.Delete(id);
             _unitOfWork.Save();
 
@@ -102,7 +169,7 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Book>> GetAllBooksForUser(int userId)
         {
-            var books = await _unitOfWork.Books.Find(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToListAsync();
+            var books = _unitOfWork.Books.Find(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToList();
 
             return books;
         }

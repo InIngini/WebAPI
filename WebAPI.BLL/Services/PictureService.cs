@@ -8,6 +8,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.BLL.Services
 {
@@ -22,8 +23,10 @@ namespace WebAPI.BLL.Services
 
         public async Task<Picture> CreatePicture(Picture picture)
         {
-            // Проверка валидности модели
-            if (!ModelState.IsValid)
+            var validationContext = new ValidationContext(picture);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(picture, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
