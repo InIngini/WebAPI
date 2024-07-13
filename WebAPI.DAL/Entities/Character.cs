@@ -13,13 +13,7 @@ public partial class Character
 
     public virtual ICollection<AddedAttribute> AddedAttributes { get; set; } = new List<AddedAttribute>();
 
-    public virtual Block1? Block1 { get; set; }
-
-    public virtual Block2? Block2 { get; set; }
-
-    public virtual Block3? Block3 { get; set; }
-
-    public virtual Block4? Block4 { get; set; }
+    public virtual Answer? Answer { get; set; }
 
     public virtual ICollection<Connection> ConnectionIdCharacter1Navigations { get; set; } = new List<Connection>();
 

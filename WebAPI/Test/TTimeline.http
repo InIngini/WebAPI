@@ -20,7 +20,7 @@ Content-Type: application/json
 PUT {{WebAPI_HostAddress}}/User/Book/Timeline/2
 Content-Type: application/json
 
-"1"
+"2"
 ###
 # удаление таймлайна
-DELETE {{WebAPI_HostAddress}}/User/Book/Timeline/2
+DELETE {{WebAPI_HostAddress}}/User/Book/Timeline/5

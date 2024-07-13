@@ -54,9 +54,9 @@ namespace WebAPI.Controllers
 
         // Изменение персонажа и блоков
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithBlocks characterWithBlocks)
+        public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithAnswers characterWithAnswers)
         {
-            var existingCharacter = _characterService.UpdateCharacter(characterWithBlocks);
+            var existingCharacter = _characterService.UpdateCharacter(characterWithAnswers,id);
 
             // Если персонаж не найден, вернуть ошибку
             if (existingCharacter == null)
@@ -73,7 +73,13 @@ namespace WebAPI.Controllers
             // Возврат обновленного персонажа в виде JSON
             return Ok(json);
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCharacter(int id)
+        {
+            await _characterService.DeleteCharacter(id);
 
+            return Ok();
+        }
         // Получение персонажа по его идентификатору
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCharacter(int id)
@@ -119,7 +125,7 @@ namespace WebAPI.Controllers
             {
                 IdCharacter = id,
                 NameAttribute = aa.NameAttribute,
-                NumberBlock = aa.NumberBlock,
+                NumberAnswer = aa.NumberAnswer,
                 ContentAttribute = String.Empty,
             };
 
@@ -153,16 +159,10 @@ namespace WebAPI.Controllers
 
         //Удалить атрибут
         [HttpDelete("{idc}/addedattribute/{ida}")]
-        public async Task<IActionResult> DeleteAddedAttribute(int ida)
+        public async Task<IActionResult> DeleteAddedAttribute(int idc,int ida)
         {
             // Получение атрибута из базы данных
-            var addedAttribute = await _addedAttributeService.DeleteAddedAttribute(ida);
-
-            // Если атрибут не найден, вернуть ошибку
-            if (addedAttribute == null)
-            {
-                return NotFound();
-            }
+            await _addedAttributeService.DeleteAddedAttribute(idc, ida);
 
             // Возврат подтверждения удаления
             return NoContent();

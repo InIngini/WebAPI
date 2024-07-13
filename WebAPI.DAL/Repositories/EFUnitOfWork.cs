@@ -10,10 +10,7 @@ namespace WebAPI.DAL.Repositories
         private Context db;
         private AddedAttributeRepository addedAttributeRepository;
         private BelongToBookRepository belongToBookRepository;
-        private Block1Repository block1Repository;
-        private Block2Repository block2Repository;
-        private Block3Repository block3Repository;
-        private Block4Repository block4Repository;
+        private AnswerRepository answerRepository;
         private BookRepository bookRepository;
         private CharacterRepository characterRepository;
         private ConnectionRepository connectionRepository;
@@ -49,43 +46,13 @@ namespace WebAPI.DAL.Repositories
             }
         }
 
-        public IRepository<Block1> Block1s
+        public IRepository<Answer> Answers
         {
             get
             {
-                if (block1Repository == null)
-                    block1Repository = new Block1Repository(db);
-                return block1Repository;
-            }
-        }
-
-        public IRepository<Block2> Block2s
-        {
-            get
-            {
-                if (block2Repository == null)
-                    block2Repository = new Block2Repository(db);
-                return block2Repository;
-            }
-        }
-
-        public IRepository<Block3> Block3s
-        {
-            get
-            {
-                if (block3Repository == null)
-                    block3Repository = new Block3Repository(db);
-                return block3Repository;
-            }
-        }
-
-        public IRepository<Block4> Block4s
-        {
-            get
-            {
-                if (block4Repository == null)
-                    block4Repository = new Block4Repository(db);
-                return block4Repository;
+                if (answerRepository == null)
+                    answerRepository = new AnswerRepository(db);
+                return answerRepository;
             }
         }
 

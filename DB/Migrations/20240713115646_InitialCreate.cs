@@ -167,7 +167,7 @@ namespace DB.Migrations
                 {
                     idAttribute = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    numberBlock = table.Column<int>(type: "int", nullable: false),
+                    numberAnswer = table.Column<int>(type: "int", nullable: false),
                     nameAttribute = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     contentAttribute = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     idCharacter = table.Column<int>(type: "int", nullable: false)
@@ -177,6 +177,54 @@ namespace DB.Migrations
                     table.PrimaryKey("PK_AddedAttributes", x => x.idAttribute);
                     table.ForeignKey(
                         name: "FK_AddedAttributes_Characters_idCharacter",
+                        column: x => x.idCharacter,
+                        principalTable: "Characters",
+                        principalColumn: "idCharacter",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Answers",
+                columns: table => new
+                {
+                    idCharacter = table.Column<int>(type: "int", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer1Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer2Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer3Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer4Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer5Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer6Personality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer1Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer2Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer3Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer4Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer5Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer6Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer7Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer8Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer9Appearance = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer1Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer2Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer3Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer4Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer5Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer6Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer7Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer8Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer9Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer10Temperament = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer1ByHistory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer2ByHistory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer3ByHistory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer4ByHistory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answer5ByHistory = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Answers", x => x.idCharacter);
+                    table.ForeignKey(
+                        name: "FK_Answers_Characters_idCharacter",
                         column: x => x.idCharacter,
                         principalTable: "Characters",
                         principalColumn: "idCharacter",
@@ -204,105 +252,6 @@ namespace DB.Migrations
                         column: x => x.idEvent,
                         principalTable: "Events",
                         principalColumn: "idEvent",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Block1s",
-                columns: table => new
-                {
-                    idCharacter = table.Column<int>(type: "int", nullable: false),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question6 = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Block1s", x => x.idCharacter);
-                    table.ForeignKey(
-                        name: "FK_Block1s_Characters_idCharacter",
-                        column: x => x.idCharacter,
-                        principalTable: "Characters",
-                        principalColumn: "idCharacter",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Block2s",
-                columns: table => new
-                {
-                    idCharacter = table.Column<int>(type: "int", nullable: false),
-                    question1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question8 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question9 = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Block2s", x => x.idCharacter);
-                    table.ForeignKey(
-                        name: "FK_Block2s_Characters_idCharacter",
-                        column: x => x.idCharacter,
-                        principalTable: "Characters",
-                        principalColumn: "idCharacter",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Block3s",
-                columns: table => new
-                {
-                    idCharacter = table.Column<int>(type: "int", nullable: false),
-                    question1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question8 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question9 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question10 = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Block3s", x => x.idCharacter);
-                    table.ForeignKey(
-                        name: "FK_Block3s_Characters_idCharacter",
-                        column: x => x.idCharacter,
-                        principalTable: "Characters",
-                        principalColumn: "idCharacter",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Block4s",
-                columns: table => new
-                {
-                    idCharacter = table.Column<int>(type: "int", nullable: false),
-                    question1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    question5 = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Block4s", x => x.idCharacter);
-                    table.ForeignKey(
-                        name: "FK_Block4s_Characters_idCharacter",
-                        column: x => x.idCharacter,
-                        principalTable: "Characters",
-                        principalColumn: "idCharacter",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -476,6 +425,9 @@ namespace DB.Migrations
                 name: "AddedAttributes");
 
             migrationBuilder.DropTable(
+                name: "Answers");
+
+            migrationBuilder.DropTable(
                 name: "BelongToBooks");
 
             migrationBuilder.DropTable(
@@ -486,18 +438,6 @@ namespace DB.Migrations
 
             migrationBuilder.DropTable(
                 name: "BelongToTimelines");
-
-            migrationBuilder.DropTable(
-                name: "Block1s");
-
-            migrationBuilder.DropTable(
-                name: "Block2s");
-
-            migrationBuilder.DropTable(
-                name: "Block3s");
-
-            migrationBuilder.DropTable(
-                name: "Block4s");
 
             migrationBuilder.DropTable(
                 name: "Galleries");

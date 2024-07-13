@@ -17,10 +17,10 @@ Content-Type: application/json
 "1"
 ###
 # изменение связи
-PUT {{WebAPI_HostAddress}}/User/Book/Scheme/2
+PUT {{WebAPI_HostAddress}}/User/Book/Scheme/3
 Content-Type: application/json
 
 "2"
 ###
 # удаление схемы
-DELETE {{WebAPI_HostAddress}}/User/Book/Scheme/2
+DELETE {{WebAPI_HostAddress}}/User/Book/Scheme/3

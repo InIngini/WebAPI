@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
+using WebAPI.BLL.Token;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace WebAPI.Controllers
 {
@@ -15,10 +18,12 @@ namespace WebAPI.Controllers
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
+        private readonly ITokenValidator _tokenValidator;
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, ITokenValidator tokenValidator)
         {
             _bookService = bookService;
+            _tokenValidator = tokenValidator;
         }
 
         //Создание книги
@@ -105,16 +110,27 @@ namespace WebAPI.Controllers
 
         //Получение всех книг для пользователя
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllBooksForUser([FromBody] int userId)
+        public async Task<IActionResult> GetAllBooksForUser([FromBody] string token)
         {
-            var books = await _bookService.GetAllBooksForUser(userId);
 
-            if (books == null || !books.Any())
+            var userId = _tokenValidator.ValidateToken(token);
+
+            if (userId > 0)
             {
-                return NotFound();
-            }
+                var books = await _bookService.GetAllBooksForUser(userId);
 
-            return Ok(books);
+                if (books == null || !books.Any())
+                {
+                    books=new List<Book>();
+                }
+
+                return Ok(books);
+
+            }
+            else
+            {
+                return Unauthorized("Invalid token");
+            }
         }
     }
 }

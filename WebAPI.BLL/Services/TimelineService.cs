@@ -50,7 +50,7 @@ namespace WebAPI.BLL.Services
 
             // Добавление события в таймлайн
             timeline.IdEvents.Add(@event);
-
+            
             _unitOfWork.Timelines.Update(timeline);
             _unitOfWork.Save();
 

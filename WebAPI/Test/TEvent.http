@@ -19,12 +19,12 @@ Content-Type: application/json
 
 "1"
 ###
-GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/3
 Accept: application/json
 
 ###
 # изменение события
-PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/3
 Content-Type: application/json
 
 {

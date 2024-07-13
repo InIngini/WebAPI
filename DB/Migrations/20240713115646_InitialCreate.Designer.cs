@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240531064331_InitialCreate")]
+    [Migration("20240713115646_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -44,7 +44,7 @@ namespace DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("numberBlock")
+                    b.Property<int>("numberAnswer")
                         .HasColumnType("int");
 
                     b.HasKey("idAttribute");
@@ -52,6 +52,140 @@ namespace DB.Migrations
                     b.HasIndex("idCharacter");
 
                     b.ToTable("AddedAttributes");
+                });
+
+            modelBuilder.Entity("DB.Entities.Answer", b =>
+                {
+                    b.Property<int>("idCharacter")
+                        .HasColumnType("int");
+
+                    b.Property<string>("answer10Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer1Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer1ByHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer1Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer1Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer2Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer2ByHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer2Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer2Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer3Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer3ByHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer3Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer3Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer4Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer4ByHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer4Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer4Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer5Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer5ByHistory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer5Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer5Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer6Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer6Personality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer6Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer7Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer7Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer8Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer8Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer9Appearance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("answer9Temperament")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("idCharacter");
+
+                    b.ToTable("Answers");
                 });
 
             modelBuilder.Entity("DB.Entities.BelongToBook", b =>
@@ -115,170 +249,6 @@ namespace DB.Migrations
                     b.HasIndex("idEvent");
 
                     b.ToTable("BelongToTimelines");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block1", b =>
-                {
-                    b.Property<int>("idCharacter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question2")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question5")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question6")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("idCharacter");
-
-                    b.ToTable("Block1s");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block2", b =>
-                {
-                    b.Property<int>("idCharacter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("question1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question2")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question5")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question6")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question7")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question8")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question9")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("idCharacter");
-
-                    b.ToTable("Block2s");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block3", b =>
-                {
-                    b.Property<int>("idCharacter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("question1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question10")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question2")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question5")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question6")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question7")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question8")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question9")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("idCharacter");
-
-                    b.ToTable("Block3s");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block4", b =>
-                {
-                    b.Property<int>("idCharacter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("question1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question2")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question5")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("idCharacter");
-
-                    b.ToTable("Block4s");
                 });
 
             modelBuilder.Entity("DB.Entities.Book", b =>
@@ -485,6 +455,17 @@ namespace DB.Migrations
                     b.Navigation("Character");
                 });
 
+            modelBuilder.Entity("DB.Entities.Answer", b =>
+                {
+                    b.HasOne("DB.Entities.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("idCharacter")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Character");
+                });
+
             modelBuilder.Entity("DB.Entities.BelongToBook", b =>
                 {
                     b.HasOne("DB.Entities.Book", "Book")
@@ -558,50 +539,6 @@ namespace DB.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("Timeline");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block1", b =>
-                {
-                    b.HasOne("DB.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("idCharacter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block2", b =>
-                {
-                    b.HasOne("DB.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("idCharacter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block3", b =>
-                {
-                    b.HasOne("DB.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("idCharacter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
-                });
-
-            modelBuilder.Entity("DB.Entities.Block4", b =>
-                {
-                    b.HasOne("DB.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("idCharacter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
                 });
 
             modelBuilder.Entity("DB.Entities.Book", b =>

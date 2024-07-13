@@ -10,7 +10,7 @@ namespace WebAPI.BLL.Interfaces
 {
     public interface IUserService
     {
-        Task<User> CreateUser(User user);
+        Task<User> CreateUser(LoginData loginData);
         Task<UserTokenData> Login(LoginData loginData);
         Task<User> GetUser(int id);
     }

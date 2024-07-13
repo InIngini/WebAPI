@@ -34,113 +34,95 @@ namespace WebAPI.BLL.Services
             _unitOfWork.Characters.Create(character);
             _unitOfWork.Save();
 
-            // Сохранение блоков с персонажем
-            Block1 block1 = new Block1()
+            Answer answer = new Answer()
             {
                 IdCharacter = character.IdCharacter,
-                Name = String.Empty,
-                Question1 = String.Empty,
-                Question2 = String.Empty,
-                Question3 = String.Empty,
-                Question4 = String.Empty,
-                Question5 = String.Empty,
-                Question6 = String.Empty,
-
+                Name="",
+                Answer1Personality = "",
+                Answer2Personality = "",
+                Answer3Personality = "",
+                Answer4Personality = "",
+                Answer5Personality = "",
+                Answer6Personality = "",
+                Answer1Appearance = "",
+                Answer2Appearance = "",
+                Answer3Appearance = "",
+                Answer4Appearance = "",
+                Answer5Appearance = "",
+                Answer6Appearance = "",
+                Answer7Appearance = "",
+                Answer8Appearance = "",
+                Answer9Appearance = "",
+                Answer1Temperament = "",
+                Answer2Temperament = "",
+                Answer3Temperament = "",
+                Answer4Temperament = "",
+                Answer5Temperament = "",
+                Answer6Temperament = "",
+                Answer7Temperament = "",
+                Answer8Temperament = "",
+                Answer9Temperament = "",
+                Answer10Temperament = "",
+                Answer1ByHistory = "",
+                Answer2ByHistory = "",
+                Answer3ByHistory = "",
+                Answer4ByHistory = "",
+                Answer5ByHistory = ""
             };
-            _unitOfWork.Block1s.Create(block1);
-            Block2 block2 = new Block2()
-            {
-                IdCharacter = character.IdCharacter,
-                Question1 = String.Empty,
-                Question2 = String.Empty,
-                Question3 = String.Empty,
-                Question4 = String.Empty,
-                Question5 = String.Empty,
-                Question6 = String.Empty,
-                Question7 = String.Empty,
-                Question8 = String.Empty,
-                Question9 = String.Empty,
-            };
-            _unitOfWork.Block2s.Create(block2);
-            Block3 block3 = new Block3()
-            {
-                IdCharacter = character.IdCharacter,
-                Question1 = String.Empty,
-                Question2 = String.Empty,
-                Question3 = String.Empty,
-                Question4 = String.Empty,
-                Question5 = String.Empty,
-                Question6 = String.Empty,
-                Question7 = String.Empty,
-                Question8 = String.Empty,
-                Question9 = String.Empty,
-                Question10 = String.Empty,
-            };
-            _unitOfWork.Block3s.Create(block3);
-            Block4 block4 = new Block4()
-            {
-                IdCharacter = character.IdCharacter,
-                Question1 = String.Empty,
-                Question2 = String.Empty,
-                Question3 = String.Empty,
-                Question4 = String.Empty,
-                Question5 = String.Empty,
-            };
-            _unitOfWork.Block4s.Create(block4);
+            _unitOfWork.Answers.Create(answer);
 
             _unitOfWork.Save();
 
             return character;
         }
 
-        public async Task<Character> UpdateCharacter(CharacterWithBlocks characterWithBlocks)
+        public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
-            var character = _unitOfWork.Characters.Get(characterWithBlocks.IdCharacter);
-            character.IdPicture = characterWithBlocks.IdPicture;
+            var character = _unitOfWork.Characters.Get(id);
+            if (character.IdPicture!=null)
+            {
+                character.IdPicture = characterWithAnswers.IdPicture;
+            }
             // Обновление персонажа
             _unitOfWork.Characters.Update(character);
 
             // Обновление блоков
-            var block1 = _unitOfWork.Block1s.Get(character.IdCharacter);
-            block1.Name = characterWithBlocks.Name;
-            block1.Question1 = characterWithBlocks.Block1Question1;
-            block1.Question2 = characterWithBlocks.Block1Question2;
-            block1.Question3 = characterWithBlocks.Block1Question3;
-            block1.Question4 = characterWithBlocks.Block1Question4;
-            block1.Question5 = characterWithBlocks.Block1Question5;
-            block1.Question6 = characterWithBlocks.Block1Question6;
-
-            var block2 = _unitOfWork.Block2s.Get(character.IdCharacter);
-            block2.Question1 = characterWithBlocks.Block2Question1;
-            block2.Question2 = characterWithBlocks.Block2Question2;
-            block2.Question3 = characterWithBlocks.Block2Question3;
-            block2.Question4 = characterWithBlocks.Block2Question4;
-            block2.Question5 = characterWithBlocks.Block2Question5;
-            block2.Question6 = characterWithBlocks.Block2Question6;
-            block2.Question7 = characterWithBlocks.Block2Question7;
-            block2.Question8 = characterWithBlocks.Block2Question8;
-            block2.Question9 = characterWithBlocks.Block2Question9;
-
-            var block3 = _unitOfWork.Block3s.Get(character.IdCharacter);
-            block3.Question1 = characterWithBlocks.Block3Question1;
-            block3.Question2 = characterWithBlocks.Block3Question2;
-            block3.Question3 = characterWithBlocks.Block3Question3;
-            block3.Question4 = characterWithBlocks.Block3Question4;
-            block3.Question5 = characterWithBlocks.Block3Question5;
-            block3.Question6 = characterWithBlocks.Block3Question6;
-            block3.Question7 = characterWithBlocks.Block3Question7;
-            block3.Question8 = characterWithBlocks.Block3Question8;
-            block3.Question9 = characterWithBlocks.Block3Question9;
-            block3.Question10 = characterWithBlocks.Block3Question10;
-
-            var block4 = _unitOfWork.Block1s.Get(character.IdCharacter);
-            block4.Question1 = characterWithBlocks.Block4Question1;
-            block4.Question2 = characterWithBlocks.Block4Question2;
-            block4.Question3 = characterWithBlocks.Block4Question3;
-            block4.Question4 = characterWithBlocks.Block4Question4;
-            block4.Question5 = characterWithBlocks.Block4Question5;
-            
+            var answer = _unitOfWork.Answers.Get(id);
+            if (answer != null)
+            {
+                answer.Answer1Personality = characterWithAnswers.Answer1Personality;
+                answer.Answer2Personality = characterWithAnswers.Answer2Personality;
+                answer.Answer3Personality = characterWithAnswers.Answer3Personality;
+                answer.Answer4Personality = characterWithAnswers.Answer4Personality;
+                answer.Answer5Personality = characterWithAnswers.Answer5Personality;
+                answer.Answer6Personality = characterWithAnswers.Answer6Personality;
+                answer.Answer1Appearance = characterWithAnswers.Answer1Appearance;
+                answer.Answer2Appearance = characterWithAnswers.Answer2Appearance;
+                answer.Answer3Appearance = characterWithAnswers.Answer3Appearance;
+                answer.Answer4Appearance = characterWithAnswers.Answer4Appearance;
+                answer.Answer5Appearance = characterWithAnswers.Answer5Appearance;
+                answer.Answer6Appearance = characterWithAnswers.Answer6Appearance;
+                answer.Answer7Appearance = characterWithAnswers.Answer7Appearance;
+                answer.Answer8Appearance = characterWithAnswers.Answer8Appearance;
+                answer.Answer9Appearance = characterWithAnswers.Answer9Appearance;
+                answer.Answer1Temperament = characterWithAnswers.Answer1Temperament;
+                answer.Answer2Temperament = characterWithAnswers.Answer2Temperament;
+                answer.Answer3Temperament = characterWithAnswers.Answer3Temperament;
+                answer.Answer4Temperament = characterWithAnswers.Answer4Temperament;
+                answer.Answer5Temperament = characterWithAnswers.Answer5Temperament;
+                answer.Answer6Temperament = characterWithAnswers.Answer6Temperament;
+                answer.Answer7Temperament = characterWithAnswers.Answer7Temperament;
+                answer.Answer8Temperament = characterWithAnswers.Answer8Temperament;
+                answer.Answer9Temperament = characterWithAnswers.Answer9Temperament;
+                answer.Answer10Temperament = characterWithAnswers.Answer10Temperament;
+                answer.Answer1ByHistory = characterWithAnswers.Answer1ByHistory;
+                answer.Answer2ByHistory = characterWithAnswers.Answer2ByHistory;
+                answer.Answer3ByHistory = characterWithAnswers.Answer3ByHistory;
+                answer.Answer4ByHistory = characterWithAnswers.Answer4ByHistory;
+                answer.Answer5ByHistory = characterWithAnswers.Answer5ByHistory;
+            }
+            _unitOfWork.Answers.Update(answer);
             _unitOfWork.Save();
 
             return character;
@@ -156,30 +138,11 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление всех блоков персонажа
-            var block1s = _unitOfWork.Block1s.Find(b => b.IdCharacter == character.IdCharacter);
-            foreach (var block in block1s)
-            {
-                // Удаление блока
-                _unitOfWork.Block1s.Delete(block.IdCharacter);
-            }
-            var block2s = _unitOfWork.Block2s.Find(b => b.IdCharacter == character.IdCharacter);
-            foreach (var block in block2s)
-            {
-                // Удаление блока
-                _unitOfWork.Block2s.Delete(block.IdCharacter);
-            }
-            var block3s = _unitOfWork.Block3s.Find(b => b.IdCharacter == character.IdCharacter);
-            foreach (var block in block3s)
-            {
-                // Удаление блока
-                _unitOfWork.Block3s.Delete(block.IdCharacter);
-            }
-            var block4s = _unitOfWork.Block4s.Find(b => b.IdCharacter == character.IdCharacter);
-            foreach (var block in block4s)
-            {
-                // Удаление блока
-                _unitOfWork.Block4s.Delete(block.IdCharacter);
-            }
+            var answer = _unitOfWork.Answers.Get(character.IdCharacter);
+            // Удаление блока
+            _unitOfWork.Answers.Delete(answer.IdCharacter);
+            
+            
             // Удаление всех добавленных атрибутов блока
             var addedAttributes = _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == character.IdCharacter);
             foreach (var addedAttribute in addedAttributes)
@@ -212,16 +175,51 @@ namespace WebAPI.BLL.Services
             return character;
         }
 
-        public async Task<Character> GetCharacter(int id)
+        public async Task<CharacterWithAnswers> GetCharacter(int id)
         {
             var character = _unitOfWork.Characters.Get(id);
-
+            var answer = _unitOfWork.Answers.Get(id);
             if (character == null)
             {
                 throw new KeyNotFoundException();
             }
+            var characterWithAnswers = new CharacterWithAnswers()
+            {
+                IdPicture = character.IdPicture,
+                Name = answer.Name,
+                Answer1Personality = answer.Answer1Personality,
+                Answer2Personality = answer.Answer2Personality, 
+                Answer3Personality = answer.Answer3Personality,
+                Answer4Personality = answer.Answer4Personality,
+                Answer5Personality = answer.Answer6Personality,
+                Answer6Personality = answer.Answer6Personality,
+                Answer1Appearance = answer.Answer1Appearance,
+                Answer2Appearance = answer.Answer2Appearance,
+                Answer3Appearance = answer.Answer3Appearance,
+                Answer4Appearance = answer.Answer4Appearance,
+                Answer5Appearance = answer.Answer5Appearance,
+                Answer6Appearance = answer.Answer6Appearance,
+                Answer7Appearance = answer.Answer7Appearance,
+                Answer8Appearance = answer.Answer8Appearance,
+                Answer9Appearance = answer.Answer9Appearance,
+                Answer1Temperament = answer.Answer1Temperament,
+                Answer2Temperament = answer.Answer2Temperament,
+                Answer3Temperament = answer.Answer3Temperament,
+                Answer4Temperament = answer.Answer4Temperament,
+                Answer5Temperament = answer.Answer5Temperament,
+                Answer6Temperament = answer.Answer6Temperament,
+                Answer7Temperament = answer.Answer7Temperament,
+                Answer8Temperament = answer.Answer8Temperament,
+                Answer9Temperament = answer.Answer9Temperament,
+                Answer10Temperament = answer.Answer10Temperament,
+                Answer1ByHistory = answer.Answer1ByHistory,
+                Answer2ByHistory = answer.Answer2ByHistory,
+                Answer3ByHistory = answer.Answer3ByHistory,
+                Answer4ByHistory = answer.Answer4ByHistory,
+                Answer5ByHistory = answer.Answer5ByHistory
+            };
 
-            return character;
+            return characterWithAnswers;
         }
 
         public async Task<IEnumerable<Character>> GetAllCharacters(int idBook)

@@ -2,7 +2,7 @@
 {
     public class AAData
     {
-        public int NumberBlock { get; set; }
+        public int NumberAnswer { get; set; }
         public string NameAttribute { get; set; }
     }
 }

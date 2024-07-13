@@ -16,67 +16,67 @@ Content-Type: application/json
 
 "1"
 ###
-GET {{WebAPI_HostAddress}}/User/Book/Character/1
+GET {{WebAPI_HostAddress}}/User/Book/Character/4
 Accept: application/json
 
 ###
 # изменение персонажа и блоков
-PUT {{WebAPI_HostAddress}}/User/Book/Character/1
+PUT {{WebAPI_HostAddress}}/User/Book/Character/5
 Content-Type: application/json
 
 {
     "Name": "Обновленное имя персонажа",
-    "Block1Question1": "Обновленный вопрос 1",
-    "Block1Question2": "Обновленный вопрос 2",
-    "Block1Question3": "Обновленный вопрос 3",
-    "Block1Question4": "Обновленный вопрос 4",
-    "Block1Question5": "Обновленный вопрос 5",
-    "Block1Question6": "Обновленный вопрос 6",
-    "Block2Question1": "Обновленный вопрос 7",
-    "Block2Question2": "Обновленный вопрос 8",
-    "Block2Question3": "Обновленный вопрос 9",
-    "Block2Question4": "Обновленный вопрос 10",
-    "Block2Question5": "Обновленный вопрос 11",
-    "Block2Question6": "Обновленный вопрос 12",
-    "Block2Question7": "Обновленный вопрос 13",
-    "Block2Question8": "Обновленный вопрос 14",
-    "Block2Question9": "Обновленный вопрос 15",
-    "Block3Question1": "Обновленный вопрос 16",
-    "Block3Question2": "Обновленный вопрос 17",
-    "Block3Question3": "Обновленный вопрос 18",
-    "Block3Question4": "Обновленный вопрос 19",
-    "Block3Question5": "Обновленный вопрос 20",
-    "Block3Question6": "Обновленный вопрос 21",
-    "Block3Question7": "Обновленный вопрос 22",
-    "Block3Question8": "Обновленный вопрос 23",
-    "Block3Question9": "Обновленный вопрос 24",
-    "Block3Question10": "Обновленный вопрос 25",
-    "Block4Question1": "Обновленный вопрос 26",
-    "Block4Question2": "Обновленный вопрос 27",
-    "Block4Question3": "Обновленный вопрос 28",
-    "Block4Question4": "Обновленный вопрос 29",
-    "Block4Question5": "Обновленный вопрос 30"
+    "Answer1Personality": "Обновленный ответ 1",
+    "Answer2Personality": "Обновленный ответ 2",
+    "Answer3Personality": "Обновленный ответ 3",
+    "Answer4Personality": "Обновленный ответ 4",
+    "Answer5Personality": "Обновленный ответ 5",
+    "Answer6Personality": "Обновленный ответ 6",
+    "Answer1Appearance": "Обновленный ответ 1",
+    "Answer2Appearance": "Обновленный ответ 2",
+    "Answer3Appearance": "Обновленный ответ 3",
+    "Answer4Appearance": "Обновленный ответ 4",
+    "Answer5Appearance": "Обновленный ответ 5",
+    "Answer6Appearance": "Обновленный ответ 6",
+    "Answer7Appearance": "Обновленный ответ 7",
+    "Answer8Appearance": "Обновленный ответ 8",
+    "Answer9Appearance": "Обновленный ответ 9",
+    "Answer1Temperament": "Обновленный ответ 1",
+    "Answer2Temperament": "Обновленный ответ 2",
+    "Answer3Temperament": "Обновленный ответ 3",
+    "Answer4Temperament": "Обновленный ответ 4",
+    "Answer5Temperament": "Обновленный ответ 5",
+    "Answer6Temperament": "Обновленный ответ 6",
+    "Answer7Temperament": "Обновленный ответ 7",
+    "Answer8Temperament": "Обновленный ответ 8",
+    "Answer9Temperament": "Обновленный ответ 9",
+    "Answer10Temperament": "Обновленный ответ 10",
+    "Answer1ByHistory": "Обновленный ответ 1",
+    "Answer2ByHistory": "Обновленный ответ 2",
+    "Answer3ByHistory": "Обновленный ответ 3",
+    "Answer4ByHistory": "Обновленный ответ 4",
+    "Answer5ByHistory": "Обновленный ответ 5"
 }
 ###
 # удаление персонажа, блоков и добавленных атрибутов
-DELETE {{WebAPI_HostAddress}}/User/Book/Character/3
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/5
 
 ###
 # для атрибутов
 # создание атрибута
-POST {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute
+POST {{WebAPI_HostAddress}}/User/Book/Character/3/addedattribute
 Content-Type: application/json
 
 {
-    "NumberBlock": "1",
+    "NumberAnswer": "1",
     "NameAttribute": "Новое имя"
 }
 ###
 # изменение атрибута
-PUT {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
+PUT {{WebAPI_HostAddress}}/User/Book/Character/4/addedattribute/1
 Content-Type: application/json
 
 "Содержимое"
 ###
 # удаление атрибута
-DELETE {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/3/addedattribute/2

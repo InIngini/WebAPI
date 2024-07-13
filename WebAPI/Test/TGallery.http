@@ -3,11 +3,11 @@
 ###
 # для галереи
 # добавление изображения в галерею 
-POST {{WebAPI_HostAddress}}/User/Book/Gallery
+POST {{WebAPI_HostAddress}}/User/Book/Character/Gallery
 Content-Type: application/json
 
 {
-    "IdCharacter": "1",
+    "IdCharacter": "4",
     "IdPicture": "1"
 }
 ###
@@ -17,4 +17,4 @@ Content-Type: application/json
 "1"
 ###
 # удаление галереии
-DELETE {{WebAPI_HostAddress}}/User/Book/Gallery/1
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/Gallery/2

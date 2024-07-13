@@ -16,7 +16,7 @@ Content-Type: application/json
 GET {{WebAPI_HostAddress}}/User/Book/all
 Content-Type: application/json
 
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjAxNzQwMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.s508OwxKbfAalrpEVXWTlhOKOqxj7kn9NdgL1fDoNeY"
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjA4NzQ2ODIsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.obDDTr4q8pxoYMSxA91iMpWTSuGKzbSENhdCeV5pZG8"
 
 ###
 GET {{WebAPI_HostAddress}}/User/Book/1
@@ -24,7 +24,7 @@ Accept: application/json
 
 ###
 # изменение книги (1 - id книги)
-PUT {{WebAPI_HostAddress}}/User/Book/1
+PUT {{WebAPI_HostAddress}}/User/Book/3
 Content-Type: application/json
 
 {
@@ -33,4 +33,4 @@ Content-Type: application/json
 
 ###
 # удаление книги
-DELETE {{WebAPI_HostAddress}}/User/Book/1
+DELETE {{WebAPI_HostAddress}}/User/Book/3

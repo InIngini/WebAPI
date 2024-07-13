@@ -27,11 +27,11 @@ namespace WebAPI.Controllers
 
         //Создание пользователя
         [HttpPost("register")]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] LoginData loginData)
         {
-            var createdUser = await _userService.CreateUser(user);
+            var createdUser = await _userService.CreateUser(loginData);
 
-            return CreatedAtAction(nameof(GetUser), new { id = createdUser.IdUser }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.IdUser }, createdUser);
         }
 
         //Авторизация пользователя

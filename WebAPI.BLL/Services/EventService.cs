@@ -73,8 +73,9 @@ namespace WebAPI.BLL.Services
 
             if (eventData.IdCharacter != null)
             {
+                var characters = @event.IdCharacters.ToList();
                 // Удаление существующих связей персонажей с событием
-                foreach (var character in @event.IdCharacters.ToList())
+                foreach (var character in characters)
                 {
                     @event.IdCharacters.Remove(character);
                 }
@@ -137,7 +138,8 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Event>> GetAllEvents(int id)
         {
-            var events = _unitOfWork.Events.Find(e => e.IdTimelines.Any(e => e.IdTimeline == id)).ToList();
+            
+            var events = _unitOfWork.Events.Find(e => e.IdTimelines.Any(t => t.IdTimeline == id)).ToList();
 
             return events;
         }

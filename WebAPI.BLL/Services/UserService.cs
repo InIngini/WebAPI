@@ -24,16 +24,27 @@ namespace WebAPI.BLL.Services
             _tokenService = tokenService;
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<User> CreateUser(LoginData loginData)
         {
-            var validationContext = new ValidationContext(user);
+            var validationContext = new ValidationContext(loginData);
             var validationResults = new List<ValidationResult>();
 
-            if (!Validator.TryValidateObject(user, validationContext, validationResults, true))
+            if (!Validator.TryValidateObject(loginData, validationContext, validationResults, true))
             {
                 throw new ArgumentException("Модель не валидна");
             }
 
+            User user = new User()
+            {
+                Login =loginData.Login,
+                Password=loginData.Password
+            };
+
+            if(_unitOfWork.Users.Find(u => u.Login==user.Login).FirstOrDefault() != null)
+            {
+                throw new ArgumentException("Такой уже есть");
+            }
+            
             _unitOfWork.Users.Create(user);
             _unitOfWork.Save();
 

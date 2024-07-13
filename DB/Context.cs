@@ -15,7 +15,7 @@ namespace DB
         public Context() 
         {
             //Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
             //Database.Migrate();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -47,10 +47,7 @@ namespace DB
         public DbSet<BelongToEvent> BelongToEvents { get; set; }
         public DbSet<BelongToScheme> BelongToSchemes { get; set; }
         public DbSet<BelongToTimeline> BelongToTimelines { get; set; }
-        public DbSet<Block1> Block1s { get; set; }
-        public DbSet<Block2> Block2s { get; set; }
-        public DbSet<Block3> Block3s { get; set; }
-        public DbSet<Block4> Block4s { get; set; }
+        public DbSet<Answer> Answers { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<Connection> Connections { get; set; }
         public DbSet<Event> Events { get; set; }

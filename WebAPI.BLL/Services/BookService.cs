@@ -169,7 +169,28 @@ namespace WebAPI.BLL.Services
 
         public async Task<IEnumerable<Book>> GetAllBooksForUser(int userId)
         {
-            var books = _unitOfWork.Books.Find(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToList();
+            var user = _unitOfWork.Users.Get(userId);
+            if (user == null)
+            {
+                throw new ArgumentException("User with the specified ID does not exist.");
+            }
+            //var books = _unitOfWork.Books.Find(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToList();
+            var books = new List<Book>();
+            var belongToBooks = _unitOfWork.BelongToBooks.Find(b=>b.IdUser == userId);
+            foreach (var belongToBook in belongToBooks)
+            {
+                var book = _unitOfWork.Books.Get(belongToBook.IdBook);
+                if (book != null)
+                {
+                    var bookDtos = new Book
+                    {
+                        IdBook = book.IdBook,
+                        NameBook = book.NameBook,
+                        IdPicture = book.IdPicture
+                    };
+                    books.Add(bookDtos);
+                }
+            }
 
             return books;
         }

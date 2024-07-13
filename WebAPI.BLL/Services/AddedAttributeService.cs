@@ -46,19 +46,20 @@ namespace WebAPI.BLL.Services
             return addedAttribute;
         }
 
-        public async Task<AddedAttribute> DeleteAddedAttribute(int id)
+        public async Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida)
         {
-            var addedAttribute = _unitOfWork.AddedAttributes.Get(id);
+            var addedAttribute = _unitOfWork.AddedAttributes.Find(a=> a.IdAttribute==ida && a.IdCharacter==idc).Single();
 
             if (addedAttribute == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException("Атрибут не найден");
             }
 
-            _unitOfWork.AddedAttributes.Delete(id);
+            _unitOfWork.AddedAttributes.Delete(ida);
             _unitOfWork.Save();
 
             return addedAttribute;
+
         }
 
         public async Task<AddedAttribute> GetAddedAttribute(int id)
@@ -69,7 +70,7 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-
+            
             return addedAttribute;
         }
 

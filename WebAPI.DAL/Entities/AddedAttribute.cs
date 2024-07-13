@@ -7,7 +7,7 @@ public partial class AddedAttribute
 {
     public int IdAttribute { get; set; }
 
-    public int NumberBlock { get; set; }
+    public int NumberAnswer { get; set; }
 
     public string NameAttribute { get; set; } = null!;
 

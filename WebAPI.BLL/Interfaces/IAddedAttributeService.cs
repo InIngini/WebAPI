@@ -11,7 +11,7 @@ namespace WebAPI.BLL.Interfaces
     {
         Task<AddedAttribute> CreateAddedAttribute(AddedAttribute addedAttribute);
         Task<AddedAttribute> UpdateAddedAttribute(AddedAttribute addedAttribute);
-        Task<AddedAttribute> DeleteAddedAttribute(int id);
+        Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida);
         Task<AddedAttribute> GetAddedAttribute(int id);
         Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter);
     }

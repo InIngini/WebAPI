@@ -20,13 +20,7 @@ public partial class Context : DbContext
 
     public virtual DbSet<BelongToBook> BelongToBooks { get; set; }
 
-    public virtual DbSet<Block1> Block1s { get; set; }
-
-    public virtual DbSet<Block2> Block2s { get; set; }
-
-    public virtual DbSet<Block3> Block3s { get; set; }
-
-    public virtual DbSet<Block4> Block4s { get; set; }
+    public virtual DbSet<Answer> Answers { get; set; }
 
     public virtual DbSet<Book> Books { get; set; }
 
@@ -63,7 +57,7 @@ public partial class Context : DbContext
             entity.Property(e => e.ContentAttribute).HasColumnName("contentAttribute");
             entity.Property(e => e.IdCharacter).HasColumnName("idCharacter");
             entity.Property(e => e.NameAttribute).HasColumnName("nameAttribute");
-            entity.Property(e => e.NumberBlock).HasColumnName("numberBlock");
+            entity.Property(e => e.NumberAnswer).HasColumnName("numberAnswer");
 
             entity.HasOne(d => d.IdCharacterNavigation).WithMany(p => p.AddedAttributes).HasForeignKey(d => d.IdCharacter);
         });
@@ -83,7 +77,7 @@ public partial class Context : DbContext
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.BelongToBooks).HasForeignKey(d => d.IdUser);
         });
 
-        modelBuilder.Entity<Block1>(entity =>
+        modelBuilder.Entity<Answer>(entity =>
         {
             entity.HasKey(e => e.IdCharacter);
 
@@ -91,71 +85,38 @@ public partial class Context : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("idCharacter");
             entity.Property(e => e.Name).HasColumnName("name");
-            entity.Property(e => e.Question1).HasColumnName("question1");
-            entity.Property(e => e.Question2).HasColumnName("question2");
-            entity.Property(e => e.Question3).HasColumnName("question3");
-            entity.Property(e => e.Question4).HasColumnName("question4");
-            entity.Property(e => e.Question5).HasColumnName("question5");
-            entity.Property(e => e.Question6).HasColumnName("question6");
+            entity.Property(e => e.Answer1Personality).HasColumnName("answer1Personality");
+            entity.Property(e => e.Answer2Personality).HasColumnName("answer2Personality");
+            entity.Property(e => e.Answer3Personality).HasColumnName("answer3Personality");
+            entity.Property(e => e.Answer4Personality).HasColumnName("answer4Personality");
+            entity.Property(e => e.Answer5Personality).HasColumnName("answer5Personality");
+            entity.Property(e => e.Answer6Personality).HasColumnName("answer6Personality");
+            entity.Property(e => e.Answer1Appearance).HasColumnName("answer1Appearance");
+            entity.Property(e => e.Answer2Appearance).HasColumnName("answer2Appearance");
+            entity.Property(e => e.Answer3Appearance).HasColumnName("answer3Appearance");
+            entity.Property(e => e.Answer4Appearance).HasColumnName("answer4Appearance");
+            entity.Property(e => e.Answer5Appearance).HasColumnName("answer5Appearance");
+            entity.Property(e => e.Answer6Appearance).HasColumnName("answer6Appearance");
+            entity.Property(e => e.Answer7Appearance).HasColumnName("answer7Appearance");
+            entity.Property(e => e.Answer8Appearance).HasColumnName("answer8Appearance");
+            entity.Property(e => e.Answer9Appearance).HasColumnName("answer9Appearance");
+            entity.Property(e => e.Answer1Temperament).HasColumnName("answer1Temperament");
+            entity.Property(e => e.Answer2Temperament).HasColumnName("answer2Temperament");
+            entity.Property(e => e.Answer3Temperament).HasColumnName("answer3Temperament");
+            entity.Property(e => e.Answer4Temperament).HasColumnName("answer4Temperament");
+            entity.Property(e => e.Answer5Temperament).HasColumnName("answer5Temperament");
+            entity.Property(e => e.Answer6Temperament).HasColumnName("answer6Temperament");
+            entity.Property(e => e.Answer7Temperament).HasColumnName("answer7Temperament");
+            entity.Property(e => e.Answer8Temperament).HasColumnName("answer8Temperament");
+            entity.Property(e => e.Answer9Temperament).HasColumnName("answer9Temperament");
+            entity.Property(e => e.Answer10Temperament).HasColumnName("answer10Temperament");
+            entity.Property(e => e.Answer1ByHistory).HasColumnName("answer1ByHistory");
+            entity.Property(e => e.Answer2ByHistory).HasColumnName("answer2ByHistory");
+            entity.Property(e => e.Answer3ByHistory).HasColumnName("answer3ByHistory");
+            entity.Property(e => e.Answer4ByHistory).HasColumnName("answer4ByHistory");
+            entity.Property(e => e.Answer5ByHistory).HasColumnName("answer5ByHistory");
 
-            entity.HasOne(d => d.IdCharacterNavigation).WithOne(p => p.Block1).HasForeignKey<Block1>(d => d.IdCharacter);
-        });
-
-        modelBuilder.Entity<Block2>(entity =>
-        {
-            entity.HasKey(e => e.IdCharacter);
-
-            entity.Property(e => e.IdCharacter)
-                .ValueGeneratedNever()
-                .HasColumnName("idCharacter");
-            entity.Property(e => e.Question1).HasColumnName("question1");
-            entity.Property(e => e.Question2).HasColumnName("question2");
-            entity.Property(e => e.Question3).HasColumnName("question3");
-            entity.Property(e => e.Question4).HasColumnName("question4");
-            entity.Property(e => e.Question5).HasColumnName("question5");
-            entity.Property(e => e.Question6).HasColumnName("question6");
-            entity.Property(e => e.Question7).HasColumnName("question7");
-            entity.Property(e => e.Question8).HasColumnName("question8");
-            entity.Property(e => e.Question9).HasColumnName("question9");
-
-            entity.HasOne(d => d.IdCharacterNavigation).WithOne(p => p.Block2).HasForeignKey<Block2>(d => d.IdCharacter);
-        });
-
-        modelBuilder.Entity<Block3>(entity =>
-        {
-            entity.HasKey(e => e.IdCharacter);
-
-            entity.Property(e => e.IdCharacter)
-                .ValueGeneratedNever()
-                .HasColumnName("idCharacter");
-            entity.Property(e => e.Question1).HasColumnName("question1");
-            entity.Property(e => e.Question10).HasColumnName("question10");
-            entity.Property(e => e.Question2).HasColumnName("question2");
-            entity.Property(e => e.Question3).HasColumnName("question3");
-            entity.Property(e => e.Question4).HasColumnName("question4");
-            entity.Property(e => e.Question5).HasColumnName("question5");
-            entity.Property(e => e.Question6).HasColumnName("question6");
-            entity.Property(e => e.Question7).HasColumnName("question7");
-            entity.Property(e => e.Question8).HasColumnName("question8");
-            entity.Property(e => e.Question9).HasColumnName("question9");
-
-            entity.HasOne(d => d.IdCharacterNavigation).WithOne(p => p.Block3).HasForeignKey<Block3>(d => d.IdCharacter);
-        });
-
-        modelBuilder.Entity<Block4>(entity =>
-        {
-            entity.HasKey(e => e.IdCharacter);
-
-            entity.Property(e => e.IdCharacter)
-                .ValueGeneratedNever()
-                .HasColumnName("idCharacter");
-            entity.Property(e => e.Question1).HasColumnName("question1");
-            entity.Property(e => e.Question2).HasColumnName("question2");
-            entity.Property(e => e.Question3).HasColumnName("question3");
-            entity.Property(e => e.Question4).HasColumnName("question4");
-            entity.Property(e => e.Question5).HasColumnName("question5");
-
-            entity.HasOne(d => d.IdCharacterNavigation).WithOne(p => p.Block4).HasForeignKey<Block4>(d => d.IdCharacter);
+            entity.HasOne(d => d.IdCharacterNavigation).WithOne(p => p.Answer).HasForeignKey<Answer>(d => d.IdCharacter);
         });
 
         modelBuilder.Entity<Book>(entity =>

@@ -13,7 +13,7 @@ namespace DB.Entities
         [Key]
         public int idAttribute {  get; set; }
 
-        public int numberBlock { get; set; }
+        public int numberAnswer { get; set; }
         public string nameAttribute {  get; set; }
         public string contentAttribute { get; set; }
 

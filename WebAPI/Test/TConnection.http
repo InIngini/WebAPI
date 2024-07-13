@@ -9,7 +9,7 @@ Content-Type: application/json
 {
     "IdBook": "1",
     "IdCharacter1": "1",
-    "IdCharacter2": "5",
+    "IdCharacter2": "2",
     "TypeConnection": "2"
 }
 
