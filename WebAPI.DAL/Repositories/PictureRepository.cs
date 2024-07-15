@@ -19,7 +19,7 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Picture> GetAll()
+        public IEnumerable<Picture> GetAll(int id)
         {
             return db.Pictures;
         }

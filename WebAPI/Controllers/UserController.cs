@@ -12,7 +12,7 @@ using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
-    //[Authorize]
+    
     [ApiController]
     [Route("[controller]")]
     //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]

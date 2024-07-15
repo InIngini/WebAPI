@@ -97,11 +97,22 @@ namespace WebAPI.BLL.Services
             return connection;
         }
 
-        public async Task<IEnumerable<Connection>> GetAllConnections(int idScheme)
+        public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
         {
-            var connections = _unitOfWork.Connections.Find(c => c.IdSchemes.Any(s => s.IdScheme == idScheme)).ToList();
-
-            return connections;
+            var connections = _unitOfWork.Connections.GetAll(idScheme).ToList();
+            var connectionsData = new List<ConnectionAllData>();
+            foreach (var connection in connections)
+            {
+                var connectionData = new ConnectionAllData()
+                {
+                    IdConnection = connection.IdConnection,
+                    IdCharacter1 = connection.IdCharacter1,
+                    IdCharacter2 = connection.IdCharacter2,
+                    TypeConnection = connection.TypeConnection
+                };
+                connectionsData.Add(connectionData);
+            }
+            return connectionsData;
         }
     }
 

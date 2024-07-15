@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.DAL.Entities;
 using WebAPI.DAL.EF;
+using WebAPI.DAL.Guide;
 
 namespace WebAPI.DAL.Interfaces
 {
@@ -23,6 +24,11 @@ namespace WebAPI.DAL.Interfaces
         public IRepository<Scheme> Schemes { get; }
         public IRepository<Timeline> Timelines { get; }
         public IRepository<User> Users { get; }
+        public IRepository<NumberBlock> NumberBlocks { get; }
+        public IRepository<Question> Questions { get; }
+        public IRepository<Sex> Sex { get; }
+        public IRepository<TypeBelongToBook> TypeBelongToBooks { get; }
+        public IRepository<TypeConnection> TypeConnections { get; }
         void Save();
     }
 }

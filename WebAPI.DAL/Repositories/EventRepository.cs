@@ -19,9 +19,12 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Event> GetAll()
+        public IEnumerable<Event> GetAll(int id)
         {
-            return db.Events;
+            var timelline = db.Timelines.Include(s => s.IdEvents).FirstOrDefault(s => s.IdTimeline == id);
+            var events = timelline.IdEvents;
+
+            return events;
         }
 
         public Event Get(int id)

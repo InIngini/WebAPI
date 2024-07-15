@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.DAL.Entities;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/Book/Character/[controller]")]
     public class GalleryController : ControllerBase

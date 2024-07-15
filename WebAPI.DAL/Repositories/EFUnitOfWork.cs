@@ -2,6 +2,7 @@
 using WebAPI.DAL.EF;
 using WebAPI.DAL.Interfaces;
 using WebAPI.DAL.Entities;
+using WebAPI.DAL.Guide;
 
 namespace WebAPI.DAL.Repositories
 {
@@ -20,6 +21,11 @@ namespace WebAPI.DAL.Repositories
         private SchemeRepository schemeRepository;
         private TimelineRepository timelineRepository;
         private UserRepository userRepository;
+        private NumberBlockRepository numberBlockRepository;
+        private QuestionRepository questionRepository;
+        private SexRepository sexRepository;
+        private TypeBelongToBookRepository typeBelongToBookRepository;
+        private TypeConnectionRepository typeConnectionRepository;
 
         public EFUnitOfWork()
         {
@@ -143,6 +149,56 @@ namespace WebAPI.DAL.Repositories
                 if (userRepository == null)
                     userRepository = new UserRepository(db);
                 return userRepository;
+            }
+        }
+
+        public IRepository<NumberBlock> NumberBlocks
+        {
+            get
+            {
+                if (numberBlockRepository == null)
+                    numberBlockRepository = new NumberBlockRepository(db);
+                return numberBlockRepository;
+            }
+        }
+
+        public IRepository<Question> Questions
+        {
+            get
+            {
+                if (questionRepository == null)
+                    questionRepository = new QuestionRepository(db);
+                return questionRepository;
+            }
+        }
+
+        public IRepository<Sex> Sex
+        {
+            get
+            {
+                if (sexRepository == null)
+                    sexRepository = new SexRepository(db);
+                return sexRepository;
+            }
+        }
+
+        public IRepository<TypeBelongToBook> TypeBelongToBooks
+        {
+            get
+            {
+                if (typeBelongToBookRepository == null)
+                    typeBelongToBookRepository = new TypeBelongToBookRepository(db);
+                return typeBelongToBookRepository;
+            }
+        }
+
+        public IRepository<TypeConnection> TypeConnections
+        {
+            get
+            {
+                if (typeConnectionRepository == null)
+                    typeConnectionRepository = new TypeConnectionRepository(db);
+                return typeConnectionRepository;
             }
         }
 

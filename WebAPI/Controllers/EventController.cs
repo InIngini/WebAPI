@@ -6,9 +6,11 @@ using System.Text.Json;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/Book/Timeline/[controller]")]
     public class EventController : Controller
@@ -42,29 +44,29 @@ namespace WebAPI.Controllers
             return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.IdEvent }, json);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
-        {
-            // Получение события из базы данных
-            var @event = await _eventService.GetEvent(id);
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
+        //{
+        //    // Получение события из базы данных
+        //    var @event = await _eventService.GetEvent(id);
 
-            // Если событие не найдено, вернуть ошибку
-            if (@event == null)
-            {
-                return NotFound();
-            }
+        //    // Если событие не найдено, вернуть ошибку
+        //    if (@event == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var updatedEvent = await _eventService.UpdateEvent(eventData,id);
+        //    var updatedEvent = await _eventService.UpdateEvent(eventData,id);
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
+        //    var options = new JsonSerializerOptions
+        //    {
+        //        ReferenceHandler = ReferenceHandler.Preserve
+        //    };
 
-            string json = JsonSerializer.Serialize(updatedEvent, options);
-            // Возврат обновленного события
-            return Ok(json);
-        }
+        //    string json = JsonSerializer.Serialize(updatedEvent, options);
+        //    // Возврат обновленного события
+        //    return Ok(json);
+        //}
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)

@@ -19,7 +19,7 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Timeline> GetAll()
+        public IEnumerable<Timeline> GetAll(int id)
         {
             return db.Timelines;
         }

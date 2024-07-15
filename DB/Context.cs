@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DB.Entities;
+using DB.Guide;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,7 @@ namespace DB
         {
             //Database.EnsureDeleted();
             //Database.EnsureCreated();
-            //Database.Migrate();
+            Database.Migrate();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -55,5 +56,10 @@ namespace DB
         public DbSet<Picture> Pictures { get; set; }
         public DbSet<Scheme> Schemes { get; set; }
         public DbSet<Timeline> Timelines { get; set; }
+        public DbSet<NumberBlock> NumberBlocks { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Sex> Sex { get; set; }
+        public DbSet<TypeBelongToBook> TypeBelongToBooks { get; set; }
+        public DbSet<TypeConnection> TypeConnections { get; set; }
     }
 }

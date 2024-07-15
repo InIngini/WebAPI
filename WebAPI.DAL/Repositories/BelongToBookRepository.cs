@@ -19,9 +19,9 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<BelongToBook> GetAll()
+        public IEnumerable<BelongToBook> GetAll(int id)
         {
-            return db.BelongToBooks;
+            return db.BelongToBooks.Where(a => a.IdUser == id);
         }
 
         public BelongToBook Get(int id)

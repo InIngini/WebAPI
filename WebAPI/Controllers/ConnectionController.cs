@@ -6,9 +6,11 @@ using System.Text.Json;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/Book/Scheme/[controller]")]
     public class ConnectionController : Controller
@@ -81,6 +83,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound();
             }
+            
 
             return Ok(connections);
         }

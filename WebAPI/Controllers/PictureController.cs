@@ -4,9 +4,11 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/[controller]")]
     public class PictureController : ControllerBase

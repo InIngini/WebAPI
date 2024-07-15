@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/Book/[controller]")]
     public class SchemeController : ControllerBase

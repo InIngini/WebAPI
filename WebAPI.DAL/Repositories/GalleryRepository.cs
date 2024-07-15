@@ -19,9 +19,9 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Gallery> GetAll()
+        public IEnumerable<Gallery> GetAll(int id)
         {
-            return db.Galleries;
+            return db.Galleries.Where(a => a.IdCharacter == id);
         }
 
         public Gallery Get(int id)

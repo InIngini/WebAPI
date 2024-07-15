@@ -10,9 +10,11 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.DAL.Entities;
 using WebAPI.BLL.Token;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("User/[controller]")]
     public class BookController : Controller

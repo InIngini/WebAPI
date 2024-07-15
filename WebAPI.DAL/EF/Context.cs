@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Entities;
 using WebAPI;
+using WebAPI.DAL.Guide;
 
 namespace WebAPI.DAL.EF;
 
@@ -39,6 +40,11 @@ public partial class Context : DbContext
     public virtual DbSet<Timeline> Timelines { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    public DbSet<NumberBlock> NumberBlocks { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Sex> Sex { get; set; }
+    public DbSet<TypeBelongToBook> TypeBelongToBooks { get; set; }
+    public DbSet<TypeConnection> TypeConnections { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -234,8 +240,7 @@ public partial class Context : DbContext
                     "BelongToScheme",
                     r => r.HasOne<Connection>().WithMany().HasForeignKey("IdConnection"),
                     l => l.HasOne<Scheme>().WithMany()
-                        .HasForeignKey("IdScheme")
-                        .OnDelete(DeleteBehavior.ClientSetNull),
+                        .HasForeignKey("IdScheme"),
                     j =>
                     {
                         j.HasKey("IdScheme", "IdConnection");
@@ -281,6 +286,50 @@ public partial class Context : DbContext
             entity.Property(e => e.Login).HasColumnName("login");
             entity.Property(e => e.Password).HasColumnName("password");
         });
+
+        modelBuilder.Entity<NumberBlock>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Name).HasColumnName("Name");
+        });
+        modelBuilder.Entity<Question>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Name).HasColumnName("Name");
+            entity.Property(e => e.Block).HasColumnName("Block");
+
+            entity.HasOne(d => d.NumberBlock)
+                .WithMany(p => p.Questions)
+                .HasForeignKey(d => d.Block)
+                .HasConstraintName("FK_Question_NumberBlock");
+        });
+        modelBuilder.Entity<Sex>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Name).HasColumnName("Name");
+        });
+        modelBuilder.Entity<TypeBelongToBook>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Name).HasColumnName("Name");
+        });
+        modelBuilder.Entity<TypeConnection>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.Name).HasColumnName("Name");
+        });
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

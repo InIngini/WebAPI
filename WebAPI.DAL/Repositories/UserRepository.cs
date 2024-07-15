@@ -19,7 +19,7 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<User> GetAll()
+        public IEnumerable<User> GetAll(int id)
         {
             return db.Users;
         }

@@ -63,38 +63,38 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
-        public async Task<Event> UpdateEvent(EventData eventData, int id)
-        {
-            Event @event = _unitOfWork.Events.Get(id);
-            // Обновление события
-            @event.Name = eventData.Name;
-            @event.Content = eventData.Content;
-            @event.Time = eventData.Time;
+        //public async Task<Event> UpdateEvent(EventData eventData, int id)
+        //{
+        //    Event @event = _unitOfWork.Events.Get(id);
+        //    // Обновление события
+        //    @event.Name = eventData.Name;
+        //    @event.Content = eventData.Content;
+        //    @event.Time = eventData.Time;
 
-            if (eventData.IdCharacter != null)
-            {
-                var characters = @event.IdCharacters.ToList();
-                // Удаление существующих связей персонажей с событием
-                foreach (var character in characters)
-                {
-                    @event.IdCharacters.Remove(character);
-                }
-                // Добавление новых
-                foreach (var idCharacter in eventData.IdCharacter)
-                {
-                    var character = _unitOfWork.Characters.Get(idCharacter);
-                    if (character != null)
-                    {
-                        @event.IdCharacters.Add(character);
-                    }
-                }
-            }
+        //    if (eventData.IdCharacter != null)
+        //    {
+        //        var characters = @event.IdCharacters.ToList();
+        //        // Удаление существующих связей персонажей с событием
+        //        foreach (var character in characters)
+        //        {
+        //            @event.IdCharacters.Remove(character);
+        //        }
+        //        // Добавление новых
+        //        foreach (var idCharacter in eventData.IdCharacter)
+        //        {
+        //            var character = _unitOfWork.Characters.Get(idCharacter);
+        //            if (character != null)
+        //            {
+        //                @event.IdCharacters.Add(character);
+        //            }
+        //        }
+        //    }
 
-            _unitOfWork.Events.Update(@event);
-            _unitOfWork.Save();
+        //    _unitOfWork.Events.Update(@event);
+        //    _unitOfWork.Save();
 
-            return @event;
-        }
+        //    return @event;
+        //}
 
         public async Task<Event> DeleteEvent(int id)
         {
@@ -136,12 +136,22 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
-        public async Task<IEnumerable<Event>> GetAllEvents(int id)
+        public async Task<IEnumerable<EventAllData>> GetAllEvents(int id)
         {
             
-            var events = _unitOfWork.Events.Find(e => e.IdTimelines.Any(t => t.IdTimeline == id)).ToList();
-
-            return events;
+            var events = _unitOfWork.Events.GetAll(id).ToList();
+            var eventsData = new List<EventAllData>();
+            foreach (var connection in events)
+            {
+                var eventData = new EventAllData()
+                {
+                    IdEvent = connection.IdEvent,
+                    Name = connection.Name,
+                    Time = connection.Time,
+                };
+                eventsData.Add(eventData);
+            }
+            return eventsData;
         }
     }
 

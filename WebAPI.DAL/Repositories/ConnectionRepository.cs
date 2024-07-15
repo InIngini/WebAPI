@@ -19,9 +19,12 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Connection> GetAll()
+        public IEnumerable<Connection> GetAll(int id)
         {
-            return db.Connections;
+            var scheme = db.Schemes.Include(s => s.IdConnections).FirstOrDefault(s => s.IdScheme == id);
+            var connections = scheme.IdConnections;
+
+            return connections;
         }
 
         public Connection Get(int id)

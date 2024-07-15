@@ -46,7 +46,7 @@ namespace WebAPI.BLL.Services
             {
                 IdUser = userbook.idUser,
                 IdBook = book.IdBook,
-                TypeBelong = 0 // автор
+                TypeBelong = 1 // автор
             };
 
             // Сохранение BelongTo в базе данных

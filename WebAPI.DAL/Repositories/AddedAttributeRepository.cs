@@ -19,9 +19,9 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<AddedAttribute> GetAll()
+        public IEnumerable<AddedAttribute> GetAll(int id)
         {
-            return db.AddedAttributes;
+            return db.AddedAttributes.Where(a=>a.IdCharacter==id);
         }
 
         public AddedAttribute Get(int id)

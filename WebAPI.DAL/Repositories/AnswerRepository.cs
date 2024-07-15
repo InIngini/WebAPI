@@ -19,9 +19,9 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Answer> GetAll()
+        public IEnumerable<Answer> GetAll(int id)
         {
-            return db.Answers;
+            return db.Answers.Where(a => a.IdCharacter == id);
         }
 
         public Answer Get(int id)

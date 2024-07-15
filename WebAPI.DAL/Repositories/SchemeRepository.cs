@@ -19,7 +19,7 @@ namespace WebAPI.DAL.Repositories
             this.db = context;
         }
 
-        public IEnumerable<Scheme> GetAll()
+        public IEnumerable<Scheme> GetAll(int id)
         {
             return db.Schemes;
         }
