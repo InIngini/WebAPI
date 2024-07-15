@@ -13,6 +13,10 @@ ER-диаграмма на это дело:
 
 ![схема (1)](https://github.com/user-attachments/assets/d313b31a-13d6-4b73-b3e4-7f9215091c33)
 
+Справочники:
+
+![oF2xiQzUoTA](https://github.com/user-attachments/assets/d4803351-b48b-4914-baa4-260c3484505b)
+
 ### Бэк
 
 Бэк: получение запросов от клиента на сохранение этих данных, выведение, изменение, удаление. 
