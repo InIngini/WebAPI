@@ -11,6 +11,6 @@ namespace WebAPI.BLL.DTO
         public int IdConnection { get; set; }
         public int IdCharacter1 { get; set; }
         public int IdCharacter2 { get; set; }
-        public int TypeConnection { get; set; }
+        public string TypeConnection { get; set; }
     }
 }

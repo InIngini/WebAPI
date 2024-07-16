@@ -16,12 +16,16 @@ Content-Type: application/json
 
 "1"
 ###
-GET {{WebAPI_HostAddress}}/User/Book/Character/4
+GET {{WebAPI_HostAddress}}/User/Book/Character/1
+Accept: application/json
+
+###
+GET {{WebAPI_HostAddress}}/User/Book/Character
 Accept: application/json
 
 ###
 # изменение персонажа и блоков
-PUT {{WebAPI_HostAddress}}/User/Book/Character/5
+PUT {{WebAPI_HostAddress}}/User/Book/Character/1
 Content-Type: application/json
 
 {

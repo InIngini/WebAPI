@@ -10,7 +10,7 @@ Content-Type: application/json
     "IdBook": "1",
     "IdCharacter1": "1",
     "IdCharacter2": "2",
-    "TypeConnection": "2"
+    "TypeConnection": "Сиблинг"
 }
 
 ###
@@ -18,3 +18,7 @@ GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/all
 Content-Type: application/json
 
 "1"
+
+###
+GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/1
+Accept: application/json

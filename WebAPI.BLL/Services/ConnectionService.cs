@@ -33,7 +33,7 @@ namespace WebAPI.BLL.Services
 
             Connection connection = new Connection()
             {
-                TypeConnection = connectionData.TypeConnection,
+                TypeConnection = _unitOfWork.TypeConnections.Find(t=>t.Name==connectionData.TypeConnection).FirstOrDefault().Id,
                 IdCharacter1 = connectionData.IdCharacter1,
                 IdCharacter2 = connectionData.IdCharacter2,
             };
@@ -85,7 +85,7 @@ namespace WebAPI.BLL.Services
             return connection;
         }
 
-        public async Task<Connection> GetConnection(int id)
+        public async Task<ConnectionData> GetConnection(int id)
         {
             var connection = _unitOfWork.Connections.Get(id);
 
@@ -93,8 +93,16 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-
-            return connection;
+            var connectionData = new ConnectionData()
+            {
+                IdConnection = connection.IdConnection,
+                IdCharacter1 = connection.IdCharacter1,
+                Name1 = _unitOfWork.Answers.Get(connection.IdCharacter1).Name,
+                IdCharacter2 = connection.IdCharacter2,
+                Name2 = _unitOfWork.Answers.Get(connection.IdCharacter2).Name,
+                TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name
+            };
+            return connectionData;
         }
 
         public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
@@ -108,7 +116,8 @@ namespace WebAPI.BLL.Services
                     IdConnection = connection.IdConnection,
                     IdCharacter1 = connection.IdCharacter1,
                     IdCharacter2 = connection.IdCharacter2,
-                    TypeConnection = connection.TypeConnection
+                    TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name
+
                 };
                 connectionsData.Add(connectionData);
             }

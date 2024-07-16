@@ -9,6 +9,7 @@ using WebAPI.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using WebAPI.DAL.Guide;
 
 namespace WebAPI.BLL.Services
 {
@@ -91,6 +92,7 @@ namespace WebAPI.BLL.Services
             var answer = _unitOfWork.Answers.Get(id);
             if (answer != null)
             {
+                answer.Name = characterWithAnswers.Name;
                 answer.Answer1Personality = characterWithAnswers.Answer1Personality;
                 answer.Answer2Personality = characterWithAnswers.Answer2Personality;
                 answer.Answer3Personality = characterWithAnswers.Answer3Personality;
@@ -222,11 +224,39 @@ namespace WebAPI.BLL.Services
             return characterWithAnswers;
         }
 
-        public async Task<IEnumerable<Character>> GetAllCharacters(int idBook)
+        public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook)
         {
             var characters = _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToList();
+            var charactersAllData = new List<CharacterAllData>();
+            foreach (var character in characters)
+            {
+                var characterAllData = new CharacterAllData()
+                {
+                    IdCharacter = character.IdCharacter,
+                    Name = _unitOfWork.Answers.Get(character.IdCharacter).Name,
+                };
+                if (character.IdPicture != null)
+                    characterAllData.Picture1 = _unitOfWork.Pictures.Get((int)character.IdPicture).Picture1;
+                charactersAllData.Add(characterAllData);
+            }
+            return charactersAllData;
+        }
+        public async Task<IEnumerable<QuestionData>> GetQuestions()
+        {
+            var questions = _unitOfWork.Questions.GetAll(0).ToList();
+            var questionsData = new List<QuestionData>();
+            foreach (var question in questions)
+            {
+                var questionData = new QuestionData()
+                {
+                    Id = question.Id,
+                    Name = question.Name,
+                    Block = _unitOfWork.NumberBlocks.Get(question.Block).Name
+                };
+                questionsData.Add(questionData);
+            }
 
-            return characters;
+            return questionsData;
         }
     }
 }

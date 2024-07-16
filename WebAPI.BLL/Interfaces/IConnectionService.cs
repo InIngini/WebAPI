@@ -12,7 +12,7 @@ namespace WebAPI.BLL.Interfaces
     {
         Task<Connection> CreateConnection(ConnectionData connectionData);
         Task<Connection> DeleteConnection(int id);
-        Task<Connection> GetConnection(int id);
+        Task<ConnectionData> GetConnection(int id);
         Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme);
     }
 

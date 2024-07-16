@@ -110,7 +110,18 @@ namespace WebAPI.Controllers
             return Ok(characters);
         }
 
+        [HttpGet]//получить вопросы
+        public async Task<IActionResult> GetQuestions()
+        {
+            var questions = await _characterService.GetQuestions();
 
+            if (questions == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(questions);
+        }
         ////////////////////////////Для добавленного атрибута//////////////////////////////
 
         /////Создать атрибут

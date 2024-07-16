@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.DTO;
 using WebAPI.DAL.Entities;
+using WebAPI.DAL.Guide;
 
 namespace WebAPI.BLL.Interfaces
 {
@@ -14,7 +15,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Character> UpdateCharacter(CharacterWithAnswers character,int id);
         Task<Character> DeleteCharacter(int id);
         Task<CharacterWithAnswers> GetCharacter(int id);
-        Task<IEnumerable<Character>> GetAllCharacters(int idBook);
+        Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook);
+        Task<IEnumerable<QuestionData>> GetQuestions();
     }
 
 }
