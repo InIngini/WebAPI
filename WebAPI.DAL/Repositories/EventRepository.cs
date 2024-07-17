@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.DAL.EF;
-using WebAPI.DAL.Entities;
+using WebAPI.DB;
+using WebAPI.DB.Entities;
 using WebAPI.DAL.Interfaces;
 
 namespace WebAPI.DAL.Repositories
@@ -21,9 +21,13 @@ namespace WebAPI.DAL.Repositories
 
         public IEnumerable<Event> GetAll(int id)
         {
-            var timelline = db.Timelines.Include(s => s.IdEvents).FirstOrDefault(s => s.IdTimeline == id);
-            var events = timelline.IdEvents;
-
+            var timelines = db.BelongToTimelines.Where(s => s.IdTimeline == id).ToList();
+            var events = new List<Event>();
+            foreach (var timeline in timelines)
+            {
+                var @event = db.Events.Find(timeline.IdEvent);
+                events.Add(@event);
+            }
             return events;
         }
 

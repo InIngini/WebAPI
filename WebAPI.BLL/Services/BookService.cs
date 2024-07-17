@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -102,10 +102,11 @@ namespace WebAPI.BLL.Services
                 if (scheme.NameScheme == "Главная схема")
                 {
                     // Удаление всех связей схемы
-                    var connections = _unitOfWork.Connections.Find(c => c.IdSchemes.Any(s => s.IdScheme == scheme.IdScheme));
-                    foreach (var connection in connections)
+                    var belongToScheme = _unitOfWork.BelongToSchemes.Find(b=> b.IdScheme==scheme.IdScheme);
+                    foreach (var connection in belongToScheme)
                     {
                         _unitOfWork.Connections.Delete(connection.IdConnection);
+                        _unitOfWork.BelongToSchemes.Delete(connection.IdConnection);
                     }
                 }
                 // Удаление схемы
@@ -120,10 +121,11 @@ namespace WebAPI.BLL.Services
                 if (timeline.NameTimeline == "Главый таймлайн")
                 {
                     // Удаление всех связей схемы
-                    var events = _unitOfWork.Events.Find(c => c.IdTimelines.Any(s => s.IdTimeline == timeline.IdTimeline));
-                    foreach (var @event in events)
+                    var belongToTimeline = _unitOfWork.BelongToTimelines.Find(b => b.IdTimeline == timeline.IdTimeline);
+                    foreach (var @event in belongToTimeline)
                     {
-                        _unitOfWork.Connections.Delete(@event.IdEvent);
+                        _unitOfWork.Events.Delete(@event.IdEvent);
+                        _unitOfWork.BelongToTimelines.Delete(@event.IdEvent);
                     }
                 }
                 // Удаление схемы

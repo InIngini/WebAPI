@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -46,7 +46,12 @@ namespace WebAPI.BLL.Services
             _unitOfWork.Save();
 
             // Добавление связи в главную схему
-            scheme.IdConnections.Add(connection);
+            var belongToScheme = new BelongToScheme()
+            {
+                IdScheme = scheme.IdScheme,
+                IdConnection = connection.IdConnection
+            };
+            _unitOfWork.BelongToSchemes.Create(belongToScheme);
             _unitOfWork.Save();
 
             return connection;
@@ -64,16 +69,12 @@ namespace WebAPI.BLL.Services
             }
 
             // Получение схем, связанных со связью, и удаление их оттуда
-            var schemes = _unitOfWork.Schemes.Find(c => c.IdConnections.Any(s => s.IdConnection == id)).ToList();
-
+            //var schemes = _unitOfWork.Schemes.Find(c => c.IdConnections.Any(s => s.IdConnection == id)).ToList();
+            var schemes = _unitOfWork.BelongToSchemes.Find(b=>b.IdConnection == id).ToList();
             // Удаление IdConnection удаляемой связи из схем
             foreach (var scheme in schemes)
             {
-                var connection1 = scheme.IdConnections.FirstOrDefault(c => c.IdConnection == id);
-                if (connection1 != null)
-                {
-                    scheme.IdConnections.Remove(connection1);
-                }
+                _unitOfWork.BelongToSchemes.Delete(scheme.IdConnection);
             }
             // Сохранение изменений в базе данных
             _unitOfWork.Save();

@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using WebAPI.BLL.Token;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;

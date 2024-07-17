@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.DAL.EF;
-using WebAPI.DAL.Entities;
+using WebAPI.DB;
+using WebAPI.DB.Entities;
 using WebAPI.DAL.Interfaces;
 
 namespace WebAPI.DAL.Repositories
@@ -21,8 +21,13 @@ namespace WebAPI.DAL.Repositories
 
         public IEnumerable<Connection> GetAll(int id)
         {
-            var scheme = db.Schemes.Include(s => s.IdConnections).FirstOrDefault(s => s.IdScheme == id);
-            var connections = scheme.IdConnections;
+            var schemes = db.BelongToSchemes.Where(s=>s.IdScheme==id).ToList();
+            var connections = new List<Connection>();
+            foreach(var scheme in schemes)
+            {
+                var connection = db.Connections.Find(scheme.IdConnection);
+                connections.Add(connection);
+            }
 
             return connections;
         }

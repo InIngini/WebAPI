@@ -13,14 +13,17 @@ using System.Text;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.Services;
 using WebAPI.BLL.Token;
-using WebAPI.DAL.EF;
+using WebAPI.DB;
 using WebAPI.DAL.Interfaces;
 using WebAPI.DAL.Repositories;
+using System.Diagnostics;
 
 namespace WebAPI
 {
     public class Program
     {
+        //dotnet ef migrations add InitialCreate - писала в консольку дл€ создани€ миграции
+
         //dotnet ef dbcontext scaffold "Data Source=(localdb)\MSSQLLocalDB;
         //AttachDbFileName=C:\Users\vorob\source\repos\WebAPI\DB\bin\Debug\net8.0\DB\DB.mdf;Integrated Security=True;"
         //Microsoft.EntityFrameworkCore.SqlServer - писала в консольку дл€ получени€ классов 
@@ -28,14 +31,14 @@ namespace WebAPI
         public static void Main(string[] args)
         {
             
-            ConnectionString.ConnectString();
+            //ConnectionString.ConnectString();
             
             // —оздаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
             // –егистраци€ контекста базы данных
             builder.Services.AddDbContext<Context>(options =>
-                options.UseSqlServer(ConnectionString.connectionString));
+                options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
 
             // ƒобавить контроллеры
             builder.Services.AddControllers();

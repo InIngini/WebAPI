@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
-using WebAPI.DAL.Guide;
+using WebAPI.DB.Entities;
+using WebAPI.DB.Guide;
 
 namespace WebAPI.BLL.Interfaces
 {

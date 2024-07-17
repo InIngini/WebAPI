@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebAPI.DAL.Interfaces;
-using WebAPI.DAL.Guide;
-using WebAPI.DAL.EF;
+using WebAPI.DB.Guide;
+using WebAPI.DB;
 
 namespace WebAPI.DAL.Repositories
 {

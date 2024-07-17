@@ -4,9 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.DAL.Entities;
-using WebAPI.DAL.EF;
-using WebAPI.DAL.Guide;
+using WebAPI.DB.Entities;
+using WebAPI.DB;
+using WebAPI.DB.Guide;
 
 namespace WebAPI.DAL.Interfaces
 {
@@ -14,6 +14,9 @@ namespace WebAPI.DAL.Interfaces
     {
         public IRepository<AddedAttribute> AddedAttributes { get; }
         public IRepository<BelongToBook> BelongToBooks { get; }
+        public IRepository<BelongToEvent> BelongToEvents { get; }
+        public IRepository<BelongToScheme> BelongToSchemes { get; }
+        public IRepository<BelongToTimeline> BelongToTimelines { get; }
         public IRepository<Answer> Answers { get; }
         public IRepository<Book> Books { get; }
         public IRepository<Character> Characters { get; }

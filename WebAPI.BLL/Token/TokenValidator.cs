@@ -3,8 +3,8 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WebAPI.DAL.Entities;
-using WebAPI.DAL.EF;
+using WebAPI.DB.Entities;
+using WebAPI.DB;
 using Microsoft.Extensions.Configuration;
 
 

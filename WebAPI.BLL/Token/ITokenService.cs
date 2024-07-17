@@ -1,4 +1,4 @@
-﻿using WebAPI.DAL.Entities;
+﻿using WebAPI.DB.Entities;
 
 namespace WebAPI.BLL.Token
 {

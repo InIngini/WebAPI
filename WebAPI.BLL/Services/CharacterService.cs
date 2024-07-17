@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
-using WebAPI.DAL.Guide;
+using WebAPI.DB.Guide;
 
 namespace WebAPI.BLL.Services
 {
@@ -157,9 +157,9 @@ namespace WebAPI.BLL.Services
             foreach (var galleryItem in galleryItems)
             {
                 // Удаление всех изображений
-                var image = _unitOfWork.Pictures.Get(galleryItem.IdPicture);
+                var image = _unitOfWork.Pictures.Get((int)galleryItem.IdPicture);
                 _unitOfWork.Pictures.Delete(image.IdPicture);
-                _unitOfWork.Galleries.Delete(galleryItem.IdPicture);
+                _unitOfWork.Galleries.Delete((int)galleryItem.IdPicture);
             }
 
             // Удаление аватарки
@@ -170,6 +170,18 @@ namespace WebAPI.BLL.Services
                 _unitOfWork.Pictures.Delete(imageavatar.IdPicture);
             }
             
+            // Удаление связи
+            var connections = _unitOfWork.Connections.Find(c=> c.IdCharacter1==character.IdCharacter||c.IdCharacter2==character.IdCharacter).ToList();
+            foreach (var connection in connections)
+            {
+                var belongToScheme = _unitOfWork.BelongToSchemes.Find(b=>b.IdConnection==connection.IdConnection).ToList();
+                foreach(var scheme in belongToScheme)
+                {
+                    _unitOfWork.BelongToSchemes.Delete(connection.IdConnection);
+                }
+                _unitOfWork.Connections.Delete(connection.IdConnection);
+            }
+
             // Удаление персонажа
             _unitOfWork.Characters.Delete(character.IdCharacter);
             _unitOfWork.Save();

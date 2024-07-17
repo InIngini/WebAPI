@@ -1,8 +1,8 @@
 ﻿using System;
-using WebAPI.DAL.EF;
+using WebAPI.DB;
 using WebAPI.DAL.Interfaces;
-using WebAPI.DAL.Entities;
-using WebAPI.DAL.Guide;
+using WebAPI.DB.Entities;
+using WebAPI.DB.Guide;
 
 namespace WebAPI.DAL.Repositories
 {
@@ -11,6 +11,9 @@ namespace WebAPI.DAL.Repositories
         private Context db;
         private AddedAttributeRepository addedAttributeRepository;
         private BelongToBookRepository belongToBookRepository;
+        private BelongToEventRepository belongToEventRepository;
+        private BelongToSchemeRepository belongToSchemeRepository;
+        private BelongToTimelineRepository belongToTimelineRepository;
         private AnswerRepository answerRepository;
         private BookRepository bookRepository;
         private CharacterRepository characterRepository;
@@ -49,6 +52,33 @@ namespace WebAPI.DAL.Repositories
                 if (belongToBookRepository == null)
                     belongToBookRepository = new BelongToBookRepository(db);
                 return belongToBookRepository;
+            }
+        }
+        public IRepository<BelongToEvent> BelongToEvents
+        {
+            get
+            {
+                if (belongToEventRepository == null)
+                    belongToEventRepository = new BelongToEventRepository(db);
+                return belongToEventRepository;
+            }
+        }
+        public IRepository<BelongToScheme> BelongToSchemes
+        {
+            get
+            {
+                if (belongToSchemeRepository == null)
+                    belongToSchemeRepository = new BelongToSchemeRepository(db);
+                return belongToSchemeRepository;
+            }
+        }
+        public IRepository<BelongToTimeline> BelongToTimelines
+        {
+            get
+            {
+                if (belongToTimelineRepository == null)
+                    belongToTimelineRepository = new BelongToTimelineRepository(db);
+                return belongToTimelineRepository;
             }
         }
 

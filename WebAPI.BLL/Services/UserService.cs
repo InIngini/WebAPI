@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Token;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
 

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers

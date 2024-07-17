@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -49,9 +49,12 @@ namespace WebAPI.BLL.Services
             }
 
             // Добавление события в таймлайн
-            timeline.IdEvents.Add(@event);
-            
-            _unitOfWork.Timelines.Update(timeline);
+            var belongToTimeline = new BelongToTimeline()
+            {
+                IdEvent = idEvent,
+                IdTimeline = timeline.IdTimeline
+            };
+            _unitOfWork.BelongToTimelines.Create(belongToTimeline);
             _unitOfWork.Save();
 
             return timeline;
@@ -65,7 +68,7 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-
+            
             _unitOfWork.Timelines.Delete(id);
             _unitOfWork.Save();
 

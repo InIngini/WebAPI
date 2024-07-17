@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -50,9 +50,12 @@ namespace WebAPI.BLL.Services
             }
 
             // Добавление соединения в схему
-            scheme.IdConnections.Add(connection);
-
-            _unitOfWork.Schemes.Update(scheme);
+            var belongToScheme = new BelongToScheme()
+            {
+                IdConnection = idConnection,
+                IdScheme = scheme.IdScheme
+            };
+            _unitOfWork.BelongToSchemes.Create(belongToScheme);
             _unitOfWork.Save();
 
             return scheme;

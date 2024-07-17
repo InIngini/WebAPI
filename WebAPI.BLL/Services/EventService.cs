@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -46,7 +46,12 @@ namespace WebAPI.BLL.Services
                     var character = _unitOfWork.Characters.Get(idCharacter);
                     if (character != null)
                     {
-                        @event.IdCharacters.Add(character);
+                        var belongToEvent=new BelongToEvent()
+                        { 
+                            IdEvent=@event.IdEvent,
+                            IdCharacter=character.IdCharacter
+                        };
+                        _unitOfWork.BelongToEvents.Create(belongToEvent);
                     }
                 }
             }
@@ -57,7 +62,12 @@ namespace WebAPI.BLL.Services
                             .Find(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
                             .SingleOrDefault();
             // Добавление связи в главную схему
-            timeline.IdEvents.Add(@event);
+            var belongToTimeline = new BelongToTimeline()
+            { 
+                IdEvent=@event.IdEvent, 
+                IdTimeline=timeline.IdTimeline
+            };
+            _unitOfWork.BelongToTimelines.Create(belongToTimeline);
             _unitOfWork.Save();
 
             return @event;
@@ -106,16 +116,12 @@ namespace WebAPI.BLL.Services
             }
 
             // Получение всех таймлайнов, связанных с событием
-            var timelines = _unitOfWork.Timelines.Find(t => t.IdEvents.Any(e => e.IdEvent == id)).ToList();
+            var belongToTimeline = _unitOfWork.BelongToTimelines.Find(t=>t.IdEvent == id).ToList();
 
             // Удаление IdConnection удаляемой связи из схем
-            foreach (var timeline in timelines)
+            foreach (var timeline in belongToTimeline)
             {
-                var @event1 = timeline.IdEvents.FirstOrDefault(c => c.IdEvent == id);
-                if (@event1 != null)
-                {
-                    timeline.IdEvents.Remove(@event1);
-                }
+                _unitOfWork.BelongToTimelines.Delete(timeline.IdEvent);
             }
 
             _unitOfWork.Events.Delete(id);

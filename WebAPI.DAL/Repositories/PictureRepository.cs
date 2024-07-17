@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.DAL.EF;
-using WebAPI.DAL.Entities;
+using WebAPI.DB;
+using WebAPI.DB.Entities;
 using WebAPI.DAL.Interfaces;
 
 namespace WebAPI.DAL.Repositories

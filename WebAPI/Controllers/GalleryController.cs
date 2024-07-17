@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 
 namespace WebAPI.Controllers
 {

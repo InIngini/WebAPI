@@ -8,7 +8,7 @@ using WebAPI.BLL.Token;
 using WebAPI;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
-using WebAPI.DAL.Entities;
+using WebAPI.DB.Entities;
 
 namespace WebAPI.Controllers
 {

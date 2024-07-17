@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.DAL.Guide;
-using WebAPI.DAL.EF;
+using WebAPI.DB.Guide;
+using WebAPI.DB;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 
