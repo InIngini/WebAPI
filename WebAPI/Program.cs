@@ -17,6 +17,7 @@ using WebAPI.DB;
 using WebAPI.DAL.Interfaces;
 using WebAPI.DAL.Repositories;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI
 {
@@ -36,15 +37,13 @@ namespace WebAPI
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
-            // Регистрация контекста базы данных
-            builder.Services.AddDbContext<Context>(options =>
-                options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
+            //// Регистрация контекста базы данных
+            //builder.Services.AddDbContext<Context>(options =>
+            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // Добавить контроллеры
             builder.Services.AddControllers();
-
-
-            
+   
 
             // Регистрация ITokenService и ITokenValidator
             builder.Services.AddTransient<ITokenService, TokenService>();
@@ -70,10 +69,18 @@ namespace WebAPI
             app.MapControllers();
 
             app.Run();
-        }
+        }     
 
         public static void ConfigureServices(IServiceCollection services)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            services.AddDbContext<Context>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
             // Регистрация сервисов
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IAddedAttributeService, AddedAttributeService>();

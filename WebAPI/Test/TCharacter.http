@@ -68,7 +68,7 @@ DELETE {{WebAPI_HostAddress}}/User/Book/Character/5
 ###
 # для атрибутов
 # создание атрибута
-POST {{WebAPI_HostAddress}}/User/Book/Character/3/addedattribute
+POST {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute
 Content-Type: application/json
 
 {
@@ -77,10 +77,10 @@ Content-Type: application/json
 }
 ###
 # изменение атрибута
-PUT {{WebAPI_HostAddress}}/User/Book/Character/4/addedattribute/1
+PUT {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
 Content-Type: application/json
 
 "Содержимое"
 ###
 # удаление атрибута
-DELETE {{WebAPI_HostAddress}}/User/Book/Character/3/addedattribute/2
+DELETE {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
