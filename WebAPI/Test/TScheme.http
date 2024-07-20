@@ -5,6 +5,7 @@
 # создание схемы (подсхемы получается)
 POST {{WebAPI_HostAddress}}/User/Book/Scheme
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o
 
 {
     "IdBook": "1",
@@ -13,14 +14,17 @@ Content-Type: application/json
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Scheme/all
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o
 
 "1"
 ###
 # изменение связи
 PUT {{WebAPI_HostAddress}}/User/Book/Scheme/4
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o
 
 "1"
 ###
 # удаление схемы
 DELETE {{WebAPI_HostAddress}}/User/Book/Scheme/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o

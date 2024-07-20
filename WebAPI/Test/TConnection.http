@@ -5,6 +5,7 @@
 # создание связи
 POST {{WebAPI_HostAddress}}/User/Book/Scheme/Connection
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o
 
 {
     "IdBook": "1",
@@ -16,9 +17,11 @@ Content-Type: application/json
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/all
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o
 
 "1"
 
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/1
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjE0ODYyMjYsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.4GtpgfJ-treAn3yojL3zOWUAm7TNNt2Nvxb_-J-8H4o

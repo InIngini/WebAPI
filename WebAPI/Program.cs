@@ -81,6 +81,9 @@ namespace WebAPI
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddAuthentication()
+                .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuthentication", options => { });
+
             // Регистрация сервисов
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IAddedAttributeService, AddedAttributeService>();

@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("User/[controller]")]
     public class BookController : Controller
@@ -112,27 +112,18 @@ namespace WebAPI.Controllers
 
         //Получение всех книг для пользователя
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllBooksForUser([FromBody] string token)
+        public async Task<IActionResult> GetAllBooksForUser([FromBody] int userId)
         {
 
-            var userId = _tokenValidator.ValidateToken(token);
+            var books = await _bookService.GetAllBooksForUser(userId);
 
-            if (userId > 0)
+            if (books == null || !books.Any())
             {
-                var books = await _bookService.GetAllBooksForUser(userId);
-
-                if (books == null || !books.Any())
-                {
-                    books=new List<Book>();
-                }
-
-                return Ok(books);
-
+                books=new List<Book>();
             }
-            else
-            {
-                return Unauthorized("Invalid token");
-            }
+
+            return Ok(books);
+
         }
     }
 }

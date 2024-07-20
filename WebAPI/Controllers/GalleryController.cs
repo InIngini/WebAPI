@@ -7,7 +7,7 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("User/Book/Character/[controller]")]
     public class GalleryController : ControllerBase

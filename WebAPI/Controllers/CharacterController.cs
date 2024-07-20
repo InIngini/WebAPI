@@ -9,7 +9,7 @@ using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
 namespace WebAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("User/Book/[controller]")]
     public class CharacterController : Controller
