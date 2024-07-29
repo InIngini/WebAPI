@@ -4,7 +4,7 @@
 
 Создана в соотвествии с данным руководством на metanit.com: https://metanit.com/sharp/mvc5/23.5.php
 
-![Копия Диаграммки-Страница — 5 (1)](https://github.com/user-attachments/assets/b1e9d50e-a591-4b56-83ed-7a6aaf125343)
+![Копия Диаграммки-Архитектура](https://github.com/user-attachments/assets/bad7716a-af0e-4075-a2c2-389c170d9651)
 
 ### БД
 БД создана с использованием Entity, MSSql. 
@@ -23,7 +23,13 @@ ER-диаграмма на это дело:
 
 Диаграмма прецендентов на это дело:
 
-![Frame 6](https://github.com/InIngini/WebAPI/assets/130362544/9ae92e41-1b39-444d-92b3-696e2eb73a16)
+![Копия Диаграммки-Диаграмма прецедентов вместе](https://github.com/user-attachments/assets/8cd8c05d-1a37-4238-aabc-949fdb367edd)
+
+### AutoMapper
+
+AutoMapper выполнен по этому видео: https://www.youtube.com/watch?v=Ssh3cBPjd4Y&list=PLEtg-LdqEKXbpq4RtUp1hxZ6ByGjnvQs4&index=5
+
+И по этой статье: https://metanit.com/sharp/mvc5/23.4.php?ysclid=lz5dui5i7p894485598
 
 ### Тесты
 Тесты (в папке Test): файлы с http запросами. Для каждого контроллера свой.
