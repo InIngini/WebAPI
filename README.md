@@ -31,5 +31,9 @@ AutoMapper выполнен по этому видео: https://www.youtube.com/
 
 И по этой статье: https://metanit.com/sharp/mvc5/23.4.php?ysclid=lz5dui5i7p894485598
 
+### Authorize
+
+Через JWT-токен.
+
 ### Тесты
 Тесты (в папке Test): файлы с http запросами. Для каждого контроллера свой.
