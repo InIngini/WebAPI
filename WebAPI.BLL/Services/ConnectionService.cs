@@ -9,16 +9,20 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using WebAPI.DB.Guide;
 
 namespace WebAPI.BLL.Services
 {
     public class ConnectionService : IConnectionService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ConnectionService(IUnitOfWork unitOfWork)
+        public ConnectionService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Connection> CreateConnection(ConnectionData connectionData)
@@ -31,12 +35,14 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            Connection connection = new Connection()
-            {
-                TypeConnection = _unitOfWork.TypeConnections.Find(t=>t.Name==connectionData.TypeConnection).FirstOrDefault().Id,
-                IdCharacter1 = connectionData.IdCharacter1,
-                IdCharacter2 = connectionData.IdCharacter2,
-            };
+            //Connection connection = new Connection()
+            //{
+            //    TypeConnection = _unitOfWork.TypeConnections.Find(t=>t.Name==connectionData.TypeConnection).FirstOrDefault().Id,
+            //    IdCharacter1 = connectionData.IdCharacter1,
+            //    IdCharacter2 = connectionData.IdCharacter2,
+            //};
+            var connection = _mapper.Map<Connection>(connectionData);
+            connection.TypeConnection = _unitOfWork.TypeConnections.Find(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
 
             var scheme = _unitOfWork.Schemes
                             .Find(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
@@ -94,15 +100,11 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-            var connectionData = new ConnectionData()
-            {
-                IdConnection = connection.IdConnection,
-                IdCharacter1 = connection.IdCharacter1,
-                Name1 = _unitOfWork.Answers.Get(connection.IdCharacter1).Name,
-                IdCharacter2 = connection.IdCharacter2,
-                Name2 = _unitOfWork.Answers.Get(connection.IdCharacter2).Name,
-                TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name
-            };
+            var connectionData = _mapper.Map<ConnectionData>(connection);
+            connectionData.Name1 = _unitOfWork.Answers.Get(connection.IdCharacter1).Name;
+            connectionData.Name2 = _unitOfWork.Answers.Get(connection.IdCharacter2).Name;
+            connectionData.TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name;
+
             return connectionData;
         }
 
@@ -110,16 +112,12 @@ namespace WebAPI.BLL.Services
         {
             var connections = _unitOfWork.Connections.GetAll(idScheme).ToList();
             var connectionsData = new List<ConnectionAllData>();
+
             foreach (var connection in connections)
             {
-                var connectionData = new ConnectionAllData()
-                {
-                    IdConnection = connection.IdConnection,
-                    IdCharacter1 = connection.IdCharacter1,
-                    IdCharacter2 = connection.IdCharacter2,
-                    TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name
 
-                };
+                var connectionData = _mapper.Map<ConnectionAllData>(connection);
+                connectionData.TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name;
                 connectionsData.Add(connectionData);
             }
             return connectionsData;

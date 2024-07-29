@@ -27,13 +27,9 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Gallery gallery = new Gallery()
-            {
-                IdCharacter = galleryData.IdCharacter,
-                IdPicture = galleryData.IdPicture,
-            };
+           
             // Сохранение галереи в базе данных
-            var createdGallery = await _galleryService.CreateGallery(gallery);
+            var createdGallery = await _galleryService.CreateGallery(galleryData);
 
             // Возврат созданной галереи
             return CreatedAtAction(nameof(GetGallery), new { id = createdGallery.IdPicture }, createdGallery);

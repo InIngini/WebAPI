@@ -134,16 +134,9 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            AddedAttribute addedAttribute = new AddedAttribute()
-            {
-                IdCharacter = id,
-                NameAttribute = aa.NameAttribute,
-                NumberAnswer = aa.NumberAnswer,
-                ContentAttribute = String.Empty,
-            };
 
             // Сохранение атрибута в базе данных
-            var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(addedAttribute);
+            var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
 
             // Возврат созданного атрибута
             return CreatedAtAction(nameof(GetAddedAttribute), new { id = createdAddedAttribute.IdAttribute }, createdAddedAttribute);

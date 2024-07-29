@@ -18,6 +18,9 @@ using WebAPI.DAL.Interfaces;
 using WebAPI.DAL.Repositories;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using WebAPI.BLL.Mappings;
+using AutoMapper;
+using System.Reflection;
 
 namespace WebAPI
 {
@@ -31,7 +34,7 @@ namespace WebAPI
 
         public static void Main(string[] args)
         {
-            
+            //new AddedData();
             //ConnectionString.ConnectString();
             
             // Создаем билдер
@@ -83,6 +86,15 @@ namespace WebAPI
 
             services.AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuthentication", options => { });
+
+            //mapper
+            services.AddAutoMapper(config =>
+            {
+                //config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
+                config.AddProfile(new AssemblyMappingProfile(Assembly.Load("WebAPI.BLL")));
+                config.AddProfile(new AssemblyMappingProfile(Assembly.Load("WebAPI.DB")));
+            });
+
 
             // Регистрация сервисов
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();

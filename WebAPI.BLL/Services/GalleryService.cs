@@ -9,20 +9,29 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class GalleryService : IGalleryService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public GalleryService(IUnitOfWork unitOfWork)
+        public GalleryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<Gallery> CreateGallery(Gallery gallery)
+        public async Task<Gallery> CreateGallery(GalleryData galleryData)
         {
+            //Gallery gallery = new Gallery()
+            //{
+            //    IdCharacter = galleryData.IdCharacter,
+            //    IdPicture = galleryData.IdPicture,
+            //};
+            var gallery = _mapper.Map<Gallery>(galleryData);
             var validationContext = new ValidationContext(gallery);
             var validationResults = new List<ValidationResult>();
 

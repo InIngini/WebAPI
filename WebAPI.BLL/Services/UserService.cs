@@ -10,6 +10,7 @@ using WebAPI.BLL.Token;
 using WebAPI.DB.Entities;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
@@ -17,11 +18,13 @@ namespace WebAPI.BLL.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public UserService(IUnitOfWork unitOfWork, ITokenService tokenService,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
         public async Task<User> CreateUser(LoginData loginData)
@@ -34,13 +37,16 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            User user = new User()
-            {
-                Login =loginData.Login,
-                Password=loginData.Password
-            };
+            //User user = new User()
+            //{
+            //    Login =loginData.Login,
+            //    Password=loginData.Password
+            //};
 
-            if(_unitOfWork.Users.Find(u => u.Login==user.Login).FirstOrDefault() != null)
+            // Используем AutoMapper для маппинга LoginData в User
+            User user = _mapper.Map<User>(loginData);
+
+            if (_unitOfWork.Users.Find(u => u.Login==user.Login).FirstOrDefault() != null)
             {
                 throw new ArgumentException("Такой уже есть");
             }
@@ -63,14 +69,12 @@ namespace WebAPI.BLL.Services
 
             var token = _tokenService.CreateToken(user);
 
-            // Возвращаем пользователя с токеном
-            return new UserTokenData
-            {
-                IdUser = user.IdUser,
-                Login = user.Login,
-                Password = user.Password,
-                Token = token
-            };
+            //// Возвращаем пользователя с токеном
+            // Используем AutoMapper для маппинга
+            var userTokenData = _mapper.Map<UserTokenData>(user); // 'user' - это объект класса User
+            userTokenData.Token = token; // Устанавливаем токен
+
+            return userTokenData;
         }
 
         public async Task<User> GetUser(int id)

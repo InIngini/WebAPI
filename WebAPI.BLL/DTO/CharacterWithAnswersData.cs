@@ -1,6 +1,10 @@
-﻿namespace WebAPI.BLL.DTO
+﻿using AutoMapper;
+using WebAPI.BLL.Mappings;
+using WebAPI.DB.Entities;
+
+namespace WebAPI.BLL.DTO
 {
-    public class CharacterWithAnswers
+    public class CharacterWithAnswers : IMapWith<Answer>
     {
         public int? IdPicture { get; set; }
         public string Name { get; set; }
@@ -34,5 +38,10 @@
         public string Answer3ByHistory { get; set; }
         public string Answer4ByHistory { get; set; }
         public string Answer5ByHistory { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<Answer, CharacterWithAnswers>(); // Если Id генерируется в базе данных, то можно игнорировать
+        }
     }
 }

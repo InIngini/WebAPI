@@ -10,16 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class EventService : IEventService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public EventService(IUnitOfWork unitOfWork)
+        public EventService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Event> CreateEvent(EventData eventData)
@@ -31,6 +34,7 @@ namespace WebAPI.BLL.Services
             {
                 throw new ArgumentException("Модель не валидна");
             }
+            //Event @event = _mapper.Map<Event>(eventData);
 
             Event @event = new Event()
             {
@@ -39,9 +43,9 @@ namespace WebAPI.BLL.Services
                 Time = eventData.Time,
 
             };
-            if (eventData.IdCharacter != null)
+            if (eventData.IdCharacters != null)
             {
-                foreach (var idCharacter in eventData.IdCharacter)
+                foreach (var idCharacter in eventData.IdCharacters)
                 {
                     var character = _unitOfWork.Characters.Get(idCharacter);
                     if (character != null)
@@ -73,38 +77,48 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
-        //public async Task<Event> UpdateEvent(EventData eventData, int id)
-        //{
-        //    Event @event = _unitOfWork.Events.Get(id);
-        //    // Обновление события
-        //    @event.Name = eventData.Name;
-        //    @event.Content = eventData.Content;
-        //    @event.Time = eventData.Time;
+        public async Task<Event> UpdateEvent(EventData eventData, int id)
+        {
+            Event @event = _unitOfWork.Events.Get(id);
+            // Обновление события
+            @event.Name = eventData.Name;
+            @event.Content = eventData.Content;
+            @event.Time = eventData.Time;
 
-        //    if (eventData.IdCharacter != null)
-        //    {
-        //        var characters = @event.IdCharacters.ToList();
-        //        // Удаление существующих связей персонажей с событием
-        //        foreach (var character in characters)
-        //        {
-        //            @event.IdCharacters.Remove(character);
-        //        }
-        //        // Добавление новых
-        //        foreach (var idCharacter in eventData.IdCharacter)
-        //        {
-        //            var character = _unitOfWork.Characters.Get(idCharacter);
-        //            if (character != null)
-        //            {
-        //                @event.IdCharacters.Add(character);
-        //            }
-        //        }
-        //    }
+            if (eventData.IdCharacters != null)
+            {
+                var characters = _unitOfWork.BelongToEvents.Find(b=>b.IdEvent==id).ToList();
+                // Удаление ненужных связей персонажей с событием. Допустим было [1,2], мы передали [2,3], значит будет [2]
+                foreach (var character in characters)
+                {
+                    if(!eventData.IdCharacters.Contains(character.IdCharacter))
+                    {
+                        _unitOfWork.BelongToEvents.Delete(character.IdCharacter);
+                    }    
+                    
+                }
+                // Добавление новых. То есть после этого уже будет [2,3]
+                foreach (var idCharacter in eventData.IdCharacters)
+                {
+                    var character = _unitOfWork.Characters.Get(idCharacter);
+                    //если такой персонаж существует и в белонгтуивант нет записи с этим персонажем и ивентом
+                    if (character != null && _unitOfWork.BelongToEvents.Find(b=>b.IdCharacter==character.IdCharacter &&b.IdEvent==id)==null)
+                    {
+                        var belong = new BelongToEvent()
+                        {
+                            IdEvent = id,
+                            IdCharacter=character.IdCharacter,
+                        };
+                        _unitOfWork.BelongToEvents.Create(belong);
+                    }
+                }
+            }
 
-        //    _unitOfWork.Events.Update(@event);
-        //    _unitOfWork.Save();
+            _unitOfWork.Events.Update(@event);
+            _unitOfWork.Save();
 
-        //    return @event;
-        //}
+            return @event;
+        }
 
         public async Task<Event> DeleteEvent(int id)
         {
@@ -147,14 +161,10 @@ namespace WebAPI.BLL.Services
             
             var events = _unitOfWork.Events.GetAll(id).ToList();
             var eventsData = new List<EventAllData>();
-            foreach (var connection in events)
+            foreach (var @event in events)
             {
-                var eventData = new EventAllData()
-                {
-                    IdEvent = connection.IdEvent,
-                    Name = connection.Name,
-                    Time = connection.Time,
-                };
+                
+                var eventData = _mapper.Map<EventAllData>(@event);
                 eventsData.Add(eventData);
             }
             return eventsData;

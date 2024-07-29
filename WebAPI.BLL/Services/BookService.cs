@@ -9,6 +9,7 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 
 namespace WebAPI.BLL.Services
@@ -16,10 +17,12 @@ namespace WebAPI.BLL.Services
     public class BookService : IBookService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public BookService(IUnitOfWork unitOfWork)
+        public BookService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Book> CreateBook(UserBookData userbook)
@@ -32,11 +35,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            Book book = new Book()
-            { 
-                NameBook = userbook.NameBook,
-                IdPicture = userbook.IdPicture
-            };
+
+            Book book = _mapper.Map<Book>(userbook);
 
             _unitOfWork.Books.Create(book);
             _unitOfWork.Save();
@@ -144,7 +144,7 @@ namespace WebAPI.BLL.Services
 
             // Удаление всех персонажей книги
             var characters = _unitOfWork.Characters.Find(c => c.IdBook == id);
-            CharacterService characterService = new CharacterService(_unitOfWork);
+            CharacterService characterService = new CharacterService(_unitOfWork,_mapper);
             foreach (var character in characters)
             {
                 characterService.DeleteCharacter(character.IdCharacter);

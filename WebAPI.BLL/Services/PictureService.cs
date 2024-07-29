@@ -9,16 +9,19 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class PictureService : IPictureService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public PictureService(IUnitOfWork unitOfWork)
+        public PictureService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Picture> CreatePicture(Picture picture)

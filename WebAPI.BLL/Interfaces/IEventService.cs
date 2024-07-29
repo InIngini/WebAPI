@@ -11,7 +11,7 @@ namespace WebAPI.BLL.Interfaces
     public interface IEventService
     {
         Task<Event> CreateEvent(EventData eventData);
-        //Task<Event> UpdateEvent(EventData eventData,int id);
+        Task<Event> UpdateEvent(EventData eventData,int id);
         Task<Event> DeleteEvent(int id);
         Task<Event> GetEvent(int id);
         Task<IEnumerable<EventAllData>> GetAllEvents(int id);

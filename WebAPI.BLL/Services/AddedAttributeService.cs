@@ -9,6 +9,7 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 
 namespace WebAPI.BLL.Services
@@ -16,14 +17,20 @@ namespace WebAPI.BLL.Services
     public class AddedAttributeService : IAddedAttributeService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public AddedAttributeService(IUnitOfWork unitOfWork)
+        public AddedAttributeService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<AddedAttribute> CreateAddedAttribute(AddedAttribute addedAttribute)
+        public async Task<AddedAttribute> CreateAddedAttribute(int id,AAData aa)
         {
+            var addedAttribute = _mapper.Map<AddedAttribute>(aa);
+            addedAttribute.ContentAttribute = String.Empty;
+            addedAttribute.IdCharacter = id;
+
             var validationContext = new ValidationContext(addedAttribute);
             var validationResults = new List<ValidationResult>();
 

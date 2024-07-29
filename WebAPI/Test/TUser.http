@@ -6,7 +6,7 @@ POST {{WebAPI_HostAddress}}/User/register
 Content-Type: application/json
 
 { 
-  "login": "username", 
+  "login": "username4", 
   "password": "password" 
 }
 
@@ -20,6 +20,6 @@ POST {{WebAPI_HostAddress}}/User/login
 Content-Type: application/json
 
 {
-    "login": "username",
+    "login": "username4",
     "password": "password"
 }

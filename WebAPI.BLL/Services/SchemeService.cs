@@ -9,16 +9,19 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class SchemeService : ISchemeService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public SchemeService(IUnitOfWork unitOfWork)
+        public SchemeService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Scheme> CreateScheme(Scheme scheme)

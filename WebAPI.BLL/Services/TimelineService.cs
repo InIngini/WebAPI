@@ -9,16 +9,19 @@ using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class TimelineService : ITimelineService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public TimelineService(IUnitOfWork unitOfWork)
+        public TimelineService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Timeline> CreateTimeline(Timeline timeline)

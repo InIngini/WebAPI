@@ -10,16 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using WebAPI.DB.Guide;
+using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
     public class CharacterService : ICharacterService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CharacterService(IUnitOfWork unitOfWork)
+        public CharacterService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Character> CreateCharacter(Character character)
@@ -197,41 +200,8 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-            var characterWithAnswers = new CharacterWithAnswers()
-            {
-                IdPicture = character.IdPicture,
-                Name = answer.Name,
-                Answer1Personality = answer.Answer1Personality,
-                Answer2Personality = answer.Answer2Personality, 
-                Answer3Personality = answer.Answer3Personality,
-                Answer4Personality = answer.Answer4Personality,
-                Answer5Personality = answer.Answer6Personality,
-                Answer6Personality = answer.Answer6Personality,
-                Answer1Appearance = answer.Answer1Appearance,
-                Answer2Appearance = answer.Answer2Appearance,
-                Answer3Appearance = answer.Answer3Appearance,
-                Answer4Appearance = answer.Answer4Appearance,
-                Answer5Appearance = answer.Answer5Appearance,
-                Answer6Appearance = answer.Answer6Appearance,
-                Answer7Appearance = answer.Answer7Appearance,
-                Answer8Appearance = answer.Answer8Appearance,
-                Answer9Appearance = answer.Answer9Appearance,
-                Answer1Temperament = answer.Answer1Temperament,
-                Answer2Temperament = answer.Answer2Temperament,
-                Answer3Temperament = answer.Answer3Temperament,
-                Answer4Temperament = answer.Answer4Temperament,
-                Answer5Temperament = answer.Answer5Temperament,
-                Answer6Temperament = answer.Answer6Temperament,
-                Answer7Temperament = answer.Answer7Temperament,
-                Answer8Temperament = answer.Answer8Temperament,
-                Answer9Temperament = answer.Answer9Temperament,
-                Answer10Temperament = answer.Answer10Temperament,
-                Answer1ByHistory = answer.Answer1ByHistory,
-                Answer2ByHistory = answer.Answer2ByHistory,
-                Answer3ByHistory = answer.Answer3ByHistory,
-                Answer4ByHistory = answer.Answer4ByHistory,
-                Answer5ByHistory = answer.Answer5ByHistory
-            };
+            var characterWithAnswers = _mapper.Map<CharacterWithAnswers>(answer);
+        
 
             return characterWithAnswers;
         }
@@ -240,13 +210,11 @@ namespace WebAPI.BLL.Services
         {
             var characters = _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToList();
             var charactersAllData = new List<CharacterAllData>();
+            
             foreach (var character in characters)
             {
-                var characterAllData = new CharacterAllData()
-                {
-                    IdCharacter = character.IdCharacter,
-                    Name = _unitOfWork.Answers.Get(character.IdCharacter).Name,
-                };
+                var characterAllData = _mapper.Map<CharacterAllData>(character);
+                characterAllData.Name = _unitOfWork.Answers.Get(character.IdCharacter).Name;
                 if (character.IdPicture != null)
                     characterAllData.Picture1 = _unitOfWork.Pictures.Get((int)character.IdPicture).Picture1;
                 charactersAllData.Add(characterAllData);
@@ -257,14 +225,20 @@ namespace WebAPI.BLL.Services
         {
             var questions = _unitOfWork.Questions.GetAll(0).ToList();
             var questionsData = new List<QuestionData>();
+            //foreach (var question in questions)
+            //{
+            //    var questionData = new QuestionData()
+            //    {
+            //        Id = question.Id,
+            //        Name = question.Name,
+            //        Block = _unitOfWork.NumberBlocks.Get(question.Block).Name
+            //    };
+            //    questionsData.Add(questionData);
+            //}
             foreach (var question in questions)
             {
-                var questionData = new QuestionData()
-                {
-                    Id = question.Id,
-                    Name = question.Name,
-                    Block = _unitOfWork.NumberBlocks.Get(question.Block).Name
-                };
+                var questionData = _mapper.Map<QuestionData>(question);
+                questionData.Block = _unitOfWork.NumberBlocks.Get(question.Block).Name;
                 questionsData.Add(questionData);
             }
 
