@@ -24,8 +24,14 @@ namespace WebAPI.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<Scheme> CreateScheme(Scheme scheme)
+        public async Task<Scheme> CreateScheme(SchemeData schemedata)
         {
+            //Scheme scheme = new Scheme()
+            //{
+            //    IdBook = schemedata.IdBook,
+            //    NameScheme = schemedata.NameScheme,
+            //};
+            var scheme = _mapper.Map<Scheme>(schemedata);
             var validationContext = new ValidationContext(scheme);
             var validationResults = new List<ValidationResult>();
 
@@ -72,7 +78,12 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-
+            var belongToSchemes = _unitOfWork.BelongToSchemes.Find(b=>b.IdScheme==id).ToList();
+            foreach(var belongToScheme in belongToSchemes)
+            {
+                _unitOfWork.BelongToSchemes.Delete(id,belongToScheme.IdConnection);
+            }
+            _unitOfWork.Save();
             _unitOfWork.Schemes.Delete(id);
             _unitOfWork.Save();
 

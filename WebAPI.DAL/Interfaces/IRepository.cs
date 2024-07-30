@@ -14,5 +14,9 @@ namespace WebAPI.DAL.Interfaces
         void Create(T item);
         void Update(T item);
         void Delete(int id);
+        void Delete(int id, int id2)//для удаления всяких там белонгов. тут определено, чтоб в других, не белонгах, не определять
+        { 
+            
+        }
     }
 }

@@ -5,7 +5,7 @@
 # создание события
 POST {{WebAPI_HostAddress}}/User/Book/Timeline/Event
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMjgwMDU5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.c4z2hl3JTfU8R-4eTMrEh_zd-zRiJoQZvQD6grv5Wkw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMzM3ODY5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.Uz25Lesg-VbRx3PE9xM5QlLxAwZA1cyQBapnQ7PNdho
 
 {
     "IdBook": "1",
@@ -17,23 +17,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hc
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/all
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMjgwMDU5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.c4z2hl3JTfU8R-4eTMrEh_zd-zRiJoQZvQD6grv5Wkw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMzM3ODY5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.Uz25Lesg-VbRx3PE9xM5QlLxAwZA1cyQBapnQ7PNdho
 
 "1"
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMjgwMDU5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.c4z2hl3JTfU8R-4eTMrEh_zd-zRiJoQZvQD6grv5Wkw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMzM3ODY5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.Uz25Lesg-VbRx3PE9xM5QlLxAwZA1cyQBapnQ7PNdho
 
 ###
 # изменение события
 PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMjgwMDU5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.c4z2hl3JTfU8R-4eTMrEh_zd-zRiJoQZvQD6grv5Wkw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzIyMzM3ODY5LCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.Uz25Lesg-VbRx3PE9xM5QlLxAwZA1cyQBapnQ7PNdho
 
 {
-    "Name": "Новое имя",
+    "Name": "Новое имя2",
     "Content": "Какой-то",
     "Time": "10.06.2024-20.06.2024",
-    "IdCharacter": [2]
+    "IdCharacters": [2]
 }

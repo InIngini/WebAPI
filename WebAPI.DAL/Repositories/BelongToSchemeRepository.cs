@@ -50,5 +50,11 @@ namespace WebAPI.DAL.Repositories
             if (belongToScheme != null)
                 db.BelongToSchemes.Remove(belongToScheme);
         }
+        public void Delete(int idScheme, int idConnection)
+        {
+            BelongToScheme belongToScheme = db.BelongToSchemes.SingleOrDefault(b => b.IdScheme == idScheme && b.IdConnection == idConnection);
+            if (belongToScheme != null)
+                db.BelongToSchemes.Remove(belongToScheme);
+        }
     }
 }

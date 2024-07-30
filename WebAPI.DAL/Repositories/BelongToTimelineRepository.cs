@@ -50,5 +50,11 @@ namespace WebAPI.DAL.Repositories
             if (belongToTimeline != null)
                 db.BelongToTimelines.Remove(belongToTimeline);
         }
+        public void Delete(int idTimeline, int idEvent)
+        {
+            BelongToTimeline belongToTimeline = db.BelongToTimelines.SingleOrDefault(b => b.IdTimeline == idTimeline && b.IdEvent == idEvent);
+            if (belongToTimeline != null)
+                db.BelongToTimelines.Remove(belongToTimeline);
+        }
     }
 }

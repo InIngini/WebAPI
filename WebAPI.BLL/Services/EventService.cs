@@ -34,15 +34,17 @@ namespace WebAPI.BLL.Services
             {
                 throw new ArgumentException("Модель не валидна");
             }
-            //Event @event = _mapper.Map<Event>(eventData);
+            Event @event = _mapper.Map<Event>(eventData);
 
-            Event @event = new Event()
-            {
-                Name = eventData.Name,
-                Content = eventData.Content,
-                Time = eventData.Time,
+            //Event @event = new Event()
+            //{
+            //    Name = eventData.Name,
+            //    Content = eventData.Content,
+            //    Time = eventData.Time,
 
-            };
+            //};
+            _unitOfWork.Events.Create(@event);
+            _unitOfWork.Save();
             if (eventData.IdCharacters != null)
             {
                 foreach (var idCharacter in eventData.IdCharacters)
@@ -59,7 +61,7 @@ namespace WebAPI.BLL.Services
                     }
                 }
             }
-            _unitOfWork.Events.Create(@event);
+            //_unitOfWork.Events.Create(@event);
             _unitOfWork.Save();
 
             var timeline = _unitOfWork.Timelines
@@ -101,8 +103,9 @@ namespace WebAPI.BLL.Services
                 foreach (var idCharacter in eventData.IdCharacters)
                 {
                     var character = _unitOfWork.Characters.Get(idCharacter);
+                    var belongToEvents = _unitOfWork.BelongToEvents.Find(b => b.IdCharacter == character.IdCharacter && b.IdEvent == id);
                     //если такой персонаж существует и в белонгтуивант нет записи с этим персонажем и ивентом
-                    if (character != null && _unitOfWork.BelongToEvents.Find(b=>b.IdCharacter==character.IdCharacter &&b.IdEvent==id)==null)
+                    if (character != null && belongToEvents.Count()==0)
                     {
                         var belong = new BelongToEvent()
                         {
@@ -144,7 +147,7 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
-        public async Task<Event> GetEvent(int id)
+        public async Task<EventData> GetEvent(int id)
         {
             var @event = _unitOfWork.Events.Get(id);
 
@@ -152,8 +155,14 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
+            var eventdata = _mapper.Map<EventData>(@event);
 
-            return @event;
+            var characters = _unitOfWork.BelongToEvents.Find(b => b.IdEvent == id).ToList();
+            int[] ints = new int[characters.Count];
+            for(int i = 0;i<ints.Length;i++)
+                ints[i] = characters[i].IdCharacter;
+            eventdata.IdCharacters = ints;
+            return @eventdata;
         }
 
         public async Task<IEnumerable<EventAllData>> GetAllEvents(int id)

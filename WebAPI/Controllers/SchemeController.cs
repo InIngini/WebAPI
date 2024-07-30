@@ -31,13 +31,9 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Scheme scheme = new Scheme()
-            {
-                IdBook = schemedata.IdBook,
-                NameScheme = schemedata.NameScheme,
-            };
+            
             // Сохранение схемы в базе данных
-            var createdScheme = await _schemeService.CreateScheme(scheme);
+            var createdScheme = await _schemeService.CreateScheme(schemedata);
 
             // Возврат созданной схемы
             return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.IdScheme }, createdScheme);

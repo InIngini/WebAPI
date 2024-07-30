@@ -31,13 +31,9 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Timeline timeline = new Timeline()
-            {
-                IdBook = timelinedata.IdBook,
-                NameTimeline = timelinedata.NameTimeline,
-            };
+            
             // Сохранение схемы в базе данных
-            var createdTimeline = await _timelineService.CreateTimeline(timeline);
+            var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
 
             // Возврат созданной схемы
             return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.IdTimeline }, createdTimeline);

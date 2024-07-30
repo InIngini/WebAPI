@@ -24,8 +24,15 @@ namespace WebAPI.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<Timeline> CreateTimeline(Timeline timeline)
+        public async Task<Timeline> CreateTimeline(TimelineData timelinedata)
         {
+            //Timeline timeline = new Timeline()
+            //{
+            //    IdBook = timelinedata.IdBook,
+            //    NameTimeline = timelinedata.NameTimeline,
+            //};
+            var timeline = _mapper.Map<Timeline>(timelinedata);
+
             var validationContext = new ValidationContext(timeline);
             var validationResults = new List<ValidationResult>();
 
@@ -71,7 +78,13 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-            
+            var belongToTimelines = _unitOfWork.BelongToTimelines.Find(b => b.IdTimeline == id).ToList();
+            foreach (var belongToTimeline in belongToTimelines)
+            {
+                _unitOfWork.BelongToTimelines.Delete(id, belongToTimeline.IdEvent);
+            }
+            _unitOfWork.Save();
+
             _unitOfWork.Timelines.Delete(id);
             _unitOfWork.Save();
 
