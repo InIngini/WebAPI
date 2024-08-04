@@ -12,17 +12,31 @@ using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.DB
 {
+    /// <summary>
+    /// Контекст базы данных для управления сущностями и их связями в базе данных.
+    /// </summary>
     public class Context : DbContext
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="Context"/> без параметров.
+        /// </summary>
         public Context() 
         {
             //Database.EnsureDeleted();
             //Database.EnsureCreated();
             //Database.Migrate();
         }
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
+        /// </summary>
+        /// <param name="options">Параметры для настройки контекста.</param>
         public Context(DbContextOptions<Context> options) : base(options)
         {
         }
+        /// <summary>
+        /// Конфигурирует параметры контекста базы данных.
+        /// </summary>
+        /// <param name="optionsBuilder">Объект, используемый для задания параметров.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var configuration = new ConfigurationBuilder()
@@ -34,6 +48,10 @@ namespace WebAPI.DB
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             optionsBuilder.LogTo(System.Console.WriteLine);
         }
+        /// <summary>
+        /// Конфигурирует модель базы данных, определяя связи между сущностями.
+        /// </summary>
+        /// <param name="modelBuilder">Объект, используемый для настройки модели.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Connection>()

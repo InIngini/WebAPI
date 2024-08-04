@@ -14,17 +14,31 @@ using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
+    /// <summary>
+    /// Сервис для управления событиями.
+    /// </summary>
     public class EventService : IEventService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="EventService"/>.
+        /// </summary>
+        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="mapper">Объект для преобразования данных.</param>
         public EventService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Создает новое событие.
+        /// </summary>
+        /// <param name="eventData">Данные о событии для создания.</param>
+        /// <returns>Созданное событие.</returns>
+        /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<Event> CreateEvent(EventData eventData)
         {
             var validationContext = new ValidationContext(eventData);
@@ -36,13 +50,6 @@ namespace WebAPI.BLL.Services
             }
             Event @event = _mapper.Map<Event>(eventData);
 
-            //Event @event = new Event()
-            //{
-            //    Name = eventData.Name,
-            //    Content = eventData.Content,
-            //    Time = eventData.Time,
-
-            //};
             _unitOfWork.Events.Create(@event);
             _unitOfWork.Save();
             if (eventData.IdCharacters != null)
@@ -61,7 +68,6 @@ namespace WebAPI.BLL.Services
                     }
                 }
             }
-            //_unitOfWork.Events.Create(@event);
             _unitOfWork.Save();
 
             var timeline = _unitOfWork.Timelines
@@ -79,6 +85,12 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
+        /// <summary>
+        /// Обновляет существующее событие.
+        /// </summary>
+        /// <param name="eventData">Данные о событии для обновления.</param>
+        /// <param name="id">Идентификатор события.</param>
+        /// <returns>Обновленное событие.</returns>
         public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
             Event @event = _unitOfWork.Events.Get(id);
@@ -123,6 +135,12 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
+        /// <summary>
+        /// Удаляет событие по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор события.</param>
+        /// <returns>Удаленное событие.</returns>
+        /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Event> DeleteEvent(int id)
         {
             var @event = _unitOfWork.Events.Get(id);
@@ -147,6 +165,12 @@ namespace WebAPI.BLL.Services
             return @event;
         }
 
+        /// <summary>
+        /// Получает событие по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор события.</param>
+        /// <returns>Данные события.</returns>
+        /// <exception cref="KeyNotFoundException">Если событие не найдена.</exception>
         public async Task<EventData> GetEvent(int id)
         {
             var @event = _unitOfWork.Events.Get(id);
@@ -165,6 +189,11 @@ namespace WebAPI.BLL.Services
             return @eventdata;
         }
 
+        /// <summary>
+        /// Получает все события для указанного таймлайна.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <returns>Список всех событий таймлайна.</returns>
         public async Task<IEnumerable<EventAllData>> GetAllEvents(int id)
         {
             

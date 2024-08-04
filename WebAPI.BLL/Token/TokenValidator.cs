@@ -10,16 +10,28 @@ using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.BLL.Token
 {
+    /// <summary>
+    /// Сервис для валидации JWT токенов.
+    /// </summary>
     public class TokenValidator : ITokenValidator
     {
         private readonly IConfiguration _configuration;
         private readonly Context _dbContext;
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TokenValidator"/>.
+        /// </summary>
+        /// <param name="configuration">Конфигурация приложения.</param>
+        /// <param name="dbContext">Контекст базы данных.</param>
         public TokenValidator(IConfiguration configuration, Context dbContext)
         {
             _configuration = configuration;
             _dbContext = dbContext;
         }
-
+        /// <summary>
+        /// Валидирует указанный токен и возвращает идентификатор пользователя.
+        /// </summary>
+        /// <param name="token">JWT токен.</param>
+        /// <returns>ID пользователя, если токен валиден; 0, если токен невалиден.</returns>
         public int ValidateToken(string token)
         {
             try

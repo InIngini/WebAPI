@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления таймлайнами.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/Book/[controller]")]
@@ -17,79 +20,79 @@ namespace WebAPI.Controllers
     {
         private readonly ITimelineService _timelineService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TimelineController"/>.
+        /// </summary>
+        /// <param name="timelineService">Сервис для работы с таймлайнами.</param>
         public TimelineController(ITimelineService timelineService)
         {
             _timelineService = timelineService;
         }
 
-        //Создание схемы
+        /// <summary>
+        /// Создает новый таймлайн.
+        /// </summary>
+        /// <param name="timelinedata">Данные о таймлайне, который необходимо создать.</param>
+        /// <returns>Результат создания таймлайна.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateTimeline([FromBody] TimelineData timelinedata)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            
-            // Сохранение схемы в базе данных
-            var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
 
-            // Возврат созданной схемы
+            var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
             return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.IdTimeline }, createdTimeline);
         }
 
-        //Добавление связей в схему
+        /// <summary>
+        /// Обновляет таймлайн, добавляя событие.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <param name="idEvent">Идентификатор события для добавления.</param>
+        /// <returns>Обновлённый таймлайн.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent)
         {
-            
-            // Получение таймлайна из базы данных
             var timeline = await _timelineService.GetTimeline(id);
-
-            // Если таймлайн не найден, вернуть ошибку
             if (timeline == null)
             {
                 return NotFound();
             }
-            
-            // Обновление таймлайна в базе данных
+
             var updatedTimeline = await _timelineService.UpdateTimeline(timeline, idEvent);
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-
+            var options = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve };
             string json = JsonSerializer.Serialize(updatedTimeline, options);
-
-            // Возврат обновленного таймлайна
             return Ok(json);
         }
 
+        /// <summary>
+        /// Удаляет таймлайн по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна для удаления.</param>
+        /// <returns>Результат удаления таймлайна.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTimeline(int id)
         {
-            // Получение таймлайна из базы данных
             var timeline = await _timelineService.GetTimeline(id);
-
-            // Если таймлайн не найден, вернуть ошибку
             if (timeline == null)
             {
                 return NotFound();
             }
 
-            // Удаление таймлайна из базы данных
             await _timelineService.DeleteTimeline(id);
-
-            // Возврат подтверждения удаления
             return NoContent();
         }
+        /// <summary>
+        /// Получает таймлайн по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <returns>Таймлайн с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTimeline(int id)
         {
             var timeline = await _timelineService.GetTimeline(id);
-
             if (timeline == null)
             {
                 return NotFound();
@@ -97,6 +100,12 @@ namespace WebAPI.Controllers
 
             return Ok(timeline);
         }
+
+        /// <summary>
+        /// Получает все таймлайны по заданному идентификатору книги.
+        /// </summary>
+        /// <param name="id">Идентификатор книги для получения всех таймлайнов.</param>
+        /// <returns>Список всех таймлайнов для указанного идентификатора книги.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllTimeline([FromBody] int id)
         {

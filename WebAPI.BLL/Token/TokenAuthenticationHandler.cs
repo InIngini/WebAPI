@@ -14,10 +14,21 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.BLL.Token
 {
+    /// <summary>
+    /// Обработчик аутентификации токенов.
+    /// </summary>
     public class TokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         private readonly ITokenValidator _tokenValidator;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TokenAuthenticationHandler"/>.
+        /// </summary>
+        /// <param name="options">Параметры схемы аутентификации.</param>
+        /// <param name="logger">Логгер для обработки журналов.</param>
+        /// <param name="encoder">Кодировщик URL.</param>
+        /// <param name="clock">Часы системы.</param>
+        /// <param name="tokenValidator">Сервис валидации токенов.</param>
         public TokenAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -30,6 +41,10 @@ namespace WebAPI.BLL.Token
             
         }
 
+        /// <summary>
+        /// Обрабатывает аутентификацию.
+        /// </summary>
+        /// <returns>Результат аутентификации.</returns>
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var request = Request;

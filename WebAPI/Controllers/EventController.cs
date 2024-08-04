@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления событиями на временной шкале.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/Book/Timeline/[controller]")]
@@ -17,40 +20,50 @@ namespace WebAPI.Controllers
     {
         private readonly IEventService _eventService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="EventController"/>.
+        /// </summary>
+        /// <param name="eventService">Сервис для работы с событиями.</param>
         public EventController(IEventService eventService)
         {
             _eventService = eventService;
         }
 
+        /// <summary>
+        /// Создает новое событие.
+        /// </summary>
+        /// <param name="eventData">Данные о событии, которое необходимо создать.</param>
+        /// <returns>Результат создания события.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateEvent([FromBody] EventData eventData)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             
-            // Сохранение связи в базе данных
             var createdEvent = await _eventService.CreateEvent(eventData);
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(createdEvent, options);
-            // Возврат созданной связи
+
             return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.IdEvent }, json);
         }
 
+        /// <summary>
+        /// Обновляет существующее событие.
+        /// </summary>
+        /// <param name="id">Идентификатор события для обновления.</param>
+        /// <param name="eventData">Обновленные данные о событии.</param>
+        /// <returns>Результат обновления события.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
         {
-            // Получение события из базы данных
             var @event = await _eventService.GetEvent(id);
 
-            // Если событие не найдено, вернуть ошибку
             if (@event == null)
             {
                 return NotFound();
@@ -62,30 +75,35 @@ namespace WebAPI.Controllers
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(updatedEvent, options);
-            // Возврат обновленного события
+            
             return Ok(json);
         }
 
+        /// <summary>
+        /// Удаляет событие по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор события для удаления.</param>
+        /// <returns>Результат удаления события.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            // Получение события из базы данных
             var @event = await _eventService.GetEvent(id);
 
-            // Если событие не найдено, вернуть ошибку
             if (@event == null)
             {
                 return NotFound();
             }
-
             await _eventService.DeleteEvent(id);
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
 
+        /// <summary>
+        /// Получает событие по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор события.</param>
+        /// <returns>Событие с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEvent(int id)
         {
@@ -99,6 +117,11 @@ namespace WebAPI.Controllers
             return Ok(@event);
         }
 
+        /// <summary>
+        /// Получает все события таймлайна по идентификатору таймлайна.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна, по которому ищутся все события.</param>
+        /// <returns>Список всех событий для указанного идентификатора таймлайна.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllEvents([FromBody] int id)
         {

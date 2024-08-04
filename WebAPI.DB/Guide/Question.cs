@@ -8,13 +8,30 @@ using System.Threading.Tasks;
 
 namespace WebAPI.DB.Guide
 {
+    /// <summary>
+    /// Класс, представляющий вопрос.
+    /// </summary>
     public class Question
     {
+        /// <summary>
+        /// Уникальный идентификатор вопроса.
+        /// </summary>
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public int Block {  get; set; }
 
+        /// <summary>
+        /// Название или текст вопроса.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Идентификатор блока, к которому принадлежит вопрос.
+        /// </summary>
+        public int Block { get; set; }
+
+        /// <summary>
+        /// Связанный блок номеров.
+        /// </summary>
         [ForeignKey(nameof(Block))]
         public NumberBlock NumberBlock { get; set; }
     }

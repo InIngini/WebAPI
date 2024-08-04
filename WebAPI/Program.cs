@@ -35,7 +35,6 @@ namespace WebAPI
         public static void Main(string[] args)
         {
             //new AddedData();
-            //ConnectionString.ConnectString();
             
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);

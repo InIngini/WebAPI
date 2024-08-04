@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления книгами.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/[controller]")]
@@ -22,46 +25,50 @@ namespace WebAPI.Controllers
         private readonly IBookService _bookService;
         private readonly ITokenValidator _tokenValidator;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="BookController"/>.
+        /// </summary>
+        /// <param name="bookService">Сервис для работы с книгами.</param>
+        /// <param name="tokenValidator">Сервис для валидации токенов.</param>
         public BookController(IBookService bookService, ITokenValidator tokenValidator)
         {
             _bookService = bookService;
             _tokenValidator = tokenValidator;
         }
 
-        //Создание книги
+        /// <summary>
+        /// Создает новую книгу.
+        /// </summary>
+        /// <param name="bookdata">Данные о книге, которые необходимо создать.</param>
+        /// <returns>Результат создания книги.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] UserBookData bookdata)
         {
-
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            // Сохранение книги в базе данных
             var createdBook = await _bookService.CreateBook(bookdata);
 
-            // Настройка параметров сериализации
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-            // Сериализация созданной книги в JSON
             string json = JsonSerializer.Serialize(createdBook, options);
 
-            // Возврат созданной книги в формате JSON
             return CreatedAtAction(nameof(GetBook), new { id = createdBook.IdBook }, json);
         }
-
-        //Изменение книги
+        /// <summary>
+        /// Обновляет существующую книгу.
+        /// </summary>
+        /// <param name="id">Идентификатор книги для обновления.</param>
+        /// <param name="book">Новые данные о книге.</param>
+        /// <returns>Результат выполнения операции обновления.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
         {
-            // Получение книги из базы данных
             var existingBook = await _bookService.GetBook(id);
 
-            // Если книга не найдена, вернуть ошибку
             if (existingBook == null)
             {
                 return NotFound();
@@ -70,21 +77,20 @@ namespace WebAPI.Controllers
             // Обновление книги
             existingBook.NameBook = book.NameBook;
             existingBook.IdPicture = book.IdPicture;
-
             await _bookService.UpdateBook(existingBook);
 
-            // Возврат обновленной книги
             return Ok(existingBook);
         }
 
-        //Удаление книги
+        /// <summary>
+        /// Удаляет книгу по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор книги для удаления.</param>
+        /// <returns>Результат выполнения операции удаления.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            // Получение книги из базы данных
             var book = await _bookService.GetBook(id);
-
-            // Если книга не найдена, вернуть ошибку
             if (book == null)
             {
                 return NotFound();
@@ -92,11 +98,14 @@ namespace WebAPI.Controllers
 
             await _bookService.DeleteBook(id);
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
 
-        //Получение книги
+        /// <summary>
+        /// Получает книгу по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор книги.</param>
+        /// <returns>Книга с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBook(int id)
         {
@@ -110,7 +119,11 @@ namespace WebAPI.Controllers
             return Ok(book);
         }
 
-        //Получение всех книг для пользователя
+        /// <summary>
+        /// Получает все книги для заданного пользователя.
+        /// </summary>
+        /// <param name="userId">Идентификатор пользователя.</param>
+        /// <returns>Список книг для указанного пользователя.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllBooksForUser([FromBody] int userId)
         {

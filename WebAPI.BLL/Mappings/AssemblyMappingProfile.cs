@@ -10,10 +10,22 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.BLL.Mappings
 {
+    /// <summary>
+    /// Профиль сопоставления для AutoMapper, который применяет сопоставления из типов, реализующих интерфейс <see cref="IMapWith{T}"/>.
+    /// </summary>
     public class AssemblyMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализируется новый экземпляр класса <see cref="AssemblyMappingProfile"/> и применяет маппинги из указанной сборки.
+        /// </summary>
+        /// <param name="assembly">Сборка, содержащая типы для сопоставления.</param>
         public AssemblyMappingProfile(Assembly assembly) =>
             ApplyMappingFromAssembly(assembly);
+
+        /// <summary>
+        /// Применяет сопоставления из всех типов в указанной сборке, которые реализуют интерфейс <see cref="IMapWith{T}"/>.
+        /// </summary>
+        /// <param name="assembly">Сборка, содержащая типы для сопоставления.</param>
         private void ApplyMappingFromAssembly(Assembly assembly)
         {
             Type[] allTypes = assembly.GetTypes();

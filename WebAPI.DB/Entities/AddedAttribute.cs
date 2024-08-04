@@ -8,16 +8,42 @@ using System.Threading.Tasks;
 
 namespace WebAPI.DB.Entities
 {
+    /// <summary>
+    /// Класс, представляющий добавленный атрибут.
+    /// </summary>
     public class AddedAttribute
     {
+        /// <summary>
+        /// Уникальный идентификатор атрибута.
+        /// </summary>
         [Key]
-        public int IdAttribute {  get; set; }
+        public int IdAttribute { get; set; }
+
+        /// <summary>
+        /// Номер ответа, связанный с атрибутом.
+        /// </summary>
         public int NumberAnswer { get; set; }
-        public string NameAttribute {  get; set; }
+
+        /// <summary>
+        /// Название атрибута.
+        /// </summary>
+        public string NameAttribute { get; set; }
+
+        /// <summary>
+        /// Содержимое атрибута.
+        /// </summary>
         public string ContentAttribute { get; set; }
+
+        /// <summary>
+        /// Идентификатор персонажа, к которому принадлежит атрибут.
+        /// </summary>
         public int IdCharacter { get; set; }
 
+        /// <summary>
+        /// Связанный персонаж.
+        /// </summary>
         [ForeignKey(nameof(IdCharacter))]
         public Character Character { get; set; }
     }
+
 }

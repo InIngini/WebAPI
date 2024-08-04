@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
-using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления изображениями.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/[controller]")]
@@ -15,46 +17,58 @@ namespace WebAPI.Controllers
     {
         private readonly IPictureService _pictureService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PictureController"/>.
+        /// </summary>
+        /// <param name="pictureService">Сервис для работы с изображениями.</param>
         public PictureController(IPictureService pictureService)
         {
             _pictureService = pictureService;
         }
 
+        /// <summary>
+        /// Создает новое изображение.
+        /// </summary>
+        /// <param name="picture">Данные о изображении, которое необходимо создать.</param>
+        /// <returns>Результат создания изображения.</returns>
         [HttpPost]
         public async Task<IActionResult> CreatePicture([FromBody] Picture picture)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Сохранение картинки в базе данных
             var createdPicture = await _pictureService.CreatePicture(picture);
 
-            // Возврат созданной картинки
             return CreatedAtAction(nameof(GetPicture), new { id = createdPicture.IdPicture }, createdPicture);
         }
 
+        /// <summary>
+        /// Удаляет изображение по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор изображения для удаления.</param>
+        /// <returns>Результат удаления изображения.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id)
         {
-            // Получение картинки из базы данных
             var picture = await _pictureService.GetPicture(id);
 
-            // Если картинка не найдена, вернуть ошибку
             if (picture == null)
             {
                 return NotFound();
             }
 
-            // Удаление картинки
             await _pictureService.DeletePicture(id);
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
 
+        /// <summary>
+        /// Получает изображение по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор изображения.</param>
+        /// <returns>Изображение с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPicture(int id)
         {

@@ -9,15 +9,35 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.BLL.DTO
 {
+    /// <summary>
+    /// Данные полного списка событии.
+    /// </summary>
     public class EventAllData : IMapWith<Event>
     {
+        /// <summary>
+        /// Идентификатор события.
+        /// </summary>
         public int IdEvent { get; set; }
+
+        /// <summary>
+        /// Название события.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Время события.
+        /// </summary>
         public string Time { get; set; }
+
+        /// <summary>
+        /// Конфигурация сопоставления между <see cref="Event"/> и <see cref="EventAllData"/>.
+        /// </summary>
+        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
         public void Mapping(Profile profile)
         {
+            // Создаём сопоставление между сущностями Event и EventAllData
             profile.CreateMap<Event, EventAllData>()
-                ; // Если Id генерируется в базе данных, то можно игнорировать
+                .ForMember(dest => dest.IdEvent, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
         }
     }
 }

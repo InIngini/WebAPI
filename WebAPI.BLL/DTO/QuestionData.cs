@@ -10,11 +10,30 @@ using WebAPI.DB.Guide;
 
 namespace WebAPI.BLL.DTO
 {
-    public class QuestionData : IMapWith<QuestionData>
+    /// <summary>
+    /// Данные вопроса.
+    /// </summary>
+    public class QuestionData : IMapWith<Question>
     {
+        /// <summary>
+        /// Идентификатор вопроса.
+        /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Название вопроса.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Блок, к которому принадлежит вопрос (может быть null).
+        /// </summary>
         public string Block { get; set; }
+
+        /// <summary>
+        /// Конфигурация сопоставления между <see cref="Question"/> и <see cref="QuestionData"/>.
+        /// </summary>
+        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Question, QuestionData>()

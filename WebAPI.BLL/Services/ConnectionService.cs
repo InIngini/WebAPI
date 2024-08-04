@@ -14,17 +14,31 @@ using WebAPI.DB.Guide;
 
 namespace WebAPI.BLL.Services
 {
+    /// <summary>
+    /// Сервис для управления связями между персонажами.
+    /// </summary>
     public class ConnectionService : IConnectionService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConnectionService"/>.
+        /// </summary>
+        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="mapper">Объект для преобразования данных.</param>
         public ConnectionService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Создает новую связь между персонажами.
+        /// </summary>
+        /// <param name="connectionData">Данные для создания связи.</param>
+        /// <returns>Созданная связь.</returns>
+        /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<Connection> CreateConnection(ConnectionData connectionData)
         {
             var validationContext = new ValidationContext(connectionData);
@@ -35,12 +49,6 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            //Connection connection = new Connection()
-            //{
-            //    TypeConnection = _unitOfWork.TypeConnections.Find(t=>t.Name==connectionData.TypeConnection).FirstOrDefault().Id,
-            //    IdCharacter1 = connectionData.IdCharacter1,
-            //    IdCharacter2 = connectionData.IdCharacter2,
-            //};
             var connection = _mapper.Map<Connection>(connectionData);
             connection.TypeConnection = _unitOfWork.TypeConnections.Find(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
 
@@ -63,26 +71,26 @@ namespace WebAPI.BLL.Services
             return connection;
         }
 
+        /// <summary>
+        /// Удаляет связь по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор связи.</param>
+        /// <returns>Удаленная связь.</returns>
+        /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Connection> DeleteConnection(int id)
         {
-            // Получение связи из базы данных
             var connection = _unitOfWork.Connections.Get(id);
-
-            // Если связь не найдена, вернуть ошибку
             if (connection == null)
             {
                 throw new KeyNotFoundException();
             }
-
-            // Получение схем, связанных со связью, и удаление их оттуда
-            //var schemes = _unitOfWork.Schemes.Find(c => c.IdConnections.Any(s => s.IdConnection == id)).ToList();
+            
             var schemes = _unitOfWork.BelongToSchemes.Find(b=>b.IdConnection == id).ToList();
             // Удаление IdConnection удаляемой связи из схем
             foreach (var scheme in schemes)
             {
                 _unitOfWork.BelongToSchemes.Delete(scheme.IdConnection);
             }
-            // Сохранение изменений в базе данных
             _unitOfWork.Save();
 
             // Удаление связи
@@ -92,6 +100,12 @@ namespace WebAPI.BLL.Services
             return connection;
         }
 
+        /// <summary>
+        /// Получает связь по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор связи.</param>
+        /// <returns>Данные связи.</returns>
+        /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<ConnectionData> GetConnection(int id)
         {
             var connection = _unitOfWork.Connections.Get(id);
@@ -108,6 +122,11 @@ namespace WebAPI.BLL.Services
             return connectionData;
         }
 
+        /// <summary>
+        /// Получает все связи для указанной схемы.
+        /// </summary>
+        /// <param name="idScheme">Идентификатор схемы.</param>
+        /// <returns>Список всех связей.</returns>
         public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
         {
             var connections = _unitOfWork.Connections.GetAll(idScheme).ToList();

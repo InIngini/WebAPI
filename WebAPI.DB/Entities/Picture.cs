@@ -7,10 +7,20 @@ using System.Threading.Tasks;
 
 namespace WebAPI.DB.Entities
 {
+    /// <summary>
+    /// Класс, представляющий изображение.
+    /// </summary>
     public class Picture
     {
+        /// <summary>
+        /// Уникальный идентификатор изображения.
+        /// </summary>
         [Key]
         public int IdPicture { get; set; }
+
+        /// <summary>
+        /// Двоичные данные изображения.
+        /// </summary>
         public byte[] Picture1 { get; set; }
     }
 }

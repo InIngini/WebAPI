@@ -13,24 +13,33 @@ using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
+    /// <summary>
+    /// Сервис для управления схемами.
+    /// </summary>
     public class SchemeService : ISchemeService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="SchemeService"/>.
+        /// </summary>
+        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="mapper">Объект для преобразования данных.</param>
         public SchemeService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Создает новую схему.
+        /// </summary>
+        /// <param name="schemedata">Данные для создания схемы.</param>
+        /// <returns>Созданная схема.</returns>
+        /// <exception cref="ArgumentException">Если модели не валидны.</exception>
         public async Task<Scheme> CreateScheme(SchemeData schemedata)
         {
-            //Scheme scheme = new Scheme()
-            //{
-            //    IdBook = schemedata.IdBook,
-            //    NameScheme = schemedata.NameScheme,
-            //};
             var scheme = _mapper.Map<Scheme>(schemedata);
             var validationContext = new ValidationContext(scheme);
             var validationResults = new List<ValidationResult>();
@@ -46,13 +55,16 @@ namespace WebAPI.BLL.Services
             return scheme;
         }
 
+        /// <summary>
+        /// Обновляет схему и добавляет связь.
+        /// </summary>
+        /// <param name="scheme">Схема, которую необходимо обновить.</param>
+        /// <param name="idConnection">Идентификатор связи.</param>
+        /// <returns>Обновленная схема.</returns>
+        /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Scheme> UpdateScheme(Scheme scheme, int idConnection)
         {
-
-            // Поиск соединения по указанному идентификатору
             var connection = _unitOfWork.Connections.Get(idConnection);
-
-            // Если соединение не найдено, вернуть ошибку
             if (connection == null)
             {
                 throw new KeyNotFoundException();
@@ -70,6 +82,12 @@ namespace WebAPI.BLL.Services
             return scheme;
         }
 
+        /// <summary>
+        /// Удаляет схему по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы.</param>
+        /// <returns>Удаленная схема.</returns>
+        /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> DeleteScheme(int id)
         {
             var scheme = _unitOfWork.Schemes.Get(id);
@@ -90,6 +108,12 @@ namespace WebAPI.BLL.Services
             return scheme;
         }
 
+        /// <summary>
+        /// Получает схему по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы.</param>
+        /// <returns>Запрашиваемая схема.</returns>
+        /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> GetScheme(int id)
         {
             var scheme = _unitOfWork.Schemes.Get(id);
@@ -102,6 +126,11 @@ namespace WebAPI.BLL.Services
             return scheme;
         }
 
+        /// <summary>
+        /// Получает все схемы для указанной книги.
+        /// </summary>
+        /// <param name="idBook">Идентификатор книги.</param>
+        /// <returns>Список всех схем книги.</returns>
         public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook)
         {
             var schemes = _unitOfWork.Schemes.Find(s => s.IdBook == idBook).ToList();

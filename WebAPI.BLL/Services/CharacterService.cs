@@ -14,17 +14,31 @@ using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
+    /// <summary>
+    /// Сервис для управления персонажами.
+    /// </summary>
     public class CharacterService : ICharacterService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="CharacterService"/>.
+        /// </summary>
+        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="mapper">Объект для преобразования данных.</param>
         public CharacterService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Создает нового персонажа.
+        /// </summary>
+        /// <param name="character">Персонаж для создания.</param>
+        /// <returns>Созданный персонаж.</returns>
+        /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<Character> CreateCharacter(Character character)
         {
             var validationContext = new ValidationContext(character);
@@ -80,6 +94,13 @@ namespace WebAPI.BLL.Services
             return character;
         }
 
+        /// <summary>
+        /// Обновляет существующего персонажа.
+        /// </summary>
+        /// <param name="characterWithAnswers">Персонаж с данными для обновления.</param>
+        /// <param name="id">Идентификатор персонажа.</param>
+        /// <returns>Обновленный персонаж.</returns>
+        /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
@@ -133,6 +154,12 @@ namespace WebAPI.BLL.Services
             return character;
         }
 
+        /// <summary>
+        /// Удаляет персонажа по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа.</param>
+        /// <returns>Удаленный персонаж.</returns>
+        /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<Character> DeleteCharacter(int id)
         {
             var character = _unitOfWork.Characters.Get(id);
@@ -192,6 +219,12 @@ namespace WebAPI.BLL.Services
             return character;
         }
 
+        /// <summary>
+        /// Получает персонажа по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа.</param>
+        /// <returns>Персонаж с заданным идентификатором.</returns>
+        /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<CharacterWithAnswers> GetCharacter(int id)
         {
             var character = _unitOfWork.Characters.Get(id);
@@ -206,6 +239,11 @@ namespace WebAPI.BLL.Services
             return characterWithAnswers;
         }
 
+        /// <summary>
+        /// Получает всех персонажей для указанной книги.
+        /// </summary>
+        /// <param name="idBook">Идентификатор книги.</param>
+        /// <returns>Список персонажей с данными.</returns>
         public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook)
         {
             var characters = _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToList();
@@ -221,20 +259,16 @@ namespace WebAPI.BLL.Services
             }
             return charactersAllData;
         }
+
+        /// <summary>
+        /// Получает все вопросы.
+        /// </summary>
+        /// <returns>Список всех вопросов.</returns>
         public async Task<IEnumerable<QuestionData>> GetQuestions()
         {
             var questions = _unitOfWork.Questions.GetAll(0).ToList();
             var questionsData = new List<QuestionData>();
-            //foreach (var question in questions)
-            //{
-            //    var questionData = new QuestionData()
-            //    {
-            //        Id = question.Id,
-            //        Name = question.Name,
-            //        Block = _unitOfWork.NumberBlocks.Get(question.Block).Name
-            //    };
-            //    questionsData.Add(questionData);
-            //}
+
             foreach (var question in questions)
             {
                 var questionData = _mapper.Map<QuestionData>(question);

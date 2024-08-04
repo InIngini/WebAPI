@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления связями между персонажами.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/Book/Scheme/[controller]")]
@@ -17,49 +20,61 @@ namespace WebAPI.Controllers
     {
         private readonly IConnectionService _connectionService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConnectionController"/>.
+        /// </summary>
+        /// <param name="connectionService">Сервис для работы со связями.</param>
         public ConnectionController(IConnectionService connectionService)
         {
             _connectionService = connectionService;
         }
 
+        /// <summary>
+        /// Создает новую связь.
+        /// </summary>
+        /// <param name="connectionData">Данные о связи, которую необходимо создать.</param>
+        /// <returns>Результат создания связи.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateConnection([FromBody] ConnectionData connectionData)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            // Сохранение связи в базе данных
             var createdConnection = await _connectionService.CreateConnection(connectionData);
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(createdConnection, options);
-            // Возврат созданной связи
+            
             return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.IdConnection }, json);
         }
 
+        /// <summary>
+        /// Удаляет связь по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор связь для удаления.</param>
+        /// <returns>Результат удаления связи.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConnection(int id)
         {
-            // Получение связи из базы данных
             var connection = await _connectionService.DeleteConnection(id);
 
-            // Если связь не найдена, вернуть ошибку
             if (connection == null)
             {
                 return NotFound();
             }
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
 
-        //Получить связь
+        /// <summary>
+        /// Получает связь по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор связи.</param>
+        /// <returns>Связь с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConnection(int id)
         {
@@ -73,7 +88,11 @@ namespace WebAPI.Controllers
             return Ok(connection);
         }
 
-        //Получить все связи схемы
+        /// <summary>
+        /// Получает все связи схемы по идентификатору схемы.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы.</param>
+        /// <returns>Список всех связей для указанной схемы.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllConnection([FromBody] int id)
         {
@@ -84,7 +103,6 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
             
-
             return Ok(connections);
         }
     }

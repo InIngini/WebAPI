@@ -13,24 +13,33 @@ using AutoMapper;
 
 namespace WebAPI.BLL.Services
 {
+    /// <summary>
+    /// Сервис для управления таймлайнами.
+    /// </summary>
     public class TimelineService : ITimelineService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TimelineService"/>.
+        /// </summary>
+        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="mapper">Объект для преобразования данных.</param>
         public TimelineService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Создает новый таймлайн.
+        /// </summary>
+        /// <param name="timelinedata">Данные для создания таймлайна.</param>
+        /// <returns>Созданный таймлайн.</returns>
+        /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<Timeline> CreateTimeline(TimelineData timelinedata)
         {
-            //Timeline timeline = new Timeline()
-            //{
-            //    IdBook = timelinedata.IdBook,
-            //    NameTimeline = timelinedata.NameTimeline,
-            //};
             var timeline = _mapper.Map<Timeline>(timelinedata);
 
             var validationContext = new ValidationContext(timeline);
@@ -47,12 +56,16 @@ namespace WebAPI.BLL.Services
             return timeline;
         }
 
+        /// <summary>
+        /// Обновляет таймлайн, добавляя событие.
+        /// </summary>
+        /// <param name="timeline">Таймлайн, который необходимо обновить.</param>
+        /// <param name="idEvent">Идентификатор события.</param>
+        /// <returns>Обновленный таймлайн.</returns>
+        /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent)
         {
-            // Поиск события по указанному идентификатору
             var @event = _unitOfWork.Events.Get(idEvent);
-
-            // Если событие не найдено, вернуть ошибку
             if (@event == null)
             {
                 throw new KeyNotFoundException();
@@ -70,6 +83,12 @@ namespace WebAPI.BLL.Services
             return timeline;
         }
 
+        /// <summary>
+        /// Удаляет таймлайн по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <returns>Удаленный таймлайн.</returns>
+        /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> DeleteTimeline(int id)
         {
             var timeline = _unitOfWork.Timelines.Get(id);
@@ -91,6 +110,12 @@ namespace WebAPI.BLL.Services
             return timeline;
         }
 
+        /// <summary>
+        /// Получает таймлайн по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <returns>Запрашиваемый таймлайн.</returns>
+        /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> GetTimeline(int id)
         {
             var timeline = _unitOfWork.Timelines.Get(id);
@@ -103,6 +128,11 @@ namespace WebAPI.BLL.Services
             return timeline;
         }
 
+        /// <summary>
+        /// Получает все таймлайны для указанной книги.
+        /// </summary>
+        /// <param name="idBook">Идентификатор книги.</param>
+        /// <returns>Список всех таймлайнов книги.</returns>
         public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook)
         {
             var timelines = _unitOfWork.Timelines.Find(t => t.IdBook == idBook)

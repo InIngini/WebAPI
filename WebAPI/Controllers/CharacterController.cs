@@ -9,6 +9,9 @@ using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления персонажами и атрибутами.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/Book/[controller]")]
@@ -17,13 +20,22 @@ namespace WebAPI.Controllers
         private readonly ICharacterService _characterService;
         private readonly IAddedAttributeService _addedAttributeService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="CharacterController"/>.
+        /// </summary>
+        /// <param name="characterService">Сервис для работы с персонажами.</param>
+        /// <param name="addedAttributeService">Сервис для работы с добавленными атрибутами.</param>
         public CharacterController(ICharacterService characterService, IAddedAttributeService addedAttributeService)
         {
             _characterService = characterService;
             _addedAttributeService = addedAttributeService;
         }
 
-        //Создание персонажа и блоков
+        /// <summary>
+        /// Создает нового персонажа и его ответов.
+        /// </summary>
+        /// <param name="bookCharacterData">Данные о персонаже, который необходимо создать.</param>
+        /// <returns>Результат создания персонажа.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateCharacter([FromBody] BookCharacterData bookCharacterData)
         {
@@ -33,34 +45,32 @@ namespace WebAPI.Controllers
                 IdPicture = bookCharacterData.IdPicture
             };
 
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-
             var createdCharacter = await _characterService.CreateCharacter(character);
-
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(createdCharacter, options);
 
-            // Возврат созданного персонажа в виде JSON
             return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.IdCharacter }, json);
         }
 
-        // Изменение персонажа и блоков
+        /// <summary>
+        /// Обновляет информацию о существующем персонаже и его ответах.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа для обновления.</param>
+        /// <param name="characterWithAnswers">Новые данные о персонаже с ответами.</param>
+        /// <returns>Результат обновления персонажа.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithAnswers characterWithAnswers)
         {
             var existingCharacter = _characterService.UpdateCharacter(characterWithAnswers,id);
 
-            // Если персонаж не найден, вернуть ошибку
             if (existingCharacter == null)
             {
                 return NotFound();
@@ -70,11 +80,15 @@ namespace WebAPI.Controllers
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(existingCharacter, options);
-            // Возврат обновленного персонажа в виде JSON
+            
             return Ok(json);
         }
+        /// <summary>
+        /// Удаляет персонажа по идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа для удаления.</param>
+        /// <returns>Результат удаления персонажа.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCharacter(int id)
         {
@@ -82,7 +96,11 @@ namespace WebAPI.Controllers
 
             return Ok();
         }
-        // Получение персонажа по его идентификатору
+        /// <summary>
+        /// Получает персонажа по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа.</param>
+        /// <returns>Персонаж с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCharacter(int id)
         {
@@ -96,7 +114,11 @@ namespace WebAPI.Controllers
             return Ok(character);
         }
 
-        // Получение всех персонажей книги
+        /// <summary>
+        /// Получает всех персонажей книги.
+        /// </summary>
+        /// <param name="idBook">Идентификатор книги.</param>
+        /// <returns>Список персонажей для указанной книги.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllCharacters([FromBody] int idBook)
         {
@@ -110,7 +132,13 @@ namespace WebAPI.Controllers
             return Ok(characters);
         }
 
-        [HttpGet]//получить вопросы
+        ////////////////////////////Для вопросов//////////////////////////////
+
+        /// <summary>
+        /// Получает все вопросы.
+        /// </summary>
+        /// <returns>Список вопросов.</returns>
+        [HttpGet]
         public async Task<IActionResult> GetQuestions()
         {
             var questions = await _characterService.GetQuestions();
@@ -122,59 +150,68 @@ namespace WebAPI.Controllers
 
             return Ok(questions);
         }
+
         ////////////////////////////Для добавленного атрибута//////////////////////////////
 
-        /////Создать атрибут
+        /// <summary>
+        /// Создает новый атрибут для персонажа.
+        /// </summary>
+        /// <param name="id">Идентификатор персонажа, к которому добавляется атрибут.</param>
+        /// <param name="aa">Данные о добавляемом атрибуте.</param>
+        /// <returns>Результат создания добавленного атрибута.</returns>
         [HttpPost("{id}/addedattribute")]
         public async Task<IActionResult> CreateAddedAttribute(int id, [FromBody] AAData aa)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-
-            // Сохранение атрибута в базе данных
             var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
 
-            // Возврат созданного атрибута
             return CreatedAtAction(nameof(GetAddedAttribute), new { id = createdAddedAttribute.IdAttribute }, createdAddedAttribute);
         }
 
-        //Изменить атрибут
+        /// <summary>
+        /// Изменяет существующий добавленный атрибут.
+        /// </summary>
+        /// <param name="ida">Идентификатор добавленного атрибута для обновления.</param>
+        /// <param name="content">Обновленное содержимое атрибута.</param>
+        /// <returns>Результат обновления добавленного атрибута.</returns>
         [HttpPut("{idc}/addedattribute/{ida}")]
         public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content)
         {
-            // Получение атрибута из базы данных
             var existingAddedAttribute = await _addedAttributeService.GetAddedAttribute(ida);
-            // Если атрибут не найден, вернуть ошибку
             if (existingAddedAttribute == null)
             {
                 return NotFound();
             }
 
-            // Обновление атрибута
             existingAddedAttribute.ContentAttribute = content;
-
             await _addedAttributeService.UpdateAddedAttribute(existingAddedAttribute);
 
-            // Возврат обновленного атрибута
             return Ok(existingAddedAttribute);
         }
 
-        //Удалить атрибут
+        /// <summary>
+        /// Удаляет добавленный атрибут по его идентификатору.
+        /// </summary>
+        /// <param name="idc">Идентификатор персонажа, к которому относится атрибут.</param>
+        /// <param name="ida">Идентификатор добавленного атрибута для удаления.</param>
+        /// <returns>Результат выполнения операции удаления.</returns>
         [HttpDelete("{idc}/addedattribute/{ida}")]
         public async Task<IActionResult> DeleteAddedAttribute(int idc,int ida)
         {
-            // Получение атрибута из базы данных
             await _addedAttributeService.DeleteAddedAttribute(idc, ida);
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
 
-        //Получить атрибут
+        /// <summary>
+        /// Получает добавленный атрибут по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор добавленного атрибута.</param>
+        /// <returns>Добавленный атрибут с указанным идентификатором.</returns>
         [HttpGet("addedattribute/{id}")]
         public async Task<IActionResult> GetAddedAttribute(int id)
         {

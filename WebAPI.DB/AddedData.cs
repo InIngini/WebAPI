@@ -9,8 +9,14 @@ using WebAPI.DB.Guide;
 
 namespace WebAPI.DB
 {
+    /// <summary>
+    /// Класс для добавления начальных данных в контекст базы данных.
+    /// </summary>
     public class AddedData
     {
+        /// <summary>
+        /// Конструктор, который инициализирует данные при создании объекта.
+        /// </summary>
         public AddedData()
         {
             using (var context = new Context())

@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления схемами.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("User/Book/[controller]")]
@@ -17,75 +20,86 @@ namespace WebAPI.Controllers
     {
         private readonly ISchemeService _schemeService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="SchemeController"/>.
+        /// </summary>
+        /// <param name="schemeService">Сервис для работы с схемами.</param>
         public SchemeController(ISchemeService schemeService)
         {
             _schemeService = schemeService;
         }
 
-        //Создание схемы
+        /// <summary>
+        /// Создает новую схему.
+        /// </summary>
+        /// <param name="schemedata">Данные о схеме, которую необходимо создать.</param>
+        /// <returns>Результат создания схемы.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateScheme([FromBody] SchemeData schemedata)
         {
-            // Проверка валидности модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             
-            // Сохранение схемы в базе данных
             var createdScheme = await _schemeService.CreateScheme(schemedata);
 
-            // Возврат созданной схемы
             return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.IdScheme }, createdScheme);
 
         }
 
-        //Добавление связей в схему
+        /// <summary>
+        /// Обновляет схему, добавляя связи.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы.</param>
+        /// <param name="idConnection">Идентификатор связи для добавления.</param>
+        /// <returns>Обновлённая схема.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection)
         {
-            // Получение схемы из базы данных
             var scheme = await _schemeService.GetScheme(id);
 
-            // Если схема не найдена, вернуть ошибку
             if (scheme == null)
             {
                 return NotFound();
             }
 
-            // Обновление схемы в базе данных
             var updatedScheme = await _schemeService.UpdateScheme(scheme,idConnection);
-            
 
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
-
             string json = JsonSerializer.Serialize(updatedScheme, options);
 
-            // Возврат обновленной схемы
             return Ok(json);
         }
 
+        /// <summary>
+        /// Удаляет схему по её идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы для удаления.</param>
+        /// <returns>Результат удаления схемы.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteScheme(int id)
         {
-            // Получение схемы из базы данных
             var scheme = await _schemeService.GetScheme(id);
 
-            // Если схема не найдена, вернуть ошибку
             if (scheme == null)
             {
                 return NotFound();
             }
 
-            // Удаление схемы из базы данных
             await _schemeService.DeleteScheme(id);
 
-            // Возврат подтверждения удаления
             return NoContent();
         }
+
+        /// <summary>
+        /// Получает схему по её идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор схемы.</param>
+        /// <returns>Схема с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetScheme(int id)
         {
@@ -98,6 +112,12 @@ namespace WebAPI.Controllers
 
             return Ok(scheme);
         }
+
+        /// <summary>
+        /// Получает все схемы по заданному идентификатору книги.
+        /// </summary>
+        /// <param name="id">Идентификатор для получения всех схем книги.</param>
+        /// <returns>Список всех схем для указанного идентификатора книги.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetAllScheme([FromBody] int id)
         {

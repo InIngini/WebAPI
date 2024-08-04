@@ -7,13 +7,25 @@ using System.Threading.Tasks;
 
 namespace WebAPI.DB.Entities
 {
+    /// <summary>
+    /// Класс, представляющий пользователя.
+    /// </summary>
     public class User
     {
+        /// <summary>
+        /// Уникальный идентификатор пользователя.
+        /// </summary>
         [Key]
         public int IdUser { get; set; }
-        
+
+        /// <summary>
+        /// Логин пользователя для входа.
+        /// </summary>
         public string Login { get; set; }
 
+        /// <summary>
+        /// Пароль пользователя для входа.
+        /// </summary>
         public string Password { get; set; }
     }
 }

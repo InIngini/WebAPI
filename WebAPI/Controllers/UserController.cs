@@ -12,7 +12,9 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.Controllers
 {
-    
+    /// <summary>
+    /// Контроллер для управления пользователями.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
@@ -20,12 +22,20 @@ namespace WebAPI.Controllers
     {
         private readonly IUserService _userService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="UserController"/>.
+        /// </summary>
+        /// <param name="userService">Сервис для работы с пользователями.</param>
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
 
-        //Создание пользователя
+        /// <summary>
+        /// Регистрирует нового пользователя.
+        /// </summary>
+        /// <param name="loginData">Данные для регистрации пользователя.</param>
+        /// <returns>Результат создания пользователя.</returns>
         [HttpPost("register")]
         public async Task<IActionResult> CreateUser([FromBody] LoginData loginData)
         {
@@ -34,7 +44,11 @@ namespace WebAPI.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.IdUser }, createdUser);
         }
 
-        //Авторизация пользователя
+        /// <summary>
+        /// Авторизирует пользователя.
+        /// </summary>
+        /// <param name="loginData">Данные для авторизации пользователя.</param>
+        /// <returns>Токен пользователя, полученный в результате авторизации.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginData loginData)
         {
@@ -45,7 +59,11 @@ namespace WebAPI.Controllers
             return Ok(new { userToken });
         }
 
-        //Получить пользователя
+        /// <summary>
+        /// Получает информацию о пользователе по его идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор пользователя.</param>
+        /// <returns>Информация о пользователе с указанным идентификатором.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {

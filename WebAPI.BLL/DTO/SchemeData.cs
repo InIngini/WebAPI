@@ -4,10 +4,25 @@ using WebAPI.DB.Entities;
 
 namespace WebAPI.BLL.DTO
 {
+    /// <summary>
+    /// Данные схемы.
+    /// </summary>
     public class SchemeData : IMapWith<Scheme>
     {
+        /// <summary>
+        /// Идентификатор книги, к которой относится схема.
+        /// </summary>
         public int IdBook { get; set; }
+
+        /// <summary>
+        /// Название схемы.
+        /// </summary>
         public string NameScheme { get; set; }
+
+        /// <summary>
+        /// Конфигурация сопоставления между <see cref="SchemeData"/> и <see cref="Scheme"/>.
+        /// </summary>
+        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
         public void Mapping(Profile profile)
         {
             profile.CreateMap<SchemeData, Scheme>()
