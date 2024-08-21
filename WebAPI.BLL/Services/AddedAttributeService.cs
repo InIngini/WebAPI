@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
+using WebAPI.DB;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -19,17 +19,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class AddedAttributeService : IAddedAttributeService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="AddedAttributeService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public AddedAttributeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AddedAttributeService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -54,8 +54,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.AddedAttributes.Create(addedAttribute);
-            _unitOfWork.Save();
+            _context.AddedAttributes.Add(addedAttribute);
+            _context.SaveChanges();
 
             return addedAttribute;
         }
@@ -67,8 +67,8 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленный добавленный атрибут.</returns>
         public async Task<AddedAttribute> UpdateAddedAttribute(AddedAttribute addedAttribute)
         {
-            _unitOfWork.AddedAttributes.Update(addedAttribute);
-            _unitOfWork.Save();
+            _context.AddedAttributes.Update(addedAttribute);
+            _context.SaveChanges();
 
             return addedAttribute;
         }
@@ -82,15 +82,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida)
         {
-            var addedAttribute = _unitOfWork.AddedAttributes.Find(a=> a.IdAttribute==ida && a.IdCharacter==idc).Single();
+            var addedAttribute = _context.AddedAttributes.Where(a=> a.IdAttribute==ida && a.IdCharacter==idc).SingleOrDefault();
 
             if (addedAttribute == null)
             {
                 throw new KeyNotFoundException("Атрибут не найден");
             }
 
-            _unitOfWork.AddedAttributes.Delete(ida);
-            _unitOfWork.Save();
+            _context.AddedAttributes.Remove(addedAttribute);
+            _context.SaveChanges();
 
             return addedAttribute;
 
@@ -103,7 +103,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> GetAddedAttribute(int id)
         {
-            var addedAttribute = _unitOfWork.AddedAttributes.Get(id);
+            var addedAttribute = _context.AddedAttributes.Find(id);
 
             if (addedAttribute == null)
             {
@@ -120,7 +120,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список добавленных атрибутов для указанного персонажа.</returns>
         public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter)
         {
-            var addedAttributes = _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == idCharacter).ToList();
+            var addedAttributes = _context.AddedAttributes.Where(aa => aa.IdCharacter == idCharacter).ToList();
 
             return addedAttributes;
         }

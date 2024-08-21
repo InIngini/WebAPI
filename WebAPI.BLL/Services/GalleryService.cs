@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -18,17 +18,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class GalleryService : IGalleryService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="GalleryService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public GalleryService(IUnitOfWork unitOfWork, IMapper mapper)
+        public GalleryService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -49,8 +49,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.Galleries.Create(gallery);
-            _unitOfWork.Save();
+            _context.Galleries.Add(gallery);
+            _context.SaveChanges();
 
             return gallery;
         }
@@ -63,25 +63,25 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если галерея или изображение не найдены.</exception>
         public async Task<Gallery> DeletePictureFromGallery(int idPicture)
         {
-            var gallery = _unitOfWork.Galleries.Get(idPicture);
+            var gallery = _context.Galleries.Find(idPicture);
             if (gallery == null)
             {
                 throw new KeyNotFoundException();
             }
 
-            var picture = _unitOfWork.Pictures.Get(idPicture);
+            var picture = _context.Pictures.Find(idPicture);
             if (picture == null)
             {
                 throw new KeyNotFoundException();
             }
 
             // Удаление записи из галереи
-            _unitOfWork.Galleries.Delete(idPicture);
-            _unitOfWork.Save();
+            _context.Galleries.Remove(gallery);
+            _context.SaveChanges();
 
             // Удаление картинки из галереи
-            _unitOfWork.Pictures.Delete(idPicture);
-            _unitOfWork.Save();
+            _context.Pictures.Remove(picture);
+            _context.SaveChanges();
 
             return gallery;
         }
@@ -94,7 +94,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если галерея не найдена.</exception>
         public async Task<Gallery> GetGallery(int id)
         {
-            var gallery = _unitOfWork.Galleries.Get(id);
+            var gallery = _context.Galleries.Find(id);
 
             if (gallery == null)
             {
@@ -111,7 +111,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список галерей персонажа.</returns>
         public async Task<IEnumerable<Gallery>> GetAllGalleries(int idCharacter)
         {
-            var galleries = _unitOfWork.Galleries.Find(g => g.IdCharacter == idCharacter).ToList();
+            var galleries = _context.Galleries.Where(g => g.IdCharacter == idCharacter).ToList();
 
             return galleries;
         }

@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -18,17 +18,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class TimelineService : ITimelineService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TimelineService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public TimelineService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TimelineService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -50,8 +50,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.Timelines.Create(timeline);
-            _unitOfWork.Save();
+            _context.Timelines.Add(timeline);
+            _context.SaveChanges();
 
             return timeline;
         }
@@ -65,7 +65,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent)
         {
-            var @event = _unitOfWork.Events.Get(idEvent);
+            var @event = _context.Events.Find(idEvent);
             if (@event == null)
             {
                 throw new KeyNotFoundException();
@@ -77,8 +77,8 @@ namespace WebAPI.BLL.Services
                 IdEvent = idEvent,
                 IdTimeline = timeline.IdTimeline
             };
-            _unitOfWork.BelongToTimelines.Create(belongToTimeline);
-            _unitOfWork.Save();
+            _context.BelongToTimelines.Add(belongToTimeline);
+            _context.SaveChanges();
 
             return timeline;
         }
@@ -91,21 +91,21 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> DeleteTimeline(int id)
         {
-            var timeline = _unitOfWork.Timelines.Get(id);
-
+            var timeline = _context.Timelines.Find(id);
             if (timeline == null)
             {
                 throw new KeyNotFoundException();
             }
-            var belongToTimelines = _unitOfWork.BelongToTimelines.Find(b => b.IdTimeline == id).ToList();
+
+            var belongToTimelines = _context.BelongToTimelines.Where(b => b.IdTimeline == id).ToList();
             foreach (var belongToTimeline in belongToTimelines)
             {
-                _unitOfWork.BelongToTimelines.Delete(id, belongToTimeline.IdEvent);
+                _context.BelongToTimelines.Remove(belongToTimeline);
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
-            _unitOfWork.Timelines.Delete(id);
-            _unitOfWork.Save();
+            _context.Timelines.Remove(timeline);
+            _context.SaveChanges();
 
             return timeline;
         }
@@ -118,7 +118,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> GetTimeline(int id)
         {
-            var timeline = _unitOfWork.Timelines.Get(id);
+            var timeline = _context.Timelines.Find(id);
 
             if (timeline == null)
             {
@@ -135,7 +135,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех таймлайнов книги.</returns>
         public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook)
         {
-            var timelines = _unitOfWork.Timelines.Find(t => t.IdBook == idBook)
+            var timelines = _context.Timelines.Where(t => t.IdBook == idBook)
                                                  .ToList();
 
             return timelines;

@@ -14,8 +14,6 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.Services;
 using WebAPI.BLL.Token;
 using WebAPI.DB;
-using WebAPI.DAL.Interfaces;
-using WebAPI.DAL.Repositories;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using WebAPI.BLL.Mappings;
@@ -39,9 +37,9 @@ namespace WebAPI
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
-            //// Регистрация контекста базы данных
-            //builder.Services.AddDbContext<Context>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // Регистрация контекста базы данных
+            builder.Services.AddDbContext<Context>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Добавить контроллеры
             builder.Services.AddControllers();
@@ -96,7 +94,6 @@ namespace WebAPI
 
 
             // Регистрация сервисов
-            services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IAddedAttributeService, AddedAttributeService>();
             services.AddTransient<IBookService, BookService>();
             services.AddTransient<ICharacterService, CharacterService>();

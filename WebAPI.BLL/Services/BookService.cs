@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -19,17 +19,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class BookService : IBookService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="BookService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public BookService(IUnitOfWork unitOfWork, IMapper mapper)
+        public BookService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -51,8 +51,8 @@ namespace WebAPI.BLL.Services
 
 
             Book book = _mapper.Map<Book>(userbook);
-            _unitOfWork.Books.Create(book);
-            _unitOfWork.Save();
+            _context.Books.Add(book);
+            _context.SaveChanges();
 
             // Создание сущности BelongTo
             BelongToBook belongToBook = new BelongToBook
@@ -61,8 +61,8 @@ namespace WebAPI.BLL.Services
                 IdBook = book.IdBook,
                 TypeBelong = 1 // автор
             };
-            _unitOfWork.BelongToBooks.Create(belongToBook);
-            _unitOfWork.Save();
+            _context.BelongToBooks.Add(belongToBook);
+            _context.SaveChanges();
 
             // Создание главной схемы 
             Scheme scheme = new Scheme()
@@ -70,8 +70,8 @@ namespace WebAPI.BLL.Services
                 NameScheme = "Главная схема",
                 IdBook = book.IdBook,
             };
-            _unitOfWork.Schemes.Create(scheme);
-            _unitOfWork.Save();
+            _context.Schemes.Add(scheme);
+            _context.SaveChanges();
 
             // Создание главного таймлайна
             Timeline timeline = new Timeline()
@@ -79,8 +79,8 @@ namespace WebAPI.BLL.Services
                 NameTimeline = "Главный таймлайн",
                 IdBook = book.IdBook,
             };
-            _unitOfWork.Timelines.Create(timeline);
-            _unitOfWork.Save();
+            _context.Timelines.Add(timeline);
+            _context.SaveChanges();
 
             return book;
         }
@@ -92,8 +92,8 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленная книга.</returns>
         public async Task<Book> UpdateBook(Book book)
         {
-            _unitOfWork.Books.Update(book);
-            _unitOfWork.Save();
+            _context.Books.Update(book);
+            _context.SaveChanges();
 
             return book;
         }
@@ -106,75 +106,91 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если книга не найдена.</exception>
         public async Task<Book> DeleteBook(int id)
         {
-            var book = _unitOfWork.Books.Get(id);
-
+            var book = _context.Books.Find(id);
             if (book == null)
             {
                 throw new KeyNotFoundException();
             }
 
             // Удаление связанных записей из таблицы BelongToBook
-            _unitOfWork.BelongToBooks.Delete(id);
-            _unitOfWork.Save();
+            var belongToBook = _context.BelongToBooks.Where(b=>b.IdBook== book.IdBook).FirstOrDefault();
+            if (belongToBook == null)
+            {
+                throw new KeyNotFoundException();
+            }
+            _context.BelongToBooks.Remove(belongToBook);
+            _context.SaveChanges();
 
             // Удаление всех схем книги
-            var schemes = _unitOfWork.Schemes.Find(s => s.IdBook == id);
+            var schemes = _context.Schemes.Where(s => s.IdBook == id).ToList();
             foreach (var scheme in schemes)
             {
                 if (scheme.NameScheme == "Главная схема")
                 {
                     // Удаление всех связей схемы
-                    var belongToScheme = _unitOfWork.BelongToSchemes.Find(b=> b.IdScheme==scheme.IdScheme);
-                    foreach (var connection in belongToScheme)
+                    var belongToSchemes = _context.BelongToSchemes.Where(b => b.IdScheme == scheme.IdScheme).ToList();
+                    foreach (var belongToScheme in belongToSchemes)
                     {
-                        _unitOfWork.Connections.Delete(connection.IdConnection);
-                        _unitOfWork.BelongToSchemes.Delete(connection.IdConnection);
+                        _context.BelongToSchemes.Remove(belongToScheme);
+
+                        var connection = _context.Connections.Find(belongToScheme.IdConnection);
+                        if (connection == null)
+                        {
+                            throw new KeyNotFoundException();
+                        }
+                        _context.Connections.Remove(connection);
+                        
                     }
                 }
                 // Удаление схемы
-                _unitOfWork.Schemes.Delete(scheme.IdScheme);
+                _context.Schemes.Remove(scheme);
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
             // Удаление всех таймлайнов книги
-            var timelines = _unitOfWork.Timelines.Find(s => s.IdBook == id);
+            var timelines = _context.Timelines.Where(s => s.IdBook == id).ToList();
             foreach (var timeline in timelines)
             {
                 if (timeline.NameTimeline == "Главый таймлайн")
                 {
                     // Удаление всех связей схемы
-                    var belongToTimeline = _unitOfWork.BelongToTimelines.Find(b => b.IdTimeline == timeline.IdTimeline);
-                    foreach (var @event in belongToTimeline)
+                    var belongToTimelines = _context.BelongToTimelines.Where(b => b.IdTimeline == timeline.IdTimeline).ToList();
+                    foreach (var belongToTimeline in belongToTimelines)
                     {
-                        _unitOfWork.Events.Delete(@event.IdEvent);
-                        _unitOfWork.BelongToTimelines.Delete(@event.IdEvent);
+                        _context.BelongToTimelines.Remove(belongToTimeline);
+                        var @event = _context.Events.Find(belongToTimeline.IdEvent);
+                        if (@event == null)
+                        {
+                            throw new KeyNotFoundException();
+                        }
+                        _context.Events.Remove(@event);
                     }
                 }
                 // Удаление схемы
-                _unitOfWork.Timelines.Delete(timeline.IdTimeline);
+                _context.Timelines.Remove(timeline);
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
             // Удаление обложки
             if (book.IdPicture != null)
             {
                 int idP = (int)book.IdPicture;
-                var image = _unitOfWork.Pictures.Get(idP);
-                _unitOfWork.Pictures.Delete(image.IdPicture);
+                var image = _context.Pictures.Find(idP);
+                _context.Pictures.Remove(image);
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
             // Удаление всех персонажей книги
-            var characters = _unitOfWork.Characters.Find(c => c.IdBook == id);
-            CharacterService characterService = new CharacterService(_unitOfWork,_mapper);
+            var characters = _context.Characters.Where(c => c.IdBook == id).ToList();
+            CharacterService characterService = new CharacterService(_context,_mapper);
             foreach (var character in characters)
             {
-                characterService.DeleteCharacter(character.IdCharacter);
+                await characterService.DeleteCharacter(character.IdCharacter);
             }
 
             // Удаление книги
-            _unitOfWork.Books.Delete(id);
-            _unitOfWork.Save();
+            _context.Books.Remove(book);
+            _context.SaveChanges();
 
             return book;
         }
@@ -187,7 +203,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если книга не найдена.</exception>
         public async Task<Book> GetBook(int id)
         {
-            var book = _unitOfWork.Books.Get(id);
+            var book = _context.Books.Find(id);
 
             if (book == null)
             {
@@ -205,17 +221,17 @@ namespace WebAPI.BLL.Services
         /// <exception cref="ArgumentException">Если пользователь с указанным идентификатором не существует.</exception>
         public async Task<IEnumerable<Book>> GetAllBooksForUser(int idUser)
         {
-            var user = _unitOfWork.Users.Get(idUser);
+            var user = _context.Users.Find(idUser);
             if (user == null)
             {
                 throw new ArgumentException("User with the specified ID does not exist.");
             }
-            //var books = _unitOfWork.Books.Find(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToList();
+            //var books = _context.Books.Where(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToList();
             var books = new List<Book>();
-            var belongToBooks = _unitOfWork.BelongToBooks.Find(b=>b.IdUser == idUser);
+            var belongToBooks = _context.BelongToBooks.Where(b=>b.IdUser == idUser).ToList();
             foreach (var belongToBook in belongToBooks)
             {
-                var book = _unitOfWork.Books.Get(belongToBook.IdBook);
+                var book = _context.Books.Find(belongToBook.IdBook);
                 if (book != null)
                 {
                     var bookDtos = new Book

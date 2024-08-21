@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebAPI.DAL\WebAPI.DAL.csproj" />
+    <ProjectReference Include="..\WebAPI.DB\WebAPI.DB.csproj" />
   </ItemGroup>
 
 </Project>

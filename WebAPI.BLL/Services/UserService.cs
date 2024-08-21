@@ -8,7 +8,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Token;
 using WebAPI.DB.Entities;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -19,19 +19,19 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="UserService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="tokenService">Сервис для работы с токенами.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public UserService(IUnitOfWork unitOfWork, ITokenService tokenService,IMapper mapper)
+        public UserService(Context context, ITokenService tokenService,IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _tokenService = tokenService;
             _mapper = mapper;
         }
@@ -55,13 +55,13 @@ namespace WebAPI.BLL.Services
             // Используем AutoMapper для маппинга LoginData в User
             User user = _mapper.Map<User>(loginData);
 
-            if (_unitOfWork.Users.Find(u => u.Login==user.Login).FirstOrDefault() != null)
+            if (_context.Users.Where(u => u.Login==user.Login).FirstOrDefault() != null)
             {
                 throw new ArgumentException("Такой уже есть");
             }
             
-            _unitOfWork.Users.Create(user);
-            _unitOfWork.Save();
+            _context.Users.Add(user);
+            _context.SaveChanges();
 
             return user;
         }
@@ -74,7 +74,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="UnauthorizedAccessException">Если пользователь не найден.</exception>
         public async Task<UserTokenData> Login(LoginData loginData)
         {
-            var user = _unitOfWork.Users.Find(u => u.Login == loginData.Login && u.Password == loginData.Password)
+            var user = _context.Users.Where(u => u.Login == loginData.Login && u.Password == loginData.Password)
                                               .FirstOrDefault();
 
             if (user == null)
@@ -99,7 +99,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если пользователь не найден.</exception>
         public async Task<User> GetUser(int id)
         {
-            var user = _unitOfWork.Users.Get(id);
+            var user = _context.Users.Find(id);
 
             if (user == null)
             {

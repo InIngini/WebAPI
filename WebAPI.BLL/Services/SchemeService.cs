@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -18,17 +18,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class SchemeService : ISchemeService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="SchemeService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public SchemeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SchemeService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -49,8 +49,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.Schemes.Create(scheme);
-            _unitOfWork.Save();
+            _context.Schemes.Add(scheme);
+            _context.SaveChanges();
 
             return scheme;
         }
@@ -64,7 +64,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Scheme> UpdateScheme(Scheme scheme, int idConnection)
         {
-            var connection = _unitOfWork.Connections.Get(idConnection);
+            var connection = _context.Connections.Find(idConnection);
             if (connection == null)
             {
                 throw new KeyNotFoundException();
@@ -76,8 +76,8 @@ namespace WebAPI.BLL.Services
                 IdConnection = idConnection,
                 IdScheme = scheme.IdScheme
             };
-            _unitOfWork.BelongToSchemes.Create(belongToScheme);
-            _unitOfWork.Save();
+            _context.BelongToSchemes.Add(belongToScheme);
+            _context.SaveChanges();
 
             return scheme;
         }
@@ -90,20 +90,21 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> DeleteScheme(int id)
         {
-            var scheme = _unitOfWork.Schemes.Get(id);
+            var scheme = _context.Schemes.Find(id);
 
             if (scheme == null)
             {
                 throw new KeyNotFoundException();
             }
-            var belongToSchemes = _unitOfWork.BelongToSchemes.Find(b=>b.IdScheme==id).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdScheme==id).ToList();
             foreach(var belongToScheme in belongToSchemes)
             {
-                _unitOfWork.BelongToSchemes.Delete(id,belongToScheme.IdConnection);
+                _context.BelongToSchemes.Remove(belongToScheme);
             }
-            _unitOfWork.Save();
-            _unitOfWork.Schemes.Delete(id);
-            _unitOfWork.Save();
+            _context.SaveChanges();
+
+            _context.Schemes.Remove(scheme);
+            _context.SaveChanges();
 
             return scheme;
         }
@@ -116,7 +117,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> GetScheme(int id)
         {
-            var scheme = _unitOfWork.Schemes.Get(id);
+            var scheme = _context.Schemes.Find(id);
 
             if (scheme == null)
             {
@@ -133,7 +134,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех схем книги.</returns>
         public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook)
         {
-            var schemes = _unitOfWork.Schemes.Find(s => s.IdBook == idBook).ToList();
+            var schemes = _context.Schemes.Where(s => s.IdBook == idBook).ToList();
 
             return schemes;
         }

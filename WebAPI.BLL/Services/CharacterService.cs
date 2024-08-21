@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using WebAPI.DB.Guide;
 using AutoMapper;
@@ -19,17 +19,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class CharacterService : ICharacterService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="CharacterService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public CharacterService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CharacterService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -49,8 +49,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.Characters.Create(character);
-            _unitOfWork.Save();
+            _context.Characters.Add(character);
+            _context.SaveChanges();
 
             Answer answer = new Answer()
             {
@@ -87,9 +87,9 @@ namespace WebAPI.BLL.Services
                 Answer4ByHistory = "",
                 Answer5ByHistory = ""
             };
-            _unitOfWork.Answers.Create(answer);
+            _context.Answers.Add(answer);
 
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
             return character;
         }
@@ -104,16 +104,16 @@ namespace WebAPI.BLL.Services
         public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
-            var character = _unitOfWork.Characters.Get(id);
+            var character = _context.Characters.Find(id);
             if (character.IdPicture!=null)
             {
                 character.IdPicture = characterWithAnswers.IdPicture;
             }
             // Обновление персонажа
-            _unitOfWork.Characters.Update(character);
+            _context.Characters.Update(character);
 
             // Обновление блоков
-            var answer = _unitOfWork.Answers.Get(id);
+            var answer = _context.Answers.Find(id);
             if (answer != null)
             {
                 answer.Name = characterWithAnswers.Name;
@@ -148,8 +148,8 @@ namespace WebAPI.BLL.Services
                 answer.Answer4ByHistory = characterWithAnswers.Answer4ByHistory;
                 answer.Answer5ByHistory = characterWithAnswers.Answer5ByHistory;
             }
-            _unitOfWork.Answers.Update(answer);
-            _unitOfWork.Save();
+            _context.Answers.Update(answer);
+            _context.SaveChanges();
 
             return character;
         }
@@ -162,7 +162,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<Character> DeleteCharacter(int id)
         {
-            var character = _unitOfWork.Characters.Get(id);
+            var character = _context.Characters.Find(id);
 
             if (character == null)
             {
@@ -170,51 +170,51 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление всех блоков персонажа
-            var answer = _unitOfWork.Answers.Get(character.IdCharacter);
+            var answer = _context.Answers.Find(character.IdCharacter);
             // Удаление блока
-            _unitOfWork.Answers.Delete(answer.IdCharacter);
+            _context.Answers.Remove(answer);
             
             
             // Удаление всех добавленных атрибутов блока
-            var addedAttributes = _unitOfWork.AddedAttributes.Find(aa => aa.IdCharacter == character.IdCharacter);
+            var addedAttributes = _context.AddedAttributes.Where(aa => aa.IdCharacter == character.IdCharacter).ToList();
             foreach (var addedAttribute in addedAttributes)
             {
-                _unitOfWork.AddedAttributes.Delete(addedAttribute.IdAttribute);
+                _context.AddedAttributes.Remove(addedAttribute);
             }
 
             // Удаление всех записей в галерее
-            var galleryItems = _unitOfWork.Galleries.Find(gi => gi.IdCharacter == id);
+            var galleryItems = _context.Galleries.Where(gi => gi.IdCharacter == id).ToList();
             foreach (var galleryItem in galleryItems)
             {
                 // Удаление всех изображений
-                var image = _unitOfWork.Pictures.Get((int)galleryItem.IdPicture);
-                _unitOfWork.Pictures.Delete(image.IdPicture);
-                _unitOfWork.Galleries.Delete((int)galleryItem.IdPicture);
+                var image = _context.Pictures.Find((int)galleryItem.IdPicture);
+                _context.Pictures.Remove(image);
+                _context.Galleries.Remove(galleryItem);
             }
 
             // Удаление аватарки
             if (character.IdPicture != null)
             {
                 int idP = (int)character.IdPicture;
-                var imageavatar = _unitOfWork.Pictures.Get(idP);
-                _unitOfWork.Pictures.Delete(imageavatar.IdPicture);
+                var imageavatar = _context.Pictures.Find(idP);
+                _context.Pictures.Remove(imageavatar);
             }
             
             // Удаление связи
-            var connections = _unitOfWork.Connections.Find(c=> c.IdCharacter1==character.IdCharacter||c.IdCharacter2==character.IdCharacter).ToList();
+            var connections = _context.Connections.Where(c=> c.IdCharacter1==character.IdCharacter||c.IdCharacter2==character.IdCharacter).ToList();
             foreach (var connection in connections)
             {
-                var belongToScheme = _unitOfWork.BelongToSchemes.Find(b=>b.IdConnection==connection.IdConnection).ToList();
-                foreach(var scheme in belongToScheme)
+                var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdConnection==connection.IdConnection).ToList();
+                foreach(var belongToScheme in belongToSchemes)
                 {
-                    _unitOfWork.BelongToSchemes.Delete(connection.IdConnection);
+                    _context.BelongToSchemes.Remove(belongToScheme);
                 }
-                _unitOfWork.Connections.Delete(connection.IdConnection);
+                _context.Connections.Remove(connection);
             }
 
             // Удаление персонажа
-            _unitOfWork.Characters.Delete(character.IdCharacter);
-            _unitOfWork.Save();
+            _context.Characters.Remove(character);
+            _context.SaveChanges();
 
             return character;
         }
@@ -227,8 +227,8 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<CharacterWithAnswers> GetCharacter(int id)
         {
-            var character = _unitOfWork.Characters.Get(id);
-            var answer = _unitOfWork.Answers.Get(id);
+            var character = _context.Characters.Find(id);
+            var answer = _context.Answers.Find(id);
             if (character == null)
             {
                 throw new KeyNotFoundException();
@@ -246,15 +246,15 @@ namespace WebAPI.BLL.Services
         /// <returns>Список персонажей с данными.</returns>
         public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook)
         {
-            var characters = _unitOfWork.Characters.Find(c => c.IdBook == idBook).ToList();
+            var characters = _context.Characters.Where(c => c.IdBook == idBook).ToList();
             var charactersAllData = new List<CharacterAllData>();
             
             foreach (var character in characters)
             {
                 var characterAllData = _mapper.Map<CharacterAllData>(character);
-                characterAllData.Name = _unitOfWork.Answers.Get(character.IdCharacter).Name;
+                characterAllData.Name = _context.Answers.Find(character.IdCharacter).Name;
                 if (character.IdPicture != null)
-                    characterAllData.Picture1 = _unitOfWork.Pictures.Get((int)character.IdPicture).Picture1;
+                    characterAllData.Picture1 = _context.Pictures.Find((int)character.IdPicture).Picture1;
                 charactersAllData.Add(characterAllData);
             }
             return charactersAllData;
@@ -266,13 +266,13 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех вопросов.</returns>
         public async Task<IEnumerable<QuestionData>> GetQuestions()
         {
-            var questions = _unitOfWork.Questions.GetAll(0).ToList();
+            var questions = _context.Questions.ToList();
             var questionsData = new List<QuestionData>();
 
             foreach (var question in questions)
             {
                 var questionData = _mapper.Map<QuestionData>(question);
-                questionData.Block = _unitOfWork.NumberBlocks.Get(question.Block).Name;
+                questionData.Block = _context.NumberBlocks.Find(question.Block).Name;
                 questionsData.Add(questionData);
             }
 

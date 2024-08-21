@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
@@ -18,17 +18,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class PictureService : IPictureService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="PictureService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public PictureService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PictureService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -48,8 +48,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _unitOfWork.Pictures.Create(picture);
-            _unitOfWork.Save();
+            _context.Pictures.Add(picture);
+            _context.SaveChanges();
 
             return picture;
         }
@@ -62,15 +62,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
         public async Task<Picture> DeletePicture(int id)
         {
-            var picture = _unitOfWork.Pictures.Get(id);
+            var picture = _context.Pictures.Find(id);
 
             if (picture == null)
             {
                 throw new KeyNotFoundException();
             }
 
-            _unitOfWork.Pictures.Delete(id);
-            _unitOfWork.Save();
+            _context.Pictures.Remove(picture);
+            _context.SaveChanges();
 
             return picture;
         }
@@ -83,7 +83,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
         public async Task<Picture> GetPicture(int id)
         {
-            var picture = _unitOfWork.Pictures.Get(id);
+            var picture = _context.Pictures.Find(id);
 
             if (picture == null)
             {

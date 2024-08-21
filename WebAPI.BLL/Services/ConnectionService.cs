@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.DB.Guide;
@@ -19,17 +19,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class ConnectionService : IConnectionService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ConnectionService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public ConnectionService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ConnectionService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -50,14 +50,14 @@ namespace WebAPI.BLL.Services
             }
 
             var connection = _mapper.Map<Connection>(connectionData);
-            connection.TypeConnection = _unitOfWork.TypeConnections.Find(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
+            connection.TypeConnection = _context.TypeConnections.Where(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
 
-            var scheme = _unitOfWork.Schemes
-                            .Find(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
+            var scheme = _context.Schemes
+                            .Where(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
                             .FirstOrDefault();
 
-            _unitOfWork.Connections.Create(connection);
-            _unitOfWork.Save();
+            _context.Connections.Add(connection);
+            _context.SaveChanges();
 
             // Добавление связи в главную схему
             var belongToScheme = new BelongToScheme()
@@ -65,8 +65,8 @@ namespace WebAPI.BLL.Services
                 IdScheme = scheme.IdScheme,
                 IdConnection = connection.IdConnection
             };
-            _unitOfWork.BelongToSchemes.Create(belongToScheme);
-            _unitOfWork.Save();
+            _context.BelongToSchemes.Add(belongToScheme);
+            _context.SaveChanges();
 
             return connection;
         }
@@ -79,23 +79,23 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Connection> DeleteConnection(int id)
         {
-            var connection = _unitOfWork.Connections.Get(id);
+            var connection = _context.Connections.Find(id);
             if (connection == null)
             {
                 throw new KeyNotFoundException();
             }
             
-            var schemes = _unitOfWork.BelongToSchemes.Find(b=>b.IdConnection == id).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdConnection == id).ToList();
             // Удаление IdConnection удаляемой связи из схем
-            foreach (var scheme in schemes)
+            foreach (var belongToScheme in belongToSchemes)
             {
-                _unitOfWork.BelongToSchemes.Delete(scheme.IdConnection);
+                _context.BelongToSchemes.Remove(belongToScheme);
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
             // Удаление связи
-            _unitOfWork.Connections.Delete(id);
-            _unitOfWork.Save();
+            _context.Connections.Remove(connection);
+            _context.SaveChanges();
 
             return connection;
         }
@@ -108,16 +108,16 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<ConnectionData> GetConnection(int id)
         {
-            var connection = _unitOfWork.Connections.Get(id);
+            var connection = _context.Connections.Find(id);
 
             if (connection == null)
             {
                 throw new KeyNotFoundException();
             }
             var connectionData = _mapper.Map<ConnectionData>(connection);
-            connectionData.Name1 = _unitOfWork.Answers.Get(connection.IdCharacter1).Name;
-            connectionData.Name2 = _unitOfWork.Answers.Get(connection.IdCharacter2).Name;
-            connectionData.TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name;
+            connectionData.Name1 = _context.Answers.Find(connection.IdCharacter1).Name;
+            connectionData.Name2 = _context.Answers.Find(connection.IdCharacter2).Name;
+            connectionData.TypeConnection = _context.TypeConnections.Find(connection.TypeConnection).Name;
 
             return connectionData;
         }
@@ -129,14 +129,25 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех связей.</returns>
         public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
         {
-            var connections = _unitOfWork.Connections.GetAll(idScheme).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdScheme == idScheme).ToList();
+
+            var connections = new List<Connection>();
+            foreach (var belongToScheme in belongToSchemes)
+            {
+                var connection = _context.Connections.Find(belongToScheme.IdConnection);
+                if (connection==null)
+                {
+                    throw new KeyNotFoundException();
+                }
+                connections.Add(connection);
+            }
+
             var connectionsData = new List<ConnectionAllData>();
 
             foreach (var connection in connections)
             {
-
                 var connectionData = _mapper.Map<ConnectionAllData>(connection);
-                connectionData.TypeConnection = _unitOfWork.TypeConnections.Get(connection.TypeConnection).Name;
+                connectionData.TypeConnection = _context.TypeConnections.Find(connection.TypeConnection).Name;
                 connectionsData.Add(connectionData);
             }
             return connectionsData;

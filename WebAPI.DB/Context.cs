@@ -20,12 +20,12 @@ namespace WebAPI.DB
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> без параметров.
         /// </summary>
-        public Context() 
-        {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
-            //Database.Migrate();
-        }
+        //public Context() 
+        //{
+        //    //Database.EnsureDeleted();
+        //    //Database.EnsureCreated();
+        //    //Database.Migrate();
+        //}
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
         /// </summary>
@@ -37,17 +37,17 @@ namespace WebAPI.DB
         /// Конфигурирует параметры контекста базы данных.
         /// </summary>
         /// <param name="optionsBuilder">Объект, используемый для задания параметров.</param>
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-            //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DB;Trusted_Connection=True;");
-            //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-            optionsBuilder.LogTo(System.Console.WriteLine);
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    var configuration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        //        .Build();
+        //    //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DB;Trusted_Connection=True;");
+        //    //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+        //    optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        //    optionsBuilder.LogTo(System.Console.WriteLine);
+        //}
         /// <summary>
         /// Конфигурирует модель базы данных, определяя связи между сущностями.
         /// </summary>

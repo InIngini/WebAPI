@@ -7,7 +7,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DAL.Interfaces;
+using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AutoMapper;
@@ -19,17 +19,17 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class EventService : IEventService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="EventService"/>.
         /// </summary>
-        /// <param name="unitOfWork">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public EventService(IUnitOfWork unitOfWork, IMapper mapper)
+        public EventService(Context context, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -50,13 +50,13 @@ namespace WebAPI.BLL.Services
             }
             Event @event = _mapper.Map<Event>(eventData);
 
-            _unitOfWork.Events.Create(@event);
-            _unitOfWork.Save();
+            _context.Events.Add(@event);
+            _context.SaveChanges();
             if (eventData.IdCharacters != null)
             {
                 foreach (var idCharacter in eventData.IdCharacters)
                 {
-                    var character = _unitOfWork.Characters.Get(idCharacter);
+                    var character = _context.Characters.Find(idCharacter);
                     if (character != null)
                     {
                         var belongToEvent=new BelongToEvent()
@@ -64,14 +64,14 @@ namespace WebAPI.BLL.Services
                             IdEvent=@event.IdEvent,
                             IdCharacter=character.IdCharacter
                         };
-                        _unitOfWork.BelongToEvents.Create(belongToEvent);
+                        _context.BelongToEvents.Add(belongToEvent);
                     }
                 }
             }
-            _unitOfWork.Save();
+            _context.SaveChanges();
 
-            var timeline = _unitOfWork.Timelines
-                            .Find(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
+            var timeline = _context.Timelines
+                            .Where(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
                             .SingleOrDefault();
             // Добавление связи в главную схему
             var belongToTimeline = new BelongToTimeline()
@@ -79,8 +79,8 @@ namespace WebAPI.BLL.Services
                 IdEvent=@event.IdEvent, 
                 IdTimeline=timeline.IdTimeline
             };
-            _unitOfWork.BelongToTimelines.Create(belongToTimeline);
-            _unitOfWork.Save();
+            _context.BelongToTimelines.Add(belongToTimeline);
+            _context.SaveChanges();
 
             return @event;
         }
@@ -93,7 +93,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленное событие.</returns>
         public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
-            Event @event = _unitOfWork.Events.Get(id);
+            Event @event = _context.Events.Find(id);
             // Обновление события
             @event.Name = eventData.Name;
             @event.Content = eventData.Content;
@@ -101,21 +101,26 @@ namespace WebAPI.BLL.Services
 
             if (eventData.IdCharacters != null)
             {
-                var characters = _unitOfWork.BelongToEvents.Find(b=>b.IdEvent==id).ToList();
+                var characters = _context.BelongToEvents.Where(b=>b.IdEvent==id).ToList();
                 // Удаление ненужных связей персонажей с событием. Допустим было [1,2], мы передали [2,3], значит будет [2]
                 foreach (var character in characters)
                 {
                     if(!eventData.IdCharacters.Contains(character.IdCharacter))
                     {
-                        _unitOfWork.BelongToEvents.Delete(character.IdCharacter);
+                        var belongToEvent = _context.BelongToEvents.Where(b=>b.IdCharacter==character.IdCharacter&&b.IdEvent==id).FirstOrDefault();
+                        if (belongToEvent == null)
+                        {
+                            throw new KeyNotFoundException();
+                        }
+                        _context.BelongToEvents.Remove(belongToEvent);
                     }    
                     
                 }
                 // Добавление новых. То есть после этого уже будет [2,3]
                 foreach (var idCharacter in eventData.IdCharacters)
                 {
-                    var character = _unitOfWork.Characters.Get(idCharacter);
-                    var belongToEvents = _unitOfWork.BelongToEvents.Find(b => b.IdCharacter == character.IdCharacter && b.IdEvent == id);
+                    var character = _context.Characters.Find(idCharacter);
+                    var belongToEvents = _context.BelongToEvents.Where(b => b.IdCharacter == character.IdCharacter && b.IdEvent == id).ToList();
                     //если такой персонаж существует и в белонгтуивант нет записи с этим персонажем и ивентом
                     if (character != null && belongToEvents.Count()==0)
                     {
@@ -124,13 +129,13 @@ namespace WebAPI.BLL.Services
                             IdEvent = id,
                             IdCharacter=character.IdCharacter,
                         };
-                        _unitOfWork.BelongToEvents.Create(belong);
+                        _context.BelongToEvents.Add(belong);
                     }
                 }
             }
 
-            _unitOfWork.Events.Update(@event);
-            _unitOfWork.Save();
+            _context.Events.Update(@event);
+            _context.SaveChanges();
 
             return @event;
         }
@@ -143,7 +148,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Event> DeleteEvent(int id)
         {
-            var @event = _unitOfWork.Events.Get(id);
+            var @event = _context.Events.Find(id);
 
             if (@event == null)
             {
@@ -151,16 +156,16 @@ namespace WebAPI.BLL.Services
             }
 
             // Получение всех таймлайнов, связанных с событием
-            var belongToTimeline = _unitOfWork.BelongToTimelines.Find(t=>t.IdEvent == id).ToList();
+            var belongToTimelines = _context.BelongToTimelines.Where(t=>t.IdEvent == id).ToList();
 
             // Удаление IdConnection удаляемой связи из схем
-            foreach (var timeline in belongToTimeline)
+            foreach (var belongToTimeline in belongToTimelines)
             {
-                _unitOfWork.BelongToTimelines.Delete(timeline.IdEvent);
+                _context.BelongToTimelines.Remove(belongToTimeline);
             }
 
-            _unitOfWork.Events.Delete(id);
-            _unitOfWork.Save();
+            _context.Events.Remove(@event);
+            _context.SaveChanges();
 
             return @event;
         }
@@ -173,7 +178,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдена.</exception>
         public async Task<EventData> GetEvent(int id)
         {
-            var @event = _unitOfWork.Events.Get(id);
+            var @event = _context.Events.Find(id);
 
             if (@event == null)
             {
@@ -181,7 +186,7 @@ namespace WebAPI.BLL.Services
             }
             var eventdata = _mapper.Map<EventData>(@event);
 
-            var characters = _unitOfWork.BelongToEvents.Find(b => b.IdEvent == id).ToList();
+            var characters = _context.BelongToEvents.Where(b => b.IdEvent == id).ToList();
             int[] ints = new int[characters.Count];
             for(int i = 0;i<ints.Length;i++)
                 ints[i] = characters[i].IdCharacter;
@@ -192,12 +197,23 @@ namespace WebAPI.BLL.Services
         /// <summary>
         /// Получает все события для указанного таймлайна.
         /// </summary>
-        /// <param name="id">Идентификатор таймлайна.</param>
+        /// <param name="idTimeline">Идентификатор таймлайна.</param>
         /// <returns>Список всех событий таймлайна.</returns>
-        public async Task<IEnumerable<EventAllData>> GetAllEvents(int id)
+        public async Task<IEnumerable<EventAllData>> GetAllEvents(int idTimeline)
         {
+            var belongToTimelines = _context.BelongToTimelines.Where(b => b.IdTimeline == idTimeline).ToList();
+
+            var events = new List<Event>();
+            foreach (var belongToTimeline in belongToTimelines)
+            {
+                var @event = _context.Events.Find(belongToTimeline.IdEvent);
+                if (@event == null)
+                {
+                    throw new KeyNotFoundException();
+                }
+                events.Add(@event);
+            }
             
-            var events = _unitOfWork.Events.GetAll(id).ToList();
             var eventsData = new List<EventAllData>();
             foreach (var @event in events)
             {
