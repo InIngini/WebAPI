@@ -5,23 +5,23 @@
 # создание связи
 POST {{WebAPI_HostAddress}}/User/Book/Scheme/Connection
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 {
-    "IdBook": "1",
-    "IdCharacter1": "1",
-    "IdCharacter2": "2",
+    "BookId": "1",
+    "Character1Id": "1",
+    "Character2Id": "2",
     "TypeConnection": "Сиблинг"
 }
 
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/all
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 "1"
 
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Scheme/Connection/2
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY

@@ -11,29 +11,29 @@ namespace WebAPI.DB.Entities
     /// <summary>
     /// Класс, представляющий изображения в галерее персонажей.
     /// </summary>
-    public class Gallery
+    public class BelongToGallery
     {
         /// <summary>
         /// Уникальный идентификатор изображения (может быть null).
         /// </summary>
         [Key]
-        public int? IdPicture { get; set; }
+        public int? PictureId { get; set; }
 
         /// <summary>
         /// Связанное изображение.
         /// </summary>
-        [ForeignKey(nameof(IdPicture))]
+        [ForeignKey(nameof(PictureId))]
         public Picture? Picture { get; set; }
 
         /// <summary>
         /// Идентификатор персонажа, к которому относится изображение.
         /// </summary>
-        public int IdCharacter { get; set; }
+        public int CharacterId { get; set; }
 
         /// <summary>
         /// Связанный персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdCharacter))]
+        [ForeignKey(nameof(CharacterId))]
         public Character Character { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор связи.
         /// </summary>
         [Key]
-        public int IdConnection { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Тип связи между персонажами.
@@ -27,23 +27,23 @@ namespace WebAPI.DB.Entities
         /// <summary>
         /// Идентификатор первого персонажа в связи.
         /// </summary>
-        public int IdCharacter1 { get; set; }
+        public int Character1Id { get; set; }
 
         /// <summary>
         /// Связанный первый персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdCharacter1))]
+        [ForeignKey(nameof(Character1Id))]
         public Character Character1 { get; set; }
 
         /// <summary>
         /// Идентификатор второго персонажа в связи.
         /// </summary>
-        public int IdCharacter2 { get; set; }
+        public int Character2Id { get; set; }
 
         /// <summary>
         /// Связанный второй персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdCharacter2))]
+        [ForeignKey(nameof(Character2Id))]
         public Character Character2 { get; set; }
     }
 }

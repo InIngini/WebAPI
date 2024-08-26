@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор пользователя, которому принадлежит книга.
         /// </summary>
-        public int IdUser { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// Название книги.
@@ -22,7 +22,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор изображения книги (может быть null).
         /// </summary>
-        public int? IdPicture { get; set; }
+        public int? PictureId { get; set; }
 
         /// <summary>
         /// Конфигурация сопоставления между <see cref="UserBookData"/> и <see cref="Book"/>.
@@ -31,7 +31,7 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<UserBookData, Book>()
-                .ForMember(dest => dest.IdBook, opt => opt.Ignore()); // Если Id генерируется в базе данных, то можно игнорировать
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Если Id генерируется в базе данных, то можно игнорировать
         }
     }
 }

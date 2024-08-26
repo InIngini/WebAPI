@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
             };
             string json = JsonSerializer.Serialize(createdConnection, options);
             
-            return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.IdConnection }, json);
+            return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.Id }, json);
         }
 
         /// <summary>

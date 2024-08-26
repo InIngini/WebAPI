@@ -22,7 +22,7 @@ namespace WebAPI.DB.Guide
         /// <summary>
         /// Название или текст вопроса.
         /// </summary>
-        public string Name { get; set; }
+        public string QuestionText { get; set; }
 
         /// <summary>
         /// Идентификатор блока, к которому принадлежит вопрос.

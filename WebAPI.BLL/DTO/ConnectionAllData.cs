@@ -18,17 +18,17 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор связи.
         /// </summary>
-        public int IdConnection { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Идентификатор первого персонажа в связи.
         /// </summary>
-        public int IdCharacter1 { get; set; }
+        public int Character1Id { get; set; }
 
         /// <summary>
         /// Идентификатор второго персонажа в связи.
         /// </summary>
-        public int IdCharacter2 { get; set; }
+        public int Character2Id { get; set; }
 
         /// <summary>
         /// Тип связи (например: партнер, ребенок-родитель, сиблинг).

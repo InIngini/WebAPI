@@ -17,7 +17,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор схемы.
         /// </summary>
         [Key]
-        public int IdScheme { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название схемы.
@@ -27,12 +27,12 @@ namespace WebAPI.DB.Entities
         /// <summary>
         /// Идентификатор книги, к которой относится схема.
         /// </summary>
-        public int IdBook { get; set; }
+        public int BookId { get; set; }
 
         /// <summary>
         /// Связанная книга.
         /// </summary>
-        [ForeignKey(nameof(IdBook))]
+        [ForeignKey(nameof(BookId))]
         public Book Book { get; set; }
     }
 }

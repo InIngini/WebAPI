@@ -58,7 +58,7 @@ namespace WebAPI.BLL.Token
                 
                 if (user != null)
                 {
-                    return user.IdUser; // Возвращаем айди пользователя
+                    return user.Id; // Возвращаем айди пользователя
                 }
                 else
                 {

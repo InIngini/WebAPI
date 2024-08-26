@@ -16,7 +16,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор события.
         /// </summary>
         [Key]
-        public int IdEvent { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название события.

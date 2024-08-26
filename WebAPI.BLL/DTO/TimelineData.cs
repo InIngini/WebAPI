@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор книги, к которой относится таймлайн.
         /// </summary>
-        public int IdBook { get; set; }
+        public int BookId { get; set; }
 
         /// <summary>
         /// Название таймлайна.
@@ -26,7 +26,7 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TimelineData, Timeline>()
-                .ForMember(dest => dest.IdTimeline, opt => opt.Ignore()); // Если Id генерируется в базе данных, то можно игнорировать
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Если Id генерируется в базе данных, то можно игнорировать
         }
     }
 }

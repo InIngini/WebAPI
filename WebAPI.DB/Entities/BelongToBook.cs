@@ -11,29 +11,29 @@ namespace WebAPI.DB.Entities
     /// <summary>
     /// Класс, представляющий связь между пользователем и книгой.
     /// </summary>
-    [PrimaryKey(nameof(IdUser), nameof(IdBook))]
+    [PrimaryKey(nameof(UserId), nameof(BookId))]
     public class BelongToBook
     {
         /// <summary>
         /// Уникальный идентификатор пользователя.
         /// </summary>
-        public int IdUser { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// Связанный пользователь.
         /// </summary>
-        [ForeignKey(nameof(IdUser))]
+        [ForeignKey(nameof(UserId))]
         public User User { get; set; }
 
         /// <summary>
         /// Уникальный идентификатор книги.
         /// </summary>
-        public int IdBook { get; set; }
+        public int BookId { get; set; }
 
         /// <summary>
         /// Связанная книга.
         /// </summary>
-        [ForeignKey(nameof(IdBook))]
+        [ForeignKey(nameof(BookId))]
         public Book Book { get; set; }
 
         /// <summary>

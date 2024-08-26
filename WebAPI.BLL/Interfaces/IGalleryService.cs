@@ -10,10 +10,10 @@ namespace WebAPI.BLL.Interfaces
 {
     public interface IGalleryService
     {
-        Task<Gallery> CreateGallery(GalleryData galleryData);
-        Task<Gallery> DeletePictureFromGallery(int idPicture);
-        Task<Gallery> GetGallery(int id);
-        Task<IEnumerable<Gallery>> GetAllGalleries(int idCharacter);
+        Task<BelongToGallery> CreateGallery(GalleryData galleryData);
+        Task<BelongToGallery> DeletePictureFromGallery(int idPicture);
+        Task<BelongToGallery> GetGallery(int id);
+        Task<IEnumerable<BelongToGallery>> GetAllGalleries(int idCharacter);
     }
 
 }

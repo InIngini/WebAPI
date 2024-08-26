@@ -5,78 +5,79 @@
 # создание персонажа и блоков
 POST {{WebAPI_HostAddress}}/User/Book/Character
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 {
-    "IdBook": 1
+    "BookId": 1
 
 }
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Character/all
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 "1"
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Character/1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Character
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 ###
 # изменение персонажа и блоков
 PUT {{WebAPI_HostAddress}}/User/Book/Character/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 {
     "Name": "Обновленное имя персонажа",
-    "Answer1Personality": "Обновленный ответ 1",
-    "Answer2Personality": "Обновленный ответ 2",
-    "Answer3Personality": "Обновленный ответ 3",
-    "Answer4Personality": "Обновленный ответ 4",
-    "Answer5Personality": "Обновленный ответ 5",
-    "Answer6Personality": "Обновленный ответ 6",
-    "Answer1Appearance": "Обновленный ответ 1",
-    "Answer2Appearance": "Обновленный ответ 2",
-    "Answer3Appearance": "Обновленный ответ 3",
-    "Answer4Appearance": "Обновленный ответ 4",
-    "Answer5Appearance": "Обновленный ответ 5",
-    "Answer6Appearance": "Обновленный ответ 6",
-    "Answer7Appearance": "Обновленный ответ 7",
-    "Answer8Appearance": "Обновленный ответ 8",
-    "Answer9Appearance": "Обновленный ответ 9",
-    "Answer1Temperament": "Обновленный ответ 1",
-    "Answer2Temperament": "Обновленный ответ 2",
-    "Answer3Temperament": "Обновленный ответ 3",
-    "Answer4Temperament": "Обновленный ответ 4",
-    "Answer5Temperament": "Обновленный ответ 5",
-    "Answer6Temperament": "Обновленный ответ 6",
-    "Answer7Temperament": "Обновленный ответ 7",
-    "Answer8Temperament": "Обновленный ответ 8",
-    "Answer9Temperament": "Обновленный ответ 9",
-    "Answer10Temperament": "Обновленный ответ 10",
-    "Answer1ByHistory": "Обновленный ответ 1",
-    "Answer2ByHistory": "Обновленный ответ 2",
-    "Answer3ByHistory": "Обновленный ответ 3",
-    "Answer4ByHistory": "Обновленный ответ 4",
-    "Answer5ByHistory": "Обновленный ответ 5"
+    "Answers": [
+        "Обновленный ответ 1",
+        "Обновленный ответ 2",
+        "Обновленный ответ 3",
+        "Обновленный ответ 4",
+        "Обновленный ответ 5",
+        "Обновленный ответ 6",
+        "Обновленный ответ 1",
+        "Обновленный ответ 2",
+        "Обновленный ответ 3",
+        "Обновленный ответ 4",
+        "Обновленный ответ 5",
+        "Обновленный ответ 6",
+        "Обновленный ответ 7",
+        "Обновленный ответ 8",
+        "Обновленный ответ 9",
+        "Обновленный ответ 1",
+        "Обновленный ответ 2",
+        "Обновленный ответ 3",
+        "Обновленный ответ 4",
+        "Обновленный ответ 5",
+        "Обновленный ответ 6",
+        "Обновленный ответ 7",
+        "Обновленный ответ 8",
+        "Обновленный ответ 9",
+        "Обновленный ответ 1",
+        "Обновленный ответ 2",
+        "Обновленный ответ 3",
+        "Обновленный ответ 4",
+        "Обновленный ответ 5"
+    ]
 }
 ###
 # удаление персонажа, блоков и добавленных атрибутов
 DELETE {{WebAPI_HostAddress}}/User/Book/Character/5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 ###
 # для атрибутов
 # создание атрибута
 POST {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 {
     "NumberAnswer": "1",
@@ -86,10 +87,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hc
 # изменение атрибута
 PUT {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY
 
 "Содержимое"
 ###
 # удаление атрибута
 DELETE {{WebAPI_HostAddress}}/User/Book/Character/1/addedattribute/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWU0IiwiZXhwIjoxNzI0MjM0MzExLCJpc3MiOiJ5b3VyX2lzc3VlciIsImF1ZCI6InlvdXJfYXVkaWVuY2UifQ.i033gN6BLn_YYofe5EQxPVYi30H_KzfUvPSVtyWdVDA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ2NzA1MDAsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.wqhmvsv8CwTLwMrwiF3cnmv7lzxdS0RYmOEB2stU1jY

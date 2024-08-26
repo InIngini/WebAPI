@@ -17,28 +17,33 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор персонажа.
         /// </summary>
         [Key]
-        public int IdCharacter { get; set; }
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Имя персонажа.
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Идентификатор книги, к которой принадлежит персонаж.
         /// </summary>
-        public int IdBook { get; set; }
+        public int BookId { get; set; }
 
         /// <summary>
         /// Связанная книга, к которой принадлежит персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdBook))]
+        [ForeignKey(nameof(BookId))]
         public Book Book { get; set; }
 
         /// <summary>
         /// Уникальный идентификатор изображения, связанного с персонажем (может быть null).
         /// </summary>
-        public int? IdPicture { get; set; }
+        public int? PictureId { get; set; }
 
         /// <summary>
         /// Связанное изображение персонажа.
         /// </summary>
-        [ForeignKey(nameof(IdPicture))]
+        [ForeignKey(nameof(PictureId))]
         public Picture? Picture { get; set; }
     }
 }

@@ -52,43 +52,17 @@ namespace WebAPI.BLL.Services
             _context.Characters.Add(character);
             _context.SaveChanges();
 
-            Answer answer = new Answer()
+            var questions = _context.Questions.ToList();
+            foreach (var question in questions)
             {
-                IdCharacter = character.IdCharacter,
-                Name="",
-                Answer1Personality = "",
-                Answer2Personality = "",
-                Answer3Personality = "",
-                Answer4Personality = "",
-                Answer5Personality = "",
-                Answer6Personality = "",
-                Answer1Appearance = "",
-                Answer2Appearance = "",
-                Answer3Appearance = "",
-                Answer4Appearance = "",
-                Answer5Appearance = "",
-                Answer6Appearance = "",
-                Answer7Appearance = "",
-                Answer8Appearance = "",
-                Answer9Appearance = "",
-                Answer1Temperament = "",
-                Answer2Temperament = "",
-                Answer3Temperament = "",
-                Answer4Temperament = "",
-                Answer5Temperament = "",
-                Answer6Temperament = "",
-                Answer7Temperament = "",
-                Answer8Temperament = "",
-                Answer9Temperament = "",
-                Answer10Temperament = "",
-                Answer1ByHistory = "",
-                Answer2ByHistory = "",
-                Answer3ByHistory = "",
-                Answer4ByHistory = "",
-                Answer5ByHistory = ""
-            };
-            _context.Answers.Add(answer);
-
+                Answer answer = new Answer()
+                {
+                    CharacterId = character.Id,
+                    QuestionId = question.Id,
+                    AnswerText = ""
+                };
+                _context.Answers.Add(answer);
+            }
             _context.SaveChanges();
 
             return character;
@@ -105,50 +79,31 @@ namespace WebAPI.BLL.Services
         {
             // Получение персонажа из базы данных
             var character = _context.Characters.Find(id);
-            if (character.IdPicture!=null)
+            if (characterWithAnswers.PictureId!=null)
             {
-                character.IdPicture = characterWithAnswers.IdPicture;
+                character.PictureId = characterWithAnswers.PictureId;
+            }
+            if(characterWithAnswers.Name!=null)
+            {
+                character.Name=characterWithAnswers.Name;
             }
             // Обновление персонажа
             _context.Characters.Update(character);
 
             // Обновление блоков
-            var answer = _context.Answers.Find(id);
-            if (answer != null)
+            for (int i=1;i<characterWithAnswers.Answers.Length;i++) 
             {
-                answer.Name = characterWithAnswers.Name;
-                answer.Answer1Personality = characterWithAnswers.Answer1Personality;
-                answer.Answer2Personality = characterWithAnswers.Answer2Personality;
-                answer.Answer3Personality = characterWithAnswers.Answer3Personality;
-                answer.Answer4Personality = characterWithAnswers.Answer4Personality;
-                answer.Answer5Personality = characterWithAnswers.Answer5Personality;
-                answer.Answer6Personality = characterWithAnswers.Answer6Personality;
-                answer.Answer1Appearance = characterWithAnswers.Answer1Appearance;
-                answer.Answer2Appearance = characterWithAnswers.Answer2Appearance;
-                answer.Answer3Appearance = characterWithAnswers.Answer3Appearance;
-                answer.Answer4Appearance = characterWithAnswers.Answer4Appearance;
-                answer.Answer5Appearance = characterWithAnswers.Answer5Appearance;
-                answer.Answer6Appearance = characterWithAnswers.Answer6Appearance;
-                answer.Answer7Appearance = characterWithAnswers.Answer7Appearance;
-                answer.Answer8Appearance = characterWithAnswers.Answer8Appearance;
-                answer.Answer9Appearance = characterWithAnswers.Answer9Appearance;
-                answer.Answer1Temperament = characterWithAnswers.Answer1Temperament;
-                answer.Answer2Temperament = characterWithAnswers.Answer2Temperament;
-                answer.Answer3Temperament = characterWithAnswers.Answer3Temperament;
-                answer.Answer4Temperament = characterWithAnswers.Answer4Temperament;
-                answer.Answer5Temperament = characterWithAnswers.Answer5Temperament;
-                answer.Answer6Temperament = characterWithAnswers.Answer6Temperament;
-                answer.Answer7Temperament = characterWithAnswers.Answer7Temperament;
-                answer.Answer8Temperament = characterWithAnswers.Answer8Temperament;
-                answer.Answer9Temperament = characterWithAnswers.Answer9Temperament;
-                answer.Answer10Temperament = characterWithAnswers.Answer10Temperament;
-                answer.Answer1ByHistory = characterWithAnswers.Answer1ByHistory;
-                answer.Answer2ByHistory = characterWithAnswers.Answer2ByHistory;
-                answer.Answer3ByHistory = characterWithAnswers.Answer3ByHistory;
-                answer.Answer4ByHistory = characterWithAnswers.Answer4ByHistory;
-                answer.Answer5ByHistory = characterWithAnswers.Answer5ByHistory;
+                if (characterWithAnswers.Answers[i-1] != "")
+                {
+                    var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefault();
+                    if (answer == null)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    answer.AnswerText = characterWithAnswers.Answers[i - 1];
+                    _context.Answers.Update(answer);
+                }
             }
-            _context.Answers.Update(answer);
             _context.SaveChanges();
 
             return character;
@@ -170,47 +125,55 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление всех блоков персонажа
-            var answer = _context.Answers.Find(character.IdCharacter);
-            // Удаление блока
-            _context.Answers.Remove(answer);
+            foreach (var question in _context.Questions.ToList())
+            {
+                var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefault();
+                if (answer == null)
+                {
+                    throw new KeyNotFoundException();
+                }
+                // Удаление блока
+                _context.Answers.Remove(answer);
+            }
             
-            
+ 
             // Удаление всех добавленных атрибутов блока
-            var addedAttributes = _context.AddedAttributes.Where(aa => aa.IdCharacter == character.IdCharacter).ToList();
+            var addedAttributes = _context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToList();
             foreach (var addedAttribute in addedAttributes)
             {
                 _context.AddedAttributes.Remove(addedAttribute);
             }
 
             // Удаление всех записей в галерее
-            var galleryItems = _context.Galleries.Where(gi => gi.IdCharacter == id).ToList();
+            var galleryItems = _context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToList();
             foreach (var galleryItem in galleryItems)
             {
                 // Удаление всех изображений
-                var image = _context.Pictures.Find((int)galleryItem.IdPicture);
+                var image = _context.Pictures.Find((int)galleryItem.PictureId);
                 _context.Pictures.Remove(image);
-                _context.Galleries.Remove(galleryItem);
+                _context.BelongToGalleries.Remove(galleryItem);
             }
 
             // Удаление аватарки
-            if (character.IdPicture != null)
+            if (character.PictureId != null)
             {
-                int idP = (int)character.IdPicture;
+                int idP = (int)character.PictureId;
                 var imageavatar = _context.Pictures.Find(idP);
                 _context.Pictures.Remove(imageavatar);
             }
             
             // Удаление связи
-            var connections = _context.Connections.Where(c=> c.IdCharacter1==character.IdCharacter||c.IdCharacter2==character.IdCharacter).ToList();
+            var connections = _context.Connections.Where(c=> c.Character1Id==character.Id||c.Character2Id==character.Id).ToList();
             foreach (var connection in connections)
             {
-                var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdConnection==connection.IdConnection).ToList();
+                var belongToSchemes = _context.BelongToSchemes.Where(b=>b.ConnectionId==connection.Id).ToList();
                 foreach(var belongToScheme in belongToSchemes)
                 {
                     _context.BelongToSchemes.Remove(belongToScheme);
                 }
                 _context.Connections.Remove(connection);
             }
+            _context.SaveChanges();
 
             // Удаление персонажа
             _context.Characters.Remove(character);
@@ -228,13 +191,24 @@ namespace WebAPI.BLL.Services
         public async Task<CharacterWithAnswers> GetCharacter(int id)
         {
             var character = _context.Characters.Find(id);
-            var answer = _context.Answers.Find(id);
             if (character == null)
             {
                 throw new KeyNotFoundException();
             }
-            var characterWithAnswers = _mapper.Map<CharacterWithAnswers>(answer);
-        
+
+            string[] answers = new string[_context.Questions.ToList().Count()-1];
+            foreach (var question in _context.Questions.ToList())
+            {
+                var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefault();
+                if (answer == null)
+                {
+                    throw new KeyNotFoundException();
+                }
+                answers[question.Id - 1] = answer.AnswerText;
+            }
+            
+            var characterWithAnswers = _mapper.Map<CharacterWithAnswers>(character);
+            characterWithAnswers.Answers = answers;
 
             return characterWithAnswers;
         }
@@ -246,15 +220,15 @@ namespace WebAPI.BLL.Services
         /// <returns>Список персонажей с данными.</returns>
         public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook)
         {
-            var characters = _context.Characters.Where(c => c.IdBook == idBook).ToList();
+            var characters = _context.Characters.Where(c => c.BookId == idBook).ToList();
             var charactersAllData = new List<CharacterAllData>();
             
             foreach (var character in characters)
             {
                 var characterAllData = _mapper.Map<CharacterAllData>(character);
-                characterAllData.Name = _context.Answers.Find(character.IdCharacter).Name;
-                if (character.IdPicture != null)
-                    characterAllData.Picture1 = _context.Pictures.Find((int)character.IdPicture).Picture1;
+                characterAllData.Name = character.Name;
+                if (character.PictureId != null)
+                    characterAllData.PictureContent = _context.Pictures.Find((int)character.PictureId).PictureContent;
                 charactersAllData.Add(characterAllData);
             }
             return charactersAllData;

@@ -53,7 +53,7 @@ namespace WebAPI.BLL.Services
             connection.TypeConnection = _context.TypeConnections.Where(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
 
             var scheme = _context.Schemes
-                            .Where(s => s.NameScheme == "Главная схема" && s.IdBook == connectionData.IdBook)
+                            .Where(s => s.NameScheme == "Главная схема" && s.BookId == connectionData.IdBook)
                             .FirstOrDefault();
 
             _context.Connections.Add(connection);
@@ -62,8 +62,8 @@ namespace WebAPI.BLL.Services
             // Добавление связи в главную схему
             var belongToScheme = new BelongToScheme()
             {
-                IdScheme = scheme.IdScheme,
-                IdConnection = connection.IdConnection
+                SchemeId = scheme.Id,
+                ConnectionId = connection.Id
             };
             _context.BelongToSchemes.Add(belongToScheme);
             _context.SaveChanges();
@@ -85,7 +85,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
             
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdConnection == id).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.ConnectionId == id).ToList();
             // Удаление IdConnection удаляемой связи из схем
             foreach (var belongToScheme in belongToSchemes)
             {
@@ -115,8 +115,8 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
             var connectionData = _mapper.Map<ConnectionData>(connection);
-            connectionData.Name1 = _context.Answers.Find(connection.IdCharacter1).Name;
-            connectionData.Name2 = _context.Answers.Find(connection.IdCharacter2).Name;
+            connectionData.Name1 = _context.Characters.Find(connection.Character1Id).Name;
+            connectionData.Name2 = _context.Characters.Find(connection.Character2Id).Name;
             connectionData.TypeConnection = _context.TypeConnections.Find(connection.TypeConnection).Name;
 
             return connectionData;
@@ -129,12 +129,12 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех связей.</returns>
         public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
         {
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdScheme == idScheme).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.SchemeId == idScheme).ToList();
 
             var connections = new List<Connection>();
             foreach (var belongToScheme in belongToSchemes)
             {
-                var connection = _context.Connections.Find(belongToScheme.IdConnection);
+                var connection = _context.Connections.Find(belongToScheme.ConnectionId);
                 if (connection==null)
                 {
                     throw new KeyNotFoundException();

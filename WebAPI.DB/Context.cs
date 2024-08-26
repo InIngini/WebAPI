@@ -8,6 +8,9 @@ using WebAPI.DB.Guide;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Configuration;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 
 namespace WebAPI.DB
@@ -20,34 +23,36 @@ namespace WebAPI.DB
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> без параметров.
         /// </summary>
-        //public Context() 
-        //{
-        //    //Database.EnsureDeleted();
-        //    //Database.EnsureCreated();
-        //    //Database.Migrate();
-        //}
+        public Context()
+        {
+            //Database.EnsureDeleted();
+            Database.EnsureCreated();
+            //Database.Migrate();
+        }
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
         /// </summary>
         /// <param name="options">Параметры для настройки контекста.</param>
         public Context(DbContextOptions<Context> options) : base(options)
         {
+            
         }
         /// <summary>
         /// Конфигурирует параметры контекста базы данных.
         /// </summary>
         /// <param name="optionsBuilder">Объект, используемый для задания параметров.</param>
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    var configuration = new ConfigurationBuilder()
-        //        .SetBasePath(Directory.GetCurrentDirectory())
-        //        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        //        .Build();
-        //    //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DB;Trusted_Connection=True;");
-        //    //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-        //    optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-        //    optionsBuilder.LogTo(System.Console.WriteLine);
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+            //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DB;Trusted_Connection=True;");
+            //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.LogTo(System.Console.WriteLine);
+        }
+
         /// <summary>
         /// Конфигурирует модель базы данных, определяя связи между сущностями.
         /// </summary>
@@ -57,13 +62,13 @@ namespace WebAPI.DB
             modelBuilder.Entity<Connection>()
                 .HasOne(c => c.Character2)
                 .WithMany()
-                .HasForeignKey(c => c.IdCharacter2)
+                .HasForeignKey(c => c.Character2Id)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<BelongToScheme>()
                 .HasOne(c => c.Scheme)
                 .WithMany()
-                .HasForeignKey(c => c.IdScheme)
+                .HasForeignKey(c => c.SchemeId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
 
@@ -79,7 +84,7 @@ namespace WebAPI.DB
         public DbSet<Character> Characters { get; set; }
         public DbSet<Connection> Connections { get; set; }
         public DbSet<Event> Events { get; set; }
-        public DbSet<Gallery> Galleries { get; set; }
+        public DbSet<BelongToGallery> BelongToGalleries { get; set; }
         public DbSet<Picture> Pictures { get; set; }
         public DbSet<Scheme> Schemes { get; set; }
         public DbSet<Timeline> Timelines { get; set; }

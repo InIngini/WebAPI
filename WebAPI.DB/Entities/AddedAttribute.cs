@@ -17,7 +17,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор атрибута.
         /// </summary>
         [Key]
-        public int IdAttribute { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Номер ответа, связанный с атрибутом.
@@ -37,12 +37,12 @@ namespace WebAPI.DB.Entities
         /// <summary>
         /// Идентификатор персонажа, к которому принадлежит атрибут.
         /// </summary>
-        public int IdCharacter { get; set; }
+        public int CharacterId { get; set; }
 
         /// <summary>
         /// Связанный персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdCharacter))]
+        [ForeignKey(nameof(CharacterId))]
         public Character Character { get; set; }
     }
 

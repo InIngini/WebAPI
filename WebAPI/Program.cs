@@ -24,7 +24,7 @@ namespace WebAPI
 {
     public class Program
     {
-        //dotnet ef migrations add InitialCreate - писала в консольку для создания миграции
+        //dotnet ef migrations add InitialCreate --project C:\Users\vorob\source\repos\WebAPI\WebAPI.DB\WebAPI.DB.csproj - писала в консольку для создания миграции
 
         //dotnet ef dbcontext scaffold "Data Source=(localdb)\MSSQLLocalDB;
         //AttachDbFileName=C:\Users\vorob\source\repos\WebAPI\DB\bin\Debug\net8.0\DB\DB.mdf;Integrated Security=True;"
@@ -32,7 +32,7 @@ namespace WebAPI
 
         public static void Main(string[] args)
         {
-            //new AddedData();
+            //using (var context = new Context()) { }
             
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +56,24 @@ namespace WebAPI
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
+
+            // Инициализация данных
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var addedData = services.GetRequiredService<AddedData>();
+
+                try
+                {
+                    addedData.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    // Логирование ошибок
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Ошибка при инициализации данных.");
+                }
+            }
 
             // Configure the HTTP request pipeline.
 
@@ -104,6 +122,9 @@ namespace WebAPI
             services.AddTransient<ISchemeService, SchemeService>();
             services.AddTransient<ITimelineService, TimelineService>();
             services.AddTransient<IUserService, UserService>();
+
+            // Регистрация класса для добавления данных
+            services.AddTransient<AddedData>();
         }
     }
 }

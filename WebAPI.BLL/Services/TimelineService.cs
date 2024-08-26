@@ -74,8 +74,8 @@ namespace WebAPI.BLL.Services
             // Добавление события в таймлайн
             var belongToTimeline = new BelongToTimeline()
             {
-                IdEvent = idEvent,
-                IdTimeline = timeline.IdTimeline
+                EventId = idEvent,
+                TimelineId = timeline.Id
             };
             _context.BelongToTimelines.Add(belongToTimeline);
             _context.SaveChanges();
@@ -97,7 +97,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException();
             }
 
-            var belongToTimelines = _context.BelongToTimelines.Where(b => b.IdTimeline == id).ToList();
+            var belongToTimelines = _context.BelongToTimelines.Where(b => b.TimelineId == id).ToList();
             foreach (var belongToTimeline in belongToTimelines)
             {
                 _context.BelongToTimelines.Remove(belongToTimeline);
@@ -135,7 +135,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех таймлайнов книги.</returns>
         public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook)
         {
-            var timelines = _context.Timelines.Where(t => t.IdBook == idBook)
+            var timelines = _context.Timelines.Where(t => t.BookId == idBook)
                                                  .ToList();
 
             return timelines;

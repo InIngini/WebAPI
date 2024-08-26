@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
             }
 
             var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
-            return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.IdTimeline }, createdTimeline);
+            return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.Id }, createdTimeline);
         }
 
         /// <summary>

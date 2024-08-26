@@ -56,7 +56,7 @@ namespace WebAPI.Controllers
             };
             string json = JsonSerializer.Serialize(createdBook, options);
 
-            return CreatedAtAction(nameof(GetBook), new { id = createdBook.IdBook }, json);
+            return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, json);
         }
         /// <summary>
         /// Обновляет существующую книгу.
@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
 
             // Обновление книги
             existingBook.NameBook = book.NameBook;
-            existingBook.IdPicture = book.IdPicture;
+            existingBook.PictureId = book.PictureId;
             await _bookService.UpdateBook(existingBook);
 
             return Ok(existingBook);

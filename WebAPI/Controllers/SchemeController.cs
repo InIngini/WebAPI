@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
             
             var createdScheme = await _schemeService.CreateScheme(schemedata);
 
-            return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.IdScheme }, createdScheme);
+            return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.Id }, createdScheme);
 
         }
 

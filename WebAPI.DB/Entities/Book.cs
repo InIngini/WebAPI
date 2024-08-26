@@ -17,7 +17,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор книги.
         /// </summary>
         [Key]
-        public int IdBook { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название книги.
@@ -27,12 +27,12 @@ namespace WebAPI.DB.Entities
         /// <summary>
         /// Уникальный идентификатор изображения, связанного с книгой (может быть null).
         /// </summary>
-        public int? IdPicture { get; set; }
+        public int? PictureId { get; set; }
 
         /// <summary>
         /// Связанное изображение книги.
         /// </summary>
-        [ForeignKey(nameof(IdPicture))]
+        [ForeignKey(nameof(PictureId))]
         public Picture? Picture { get; set; }
     }
 }

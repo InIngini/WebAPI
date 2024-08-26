@@ -16,7 +16,7 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор пользователя.
         /// </summary>
         [Key]
-        public int IdUser { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Логин пользователя для входа.

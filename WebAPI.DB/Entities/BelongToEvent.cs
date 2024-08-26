@@ -11,29 +11,29 @@ namespace WebAPI.DB.Entities
     /// <summary>
     /// Класс, представляющий связь между персонажем и событием.
     /// </summary>
-    [PrimaryKey(nameof(IdCharacter), nameof(IdEvent))]
+    [PrimaryKey(nameof(CharacterId), nameof(EventId))]
     public class BelongToEvent
     {
         /// <summary>
         /// Уникальный идентификатор персонажа.
         /// </summary>
-        public int IdCharacter { get; set; }
+        public int CharacterId { get; set; }
 
         /// <summary>
         /// Связанный персонаж.
         /// </summary>
-        [ForeignKey(nameof(IdCharacter))]
+        [ForeignKey(nameof(CharacterId))]
         public Character Character { get; set; }
 
         /// <summary>
         /// Уникальный идентификатор события.
         /// </summary>
-        public int IdEvent { get; set; }
+        public int EventId { get; set; }
 
         /// <summary>
         /// Связанное событие.
         /// </summary>
-        [ForeignKey(nameof(IdEvent))]
+        [ForeignKey(nameof(EventId))]
         public Event Event { get; set; }
     }
 

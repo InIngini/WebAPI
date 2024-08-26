@@ -44,7 +44,7 @@ namespace WebAPI.BLL.Services
         {
             var addedAttribute = _mapper.Map<AddedAttribute>(aa);
             addedAttribute.ContentAttribute = String.Empty;
-            addedAttribute.IdCharacter = id;
+            addedAttribute.CharacterId = id;
 
             var validationContext = new ValidationContext(addedAttribute);
             var validationResults = new List<ValidationResult>();
@@ -82,7 +82,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida)
         {
-            var addedAttribute = _context.AddedAttributes.Where(a=> a.IdAttribute==ida && a.IdCharacter==idc).SingleOrDefault();
+            var addedAttribute = _context.AddedAttributes.Where(a=> a.Id==ida && a.CharacterId==idc).SingleOrDefault();
 
             if (addedAttribute == null)
             {
@@ -120,7 +120,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список добавленных атрибутов для указанного персонажа.</returns>
         public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter)
         {
-            var addedAttributes = _context.AddedAttributes.Where(aa => aa.IdCharacter == idCharacter).ToList();
+            var addedAttributes = _context.AddedAttributes.Where(aa => aa.CharacterId == idCharacter).ToList();
 
             return addedAttributes;
         }

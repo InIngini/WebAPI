@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
            
             var createdGallery = await _galleryService.CreateGallery(galleryData);
 
-            return CreatedAtAction(nameof(GetGallery), new { id = createdGallery.IdPicture }, createdGallery);
+            return CreatedAtAction(nameof(GetGallery), new { id = createdGallery.PictureId }, createdGallery);
         }
 
         /// <summary>

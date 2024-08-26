@@ -73,8 +73,8 @@ namespace WebAPI.BLL.Services
             // Добавление соединения в схему
             var belongToScheme = new BelongToScheme()
             {
-                IdConnection = idConnection,
-                IdScheme = scheme.IdScheme
+                ConnectionId = idConnection,
+                SchemeId = scheme.Id
             };
             _context.BelongToSchemes.Add(belongToScheme);
             _context.SaveChanges();
@@ -96,7 +96,7 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException();
             }
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.IdScheme==id).ToList();
+            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.SchemeId==id).ToList();
             foreach(var belongToScheme in belongToSchemes)
             {
                 _context.BelongToSchemes.Remove(belongToScheme);
@@ -134,7 +134,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех схем книги.</returns>
         public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook)
         {
-            var schemes = _context.Schemes.Where(s => s.IdBook == idBook).ToList();
+            var schemes = _context.Schemes.Where(s => s.BookId == idBook).ToList();
 
             return schemes;
         }

@@ -52,17 +52,17 @@ namespace WebAPI.BLL.Services
 
             _context.Events.Add(@event);
             _context.SaveChanges();
-            if (eventData.IdCharacters != null)
+            if (eventData.CharactersId != null)
             {
-                foreach (var idCharacter in eventData.IdCharacters)
+                foreach (var idCharacter in eventData.CharactersId)
                 {
                     var character = _context.Characters.Find(idCharacter);
                     if (character != null)
                     {
                         var belongToEvent=new BelongToEvent()
                         { 
-                            IdEvent=@event.IdEvent,
-                            IdCharacter=character.IdCharacter
+                            EventId=@event.Id,
+                            CharacterId=character.Id
                         };
                         _context.BelongToEvents.Add(belongToEvent);
                     }
@@ -71,13 +71,13 @@ namespace WebAPI.BLL.Services
             _context.SaveChanges();
 
             var timeline = _context.Timelines
-                            .Where(s => s.NameTimeline == "Главный таймлайн" && s.IdBook == eventData.IdBook)
+                            .Where(s => s.NameTimeline == "Главный таймлайн" && s.BookId == eventData.BookId)
                             .SingleOrDefault();
             // Добавление связи в главную схему
             var belongToTimeline = new BelongToTimeline()
             { 
-                IdEvent=@event.IdEvent, 
-                IdTimeline=timeline.IdTimeline
+                EventId=@event.Id, 
+                TimelineId=timeline.Id
             };
             _context.BelongToTimelines.Add(belongToTimeline);
             _context.SaveChanges();
@@ -99,15 +99,15 @@ namespace WebAPI.BLL.Services
             @event.Content = eventData.Content;
             @event.Time = eventData.Time;
 
-            if (eventData.IdCharacters != null)
+            if (eventData.CharactersId != null)
             {
-                var characters = _context.BelongToEvents.Where(b=>b.IdEvent==id).ToList();
+                var characters = _context.BelongToEvents.Where(b=>b.EventId==id).ToList();
                 // Удаление ненужных связей персонажей с событием. Допустим было [1,2], мы передали [2,3], значит будет [2]
                 foreach (var character in characters)
                 {
-                    if(!eventData.IdCharacters.Contains(character.IdCharacter))
+                    if(!eventData.CharactersId.Contains(character.CharacterId))
                     {
-                        var belongToEvent = _context.BelongToEvents.Where(b=>b.IdCharacter==character.IdCharacter&&b.IdEvent==id).FirstOrDefault();
+                        var belongToEvent = _context.BelongToEvents.Where(b=>b.CharacterId==character.CharacterId&&b.EventId==id).FirstOrDefault();
                         if (belongToEvent == null)
                         {
                             throw new KeyNotFoundException();
@@ -117,17 +117,17 @@ namespace WebAPI.BLL.Services
                     
                 }
                 // Добавление новых. То есть после этого уже будет [2,3]
-                foreach (var idCharacter in eventData.IdCharacters)
+                foreach (var idCharacter in eventData.CharactersId)
                 {
                     var character = _context.Characters.Find(idCharacter);
-                    var belongToEvents = _context.BelongToEvents.Where(b => b.IdCharacter == character.IdCharacter && b.IdEvent == id).ToList();
+                    var belongToEvents = _context.BelongToEvents.Where(b => b.CharacterId == character.Id && b.EventId == id).ToList();
                     //если такой персонаж существует и в белонгтуивант нет записи с этим персонажем и ивентом
                     if (character != null && belongToEvents.Count()==0)
                     {
                         var belong = new BelongToEvent()
                         {
-                            IdEvent = id,
-                            IdCharacter=character.IdCharacter,
+                            EventId = id,
+                            CharacterId=character.Id,
                         };
                         _context.BelongToEvents.Add(belong);
                     }
@@ -156,7 +156,7 @@ namespace WebAPI.BLL.Services
             }
 
             // Получение всех таймлайнов, связанных с событием
-            var belongToTimelines = _context.BelongToTimelines.Where(t=>t.IdEvent == id).ToList();
+            var belongToTimelines = _context.BelongToTimelines.Where(t=>t.EventId == id).ToList();
 
             // Удаление IdConnection удаляемой связи из схем
             foreach (var belongToTimeline in belongToTimelines)
@@ -186,11 +186,11 @@ namespace WebAPI.BLL.Services
             }
             var eventdata = _mapper.Map<EventData>(@event);
 
-            var characters = _context.BelongToEvents.Where(b => b.IdEvent == id).ToList();
+            var characters = _context.BelongToEvents.Where(b => b.EventId == id).ToList();
             int[] ints = new int[characters.Count];
             for(int i = 0;i<ints.Length;i++)
-                ints[i] = characters[i].IdCharacter;
-            eventdata.IdCharacters = ints;
+                ints[i] = characters[i].CharacterId;
+            eventdata.CharactersId = ints;
             return @eventdata;
         }
 
@@ -201,12 +201,12 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех событий таймлайна.</returns>
         public async Task<IEnumerable<EventAllData>> GetAllEvents(int idTimeline)
         {
-            var belongToTimelines = _context.BelongToTimelines.Where(b => b.IdTimeline == idTimeline).ToList();
+            var belongToTimelines = _context.BelongToTimelines.Where(b => b.TimelineId == idTimeline).ToList();
 
             var events = new List<Event>();
             foreach (var belongToTimeline in belongToTimelines)
             {
-                var @event = _context.Events.Find(belongToTimeline.IdEvent);
+                var @event = _context.Events.Find(belongToTimeline.EventId);
                 if (@event == null)
                 {
                     throw new KeyNotFoundException();

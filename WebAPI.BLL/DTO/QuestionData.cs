@@ -23,7 +23,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Название вопроса.
         /// </summary>
-        public string Name { get; set; }
+        public string QuestionText { get; set; }
 
         /// <summary>
         /// Блок, к которому принадлежит вопрос (может быть null).

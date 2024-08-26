@@ -16,11 +16,11 @@ namespace WebAPI.DB.Entities
         /// Уникальный идентификатор изображения.
         /// </summary>
         [Key]
-        public int IdPicture { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Двоичные данные изображения.
         /// </summary>
-        public byte[] Picture1 { get; set; }
+        public byte[] PictureContent { get; set; }
     }
 }

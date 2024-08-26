@@ -38,9 +38,9 @@ namespace WebAPI.BLL.Services
         /// <param name="galleryData">Данные для создания галереи.</param>
         /// <returns>Созданная галерея.</returns>
         /// <exception cref="ArgumentException">Если модель не валидна.</exception>
-        public async Task<Gallery> CreateGallery(GalleryData galleryData)
+        public async Task<BelongToGallery> CreateGallery(GalleryData galleryData)
         {
-            var gallery = _mapper.Map<Gallery>(galleryData);
+            var gallery = _mapper.Map<BelongToGallery>(galleryData);
             var validationContext = new ValidationContext(gallery);
             var validationResults = new List<ValidationResult>();
 
@@ -49,7 +49,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException("Модель не валидна");
             }
 
-            _context.Galleries.Add(gallery);
+            _context.BelongToGalleries.Add(gallery);
             _context.SaveChanges();
 
             return gallery;
@@ -61,9 +61,9 @@ namespace WebAPI.BLL.Services
         /// <param name="idPicture">Идентификатор изображения.</param>
         /// <returns>Галерея, из которой было удалено изображение.</returns>
         /// <exception cref="KeyNotFoundException">Если галерея или изображение не найдены.</exception>
-        public async Task<Gallery> DeletePictureFromGallery(int idPicture)
+        public async Task<BelongToGallery> DeletePictureFromGallery(int idPicture)
         {
-            var gallery = _context.Galleries.Find(idPicture);
+            var gallery = _context.BelongToGalleries.Find(idPicture);
             if (gallery == null)
             {
                 throw new KeyNotFoundException();
@@ -76,7 +76,7 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление записи из галереи
-            _context.Galleries.Remove(gallery);
+            _context.BelongToGalleries.Remove(gallery);
             _context.SaveChanges();
 
             // Удаление картинки из галереи
@@ -92,9 +92,9 @@ namespace WebAPI.BLL.Services
         /// <param name="id">Идентификатор галереи.</param>
         /// <returns>Запрашиваемая галерея.</returns>
         /// <exception cref="KeyNotFoundException">Если галерея не найдена.</exception>
-        public async Task<Gallery> GetGallery(int id)
+        public async Task<BelongToGallery> GetGallery(int id)
         {
-            var gallery = _context.Galleries.Find(id);
+            var gallery = _context.BelongToGalleries.Find(id);
 
             if (gallery == null)
             {
@@ -109,9 +109,9 @@ namespace WebAPI.BLL.Services
         /// </summary>
         /// <param name="idCharacter">Идентификатор персонажа.</param>
         /// <returns>Список галерей персонажа.</returns>
-        public async Task<IEnumerable<Gallery>> GetAllGalleries(int idCharacter)
+        public async Task<IEnumerable<BelongToGallery>> GetAllGalleries(int idCharacter)
         {
-            var galleries = _context.Galleries.Where(g => g.IdCharacter == idCharacter).ToList();
+            var galleries = _context.BelongToGalleries.Where(g => g.CharacterId == idCharacter).ToList();
 
             return galleries;
         }

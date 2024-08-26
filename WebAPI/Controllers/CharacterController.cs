@@ -41,8 +41,8 @@ namespace WebAPI.Controllers
         {
             Character character = new Character()
             {
-                IdBook = bookCharacterData.IdBook,
-                IdPicture = bookCharacterData.IdPicture
+                BookId = bookCharacterData.BookId,
+                PictureId = bookCharacterData.PictureId
             };
 
             if (!ModelState.IsValid)
@@ -57,7 +57,7 @@ namespace WebAPI.Controllers
             };
             string json = JsonSerializer.Serialize(createdCharacter, options);
 
-            return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.IdCharacter }, json);
+            return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.Id }, json);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace WebAPI.Controllers
 
             var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
 
-            return CreatedAtAction(nameof(GetAddedAttribute), new { id = createdAddedAttribute.IdAttribute }, createdAddedAttribute);
+            return CreatedAtAction(nameof(GetAddedAttribute), new { id = createdAddedAttribute.Id }, createdAddedAttribute);
         }
 
         /// <summary>

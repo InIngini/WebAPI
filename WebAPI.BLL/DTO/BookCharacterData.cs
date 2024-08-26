@@ -12,12 +12,12 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор книги.
         /// </summary>
-        public int IdBook { get; set; }
+        public int BookId { get; set; }
 
         /// <summary>
         /// Идентификатор изображения персонажа (может быть null).
         /// </summary>
-        public int? IdPicture { get; set; }
+        public int? PictureId { get; set; }
 
         /// <summary>
         /// Конфигурация сопоставления между <see cref="BookCharacterData"/> и <see cref="Character/>.
@@ -26,9 +26,9 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<BookCharacterData, Character>()
-                .ForMember(dest => dest.IdBook, opt => opt.MapFrom(src => src.IdBook))
-                .ForMember(dest => dest.IdPicture, opt => opt.MapFrom(src => src.IdPicture))
-                .ForMember(dest => dest.IdCharacter, opt => opt.Ignore()); // Игнорировать, если Id генерируется в базе данных
+                .ForMember(dest => dest.BookId, opt => opt.MapFrom(src => src.BookId))
+                .ForMember(dest => dest.PictureId, opt => opt.MapFrom(src => src.PictureId))
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорировать, если Id генерируется в базе данных
         }
     }
 }

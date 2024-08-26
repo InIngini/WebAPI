@@ -17,7 +17,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор пользователя.
         /// </summary>
-        public int IdUser { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// Логин пользователя.

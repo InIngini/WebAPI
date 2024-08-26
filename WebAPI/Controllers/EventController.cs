@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
             };
             string json = JsonSerializer.Serialize(createdEvent, options);
 
-            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.IdEvent }, json);
+            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.Id }, json);
         }
 
         /// <summary>

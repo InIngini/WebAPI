@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор связи (может быть null).
         /// </summary>
-        public int? IdConnection { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// Идентификатор книги (может быть null).
@@ -22,7 +22,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор первого персонажа.
         /// </summary>
-        public int IdCharacter1 { get; set; }
+        public int Character1Id { get; set; }
 
         /// <summary>
         /// Имя первого персонажа (может быть null).
@@ -32,7 +32,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор второго персонажа.
         /// </summary>
-        public int IdCharacter2 { get; set; }
+        public int Character2Id { get; set; }
 
         /// <summary>
         /// Имя второго персонажа (может быть null).

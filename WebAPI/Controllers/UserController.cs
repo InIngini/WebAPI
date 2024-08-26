@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
         {
             var createdUser = await _userService.CreateUser(loginData);
 
-            return CreatedAtAction(nameof(GetUser), new { id = createdUser.IdUser }, createdUser);
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
         }
 
         /// <summary>

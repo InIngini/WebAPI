@@ -17,7 +17,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор события.
         /// </summary>
-        public int IdEvent { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название события.
@@ -37,7 +37,7 @@ namespace WebAPI.BLL.DTO
         {
             // Создаём сопоставление между сущностями Event и EventAllData
             profile.CreateMap<Event, EventAllData>()
-                .ForMember(dest => dest.IdEvent, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
         }
     }
 }

@@ -17,7 +17,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор персонажа.
         /// </summary>
-        public int IdCharacter { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Имя персонажа.
@@ -27,7 +27,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Изображение персонажа в виде массива байтов (может быть null).
         /// </summary>
-        public byte[]? Picture1 { get; set; }
+        public byte[]? PictureContent { get; set; }
 
         /// <summary>
         /// Конфигурация сопоставления между <see cref="Character"/> и <see cref="CharacterAllData"/>.
@@ -36,9 +36,9 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Character, CharacterAllData>()
-                .ForMember(dest => dest.IdCharacter, opt => opt.MapFrom(src => src.IdCharacter))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.Ignore()) // Игнорирует имя
-                .ForMember(dest => dest.Picture1, opt => opt.Ignore()); // Игнорирует изображение
+                .ForMember(dest => dest.PictureContent, opt => opt.Ignore()); // Игнорирует изображение
         }
     }
 }

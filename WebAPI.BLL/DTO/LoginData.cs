@@ -26,7 +26,7 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<LoginData, User>()
-                .ForMember(dest => dest.IdUser, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Login, opt => opt.MapFrom(src => src.Login))
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password)); // Если IdUser генерируется в базе данных, то можно игнорировать
         }

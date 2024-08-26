@@ -24,308 +24,212 @@ namespace WebAPI.DB.Migrations
 
             modelBuilder.Entity("WebAPI.DB.Entities.AddedAttribute", b =>
                 {
-                    b.Property<int>("IdAttribute")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAttribute"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CharacterId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ContentAttribute")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IdCharacter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NnameAttribute")
+                    b.Property<string>("NameAttribute")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NumberAnswer")
                         .HasColumnType("int");
 
-                    b.HasKey("IdAttribute");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdCharacter");
+                    b.HasIndex("CharacterId");
 
                     b.ToTable("AddedAttributes");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Answer", b =>
                 {
-                    b.Property<int>("IdCharacter")
+                    b.Property<int>("CharacterId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Answer10Temperament")
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AnswerText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Answer1Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("CharacterId", "QuestionId");
 
-                    b.Property<string>("Answer1ByHistory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer1Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer1Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer2Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer2ByHistory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer2Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer2Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer3Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer3ByHistory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer3Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer3Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer4Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer4ByHistory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer4Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer4Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer5Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer5ByHistory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer5Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer5Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer6Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer6Personality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer6Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer7Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer7Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer8Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer8Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer9Appearance")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Answer9Temperament")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdCharacter");
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("Answers");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToBook", b =>
                 {
-                    b.Property<int>("IdUser")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdBook")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
                     b.Property<int>("TypeBelong")
                         .HasColumnType("int");
 
-                    b.HasKey("IdUser", "IdBook");
+                    b.HasKey("UserId", "BookId");
 
-                    b.HasIndex("IdBook");
+                    b.HasIndex("BookId");
 
                     b.ToTable("BelongToBooks");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToEvent", b =>
                 {
-                    b.Property<int>("IdCharacter")
+                    b.Property<int>("CharacterId")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdEvent")
+                    b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdCharacter", "IdEvent");
+                    b.HasKey("CharacterId", "EventId");
 
-                    b.HasIndex("IdEvent");
+                    b.HasIndex("EventId");
 
                     b.ToTable("BelongToEvents");
                 });
 
+            modelBuilder.Entity("WebAPI.DB.Entities.BelongToGallery", b =>
+                {
+                    b.Property<int?>("PictureId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CharacterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PictureId");
+
+                    b.HasIndex("CharacterId");
+
+                    b.ToTable("BelongToGalleries");
+                });
+
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToScheme", b =>
                 {
-                    b.Property<int>("IdScheme")
+                    b.Property<int>("SchemeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdConnection")
+                    b.Property<int>("ConnectionId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdScheme", "IdConnection");
+                    b.HasKey("SchemeId", "ConnectionId");
 
-                    b.HasIndex("IdConnection");
+                    b.HasIndex("ConnectionId");
 
                     b.ToTable("BelongToSchemes");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToTimeline", b =>
                 {
-                    b.Property<int>("IdTimeline")
+                    b.Property<int>("TimelineId")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdEvent")
+                    b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdTimeline", "IdEvent");
+                    b.HasKey("TimelineId", "EventId");
 
-                    b.HasIndex("IdEvent");
+                    b.HasIndex("EventId");
 
                     b.ToTable("BelongToTimelines");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Book", b =>
                 {
-                    b.Property<int>("IdBook")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdBook"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("IdPicture")
-                        .HasColumnType("int");
-
-                    b.Property<string>("nameBook")
+                    b.Property<string>("NameBook")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdBook");
+                    b.Property<int?>("PictureId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("IdPicture");
+                    b.HasKey("Id");
+
+                    b.HasIndex("PictureId");
 
                     b.ToTable("Books");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Character", b =>
                 {
-                    b.Property<int>("IdCharacter")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCharacter"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdBook")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdPicture")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdCharacter");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdBook");
+                    b.HasIndex("BookId");
 
-                    b.HasIndex("IdPicture");
+                    b.HasIndex("PictureId");
 
                     b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Connection", b =>
                 {
-                    b.Property<int>("IdConnection")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdConnection"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdCharacter1")
+                    b.Property<int>("Character1Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdCharacter2")
+                    b.Property<int>("Character2Id")
                         .HasColumnType("int");
 
                     b.Property<int>("TypeConnection")
                         .HasColumnType("int");
 
-                    b.HasKey("IdConnection");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdCharacter1");
+                    b.HasIndex("Character1Id");
 
-                    b.HasIndex("IdCharacter2");
+                    b.HasIndex("Character2Id");
 
                     b.ToTable("Connections");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Event", b =>
                 {
-                    b.Property<int>("IdEvent")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdEvent"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -339,94 +243,79 @@ namespace WebAPI.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdEvent");
+                    b.HasKey("Id");
 
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("WebAPI.DB.Entities.Gallery", b =>
-                {
-                    b.Property<int?>("IdPicture")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdCharacter")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdPicture");
-
-                    b.HasIndex("IdCharacter");
-
-                    b.ToTable("Galleries");
-                });
-
             modelBuilder.Entity("WebAPI.DB.Entities.Picture", b =>
                 {
-                    b.Property<int>("IdPicture")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdPicture"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("Picture1")
+                    b.Property<byte[]>("PictureContent")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.HasKey("IdPicture");
+                    b.HasKey("Id");
 
                     b.ToTable("Pictures");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Scheme", b =>
                 {
-                    b.Property<int>("IdScheme")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdScheme"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdBook")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
                     b.Property<string>("NameScheme")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdScheme");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdBook");
+                    b.HasIndex("BookId");
 
                     b.ToTable("Schemes");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.Timeline", b =>
                 {
-                    b.Property<int>("IdTimeline")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTimeline"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdBook")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
                     b.Property<string>("NameTimeline")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdTimeline");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdBook");
+                    b.HasIndex("BookId");
 
                     b.ToTable("Timelines");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.User", b =>
                 {
-                    b.Property<int>("IdUser")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUser"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Login")
                         .IsRequired()
@@ -436,7 +325,7 @@ namespace WebAPI.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdUser");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
@@ -469,7 +358,7 @@ namespace WebAPI.DB.Migrations
                     b.Property<int>("Block")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("QuestionText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -535,7 +424,7 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("IdCharacter")
+                        .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -546,24 +435,32 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("IdCharacter")
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.DB.Guide.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Character");
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToBook", b =>
                 {
                     b.HasOne("WebAPI.DB.Entities.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("IdBook")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("IdUser")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -576,13 +473,13 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("IdCharacter")
+                        .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("IdEvent")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -591,17 +488,36 @@ namespace WebAPI.DB.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("WebAPI.DB.Entities.BelongToGallery", b =>
+                {
+                    b.HasOne("WebAPI.DB.Entities.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.DB.Entities.Picture", "Picture")
+                        .WithMany()
+                        .HasForeignKey("PictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Character");
+
+                    b.Navigation("Picture");
+                });
+
             modelBuilder.Entity("WebAPI.DB.Entities.BelongToScheme", b =>
                 {
                     b.HasOne("WebAPI.DB.Entities.Connection", "Connection")
                         .WithMany()
-                        .HasForeignKey("IdConnection")
+                        .HasForeignKey("ConnectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.Scheme", "Scheme")
                         .WithMany()
-                        .HasForeignKey("IdScheme")
+                        .HasForeignKey("SchemeId")
                         .IsRequired();
 
                     b.Navigation("Connection");
@@ -613,13 +529,13 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("IdEvent")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.Timeline", "Timeline")
                         .WithMany()
-                        .HasForeignKey("IdTimeline")
+                        .HasForeignKey("TimelineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -632,7 +548,7 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Picture", "Picture")
                         .WithMany()
-                        .HasForeignKey("IdPicture");
+                        .HasForeignKey("PictureId");
 
                     b.Navigation("Picture");
                 });
@@ -641,13 +557,13 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("IdBook")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.Picture", "Picture")
                         .WithMany()
-                        .HasForeignKey("IdPicture");
+                        .HasForeignKey("PictureId");
 
                     b.Navigation("Book");
 
@@ -658,13 +574,13 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Character", "Character1")
                         .WithMany()
-                        .HasForeignKey("IdCharacter1")
+                        .HasForeignKey("Character1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebAPI.DB.Entities.Character", "Character2")
                         .WithMany()
-                        .HasForeignKey("IdCharacter2")
+                        .HasForeignKey("Character2Id")
                         .IsRequired();
 
                     b.Navigation("Character1");
@@ -672,30 +588,11 @@ namespace WebAPI.DB.Migrations
                     b.Navigation("Character2");
                 });
 
-            modelBuilder.Entity("WebAPI.DB.Entities.Gallery", b =>
-                {
-                    b.HasOne("WebAPI.DB.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("IdCharacter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebAPI.DB.Entities.Picture", "Picture")
-                        .WithMany()
-                        .HasForeignKey("IdPicture")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
-
-                    b.Navigation("Picture");
-                });
-
             modelBuilder.Entity("WebAPI.DB.Entities.Scheme", b =>
                 {
                     b.HasOne("WebAPI.DB.Entities.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("IdBook")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -706,7 +603,7 @@ namespace WebAPI.DB.Migrations
                 {
                     b.HasOne("WebAPI.DB.Entities.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("IdBook")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

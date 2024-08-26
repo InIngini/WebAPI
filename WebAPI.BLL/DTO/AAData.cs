@@ -27,8 +27,8 @@ namespace WebAPI.BLL.DTO
         {
             profile.CreateMap<AAData, AddedAttribute>()
                 .ForMember(dest => dest.ContentAttribute, opt => opt.Ignore())
-                .ForMember(dest => dest.IdAttribute, opt => opt.Ignore())
-                .ForMember(dest => dest.IdCharacter, opt => opt.Ignore()); // Игнорировать, если Id генерируется в базе данных
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CharacterId, opt => opt.Ignore()); // Игнорировать, если Id генерируется в базе данных
         }
     }
 }

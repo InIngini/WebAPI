@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор книги (может быть null).
         /// </summary>
-        public int? IdBook { get; set; }
+        public int? BookId { get; set; }
 
         /// <summary>
         /// Название события.
@@ -32,7 +32,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Массив идентификаторов персонажей, участвующих в событии (может быть null).
         /// </summary>
-        public int[]? IdCharacters { get; set; }
+        public int[]? CharactersId { get; set; }
 
         /// <summary>
         /// Конфигурация сопоставления между <see cref="Event"/> и <see cref="EventData"/>.
@@ -45,7 +45,7 @@ namespace WebAPI.BLL.DTO
 
             // Создаём обратное сопоставление от EventData к Event
             profile.CreateMap<EventData, Event>()
-                .ForMember(dest => dest.IdEvent, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
         }
     }
 }

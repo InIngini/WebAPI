@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
 
             var createdPicture = await _pictureService.CreatePicture(picture);
 
-            return CreatedAtAction(nameof(GetPicture), new { id = createdPicture.IdPicture }, createdPicture);
+            return CreatedAtAction(nameof(GetPicture), new { id = createdPicture.Id }, createdPicture);
         }
 
         /// <summary>
