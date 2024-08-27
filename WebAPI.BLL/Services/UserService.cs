@@ -11,6 +11,7 @@ using WebAPI.DB.Entities;
 using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -49,19 +50,19 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(loginData, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             // Используем AutoMapper для маппинга LoginData в User
             User user = _mapper.Map<User>(loginData);
 
-            if (_context.Users.Where(u => u.Login==user.Login).FirstOrDefault() != null)
+            if (await _context.Users.Where(u => u.Login==user.Login).FirstOrDefaultAsync() != null)
             {
-                throw new ArgumentException("Такой уже есть");
+                throw new ArgumentException(TypesOfErrors.UserFound(loginData.Login));
             }
             
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return user;
         }
@@ -72,14 +73,14 @@ namespace WebAPI.BLL.Services
         /// <param name="loginData">Данные для входа пользователя.</param>
         /// <returns>Данные пользователя с токеном.</returns>
         /// <exception cref="UnauthorizedAccessException">Если пользователь не найден.</exception>
-        public async Task<UserTokenData> Login(LoginData loginData)
+        public async Task<UserTokenData> Login(LoginData loginData, CancellationToken cancellationToken)
         {
-            var user = _context.Users.Where(u => u.Login == loginData.Login && u.Password == loginData.Password)
-                                              .FirstOrDefault();
+            var user = await _context.Users.Where(u => u.Login == loginData.Login && u.Password == loginData.Password)
+                                              .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
             {
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException(TypesOfErrors.UserNotFound(loginData.Login));
             }
 
             var token = _tokenService.CreateToken(user);
@@ -97,13 +98,13 @@ namespace WebAPI.BLL.Services
         /// <param name="id">Идентификатор пользователя.</param>
         /// <returns>Запрашиваемый пользователь.</returns>
         /// <exception cref="KeyNotFoundException">Если пользователь не найден.</exception>
-        public async Task<User> GetUser(int id)
+        public async Task<User> GetUser(int id, CancellationToken cancellationToken)
         {
-            var user = _context.Users.Find(id);
+            var user = await _context.Users.FindAsync(id,cancellationToken);
 
             if (user == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Пользователь", 1));
             }
 
             return user;

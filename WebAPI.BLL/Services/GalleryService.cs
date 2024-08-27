@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -46,11 +47,11 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(gallery, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.BelongToGalleries.Add(gallery);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return gallery;
         }
@@ -63,25 +64,25 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если галерея или изображение не найдены.</exception>
         public async Task<BelongToGallery> DeletePictureFromGallery(int idPicture)
         {
-            var gallery = _context.BelongToGalleries.Find(idPicture);
+            var gallery = await _context.BelongToGalleries.FindAsync(idPicture);
             if (gallery == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
-            var picture = _context.Pictures.Find(idPicture);
+            var picture = await _context.Pictures.FindAsync(idPicture);
             if (picture == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             // Удаление записи из галереи
             _context.BelongToGalleries.Remove(gallery);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Удаление картинки из галереи
             _context.Pictures.Remove(picture);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return gallery;
         }
@@ -90,15 +91,16 @@ namespace WebAPI.BLL.Services
         /// Получает галерею по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор галереи.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Запрашиваемая галерея.</returns>
         /// <exception cref="KeyNotFoundException">Если галерея не найдена.</exception>
-        public async Task<BelongToGallery> GetGallery(int id)
+        public async Task<BelongToGallery> GetGallery(int id, CancellationToken cancellationToken)
         {
-            var gallery = _context.BelongToGalleries.Find(id);
+            var gallery = await _context.BelongToGalleries.FindAsync(id, cancellationToken);
 
             if (gallery == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return gallery;
@@ -108,10 +110,11 @@ namespace WebAPI.BLL.Services
         /// Получает все галереи для указанного персонажа.
         /// </summary>
         /// <param name="idCharacter">Идентификатор персонажа.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список галерей персонажа.</returns>
-        public async Task<IEnumerable<BelongToGallery>> GetAllGalleries(int idCharacter)
+        public async Task<IEnumerable<BelongToGallery>> GetAllGalleries(int idCharacter, CancellationToken cancellationToken)
         {
-            var galleries = _context.BelongToGalleries.Where(g => g.CharacterId == idCharacter).ToList();
+            var galleries = await _context.BelongToGalleries.Where(g => g.CharacterId == idCharacter).ToListAsync(cancellationToken);
 
             return galleries;
         }

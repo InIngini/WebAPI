@@ -13,8 +13,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Event> CreateEvent(EventData eventData);
         Task<Event> UpdateEvent(EventData eventData,int id);
         Task<Event> DeleteEvent(int id);
-        Task<EventData> GetEvent(int id);
-        Task<IEnumerable<EventAllData>> GetAllEvents(int id);
+        Task<EventData> GetEvent(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<EventAllData>> GetAllEvents(int id, CancellationToken cancellationToken);
     }
 
 }

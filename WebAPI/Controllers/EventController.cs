@@ -7,6 +7,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -39,18 +40,12 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
             
             var createdEvent = await _eventService.CreateEvent(eventData);
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(createdEvent, options);
-
-            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.Id }, json);
+            return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.Id }, createdEvent);
         }
 
         /// <summary>
@@ -58,60 +53,57 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор события для обновления.</param>
         /// <param name="eventData">Обновленные данные о событии.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат обновления события.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData)
+        public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData, CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id);
+            var @event = await _eventService.GetEvent(id, cancellationToken);
 
             if (@event == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
             }
 
             var updatedEvent = await _eventService.UpdateEvent(eventData, id);
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(updatedEvent, options);
-            
-            return Ok(json);
+            return Ok(updatedEvent);
         }
 
         /// <summary>
         /// Удаляет событие по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор события для удаления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат удаления события.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        public async Task<IActionResult> DeleteEvent(int id,CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id);
+            var @event = await _eventService.GetEvent(id, cancellationToken);
 
             if (@event == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
             }
             await _eventService.DeleteEvent(id);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
         /// Получает событие по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор события.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Событие с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEvent(int id)
+        public async Task<IActionResult> GetEvent(int id, CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id);
+            var @event = await _eventService.GetEvent(id, cancellationToken);
 
             if (@event == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
             }
 
             return Ok(@event);
@@ -121,15 +113,16 @@ namespace WebAPI.Controllers
         /// Получает все события таймлайна по идентификатору таймлайна.
         /// </summary>
         /// <param name="id">Идентификатор таймлайна, по которому ищутся все события.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех событий для указанного идентификатора таймлайна.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllEvents([FromBody] int id)
+        public async Task<IActionResult> GetAllEvents([FromBody] int id, CancellationToken cancellationToken)
         {
-            var events = await _eventService.GetAllEvents(id);
+            var events = await _eventService.GetAllEvents(id, cancellationToken);
 
             if (events == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("События", 3));
             }
 
             return Ok(events);

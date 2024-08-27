@@ -13,8 +13,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Scheme> CreateScheme(SchemeData schemedata);
         Task<Scheme> UpdateScheme(Scheme scheme, int idConnection);
         Task<Scheme> DeleteScheme(int id);
-        Task<Scheme> GetScheme(int id);
-        Task<IEnumerable<Scheme>> GetAllSchemes(int idBook);
+        Task<Scheme> GetScheme(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<Scheme>> GetAllSchemes(int idBook,CancellationToken cancellationToken);
     }
 
 }

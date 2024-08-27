@@ -11,8 +11,8 @@ namespace WebAPI.BLL.Interfaces
     public interface IUserService
     {
         Task<User> CreateUser(LoginData loginData);
-        Task<UserTokenData> Login(LoginData loginData);
-        Task<User> GetUser(int id);
+        Task<UserTokenData> Login(LoginData loginData,CancellationToken cancellationToken);
+        Task<User> GetUser(int id, CancellationToken cancellationToken);
     }
 
 }

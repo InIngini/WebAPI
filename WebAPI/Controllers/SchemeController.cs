@@ -7,6 +7,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -39,7 +40,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
             
             var createdScheme = await _schemeService.CreateScheme(schemedata);
@@ -53,41 +54,37 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор схемы.</param>
         /// <param name="idConnection">Идентификатор связи для добавления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Обновлённая схема.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection)
+        public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection,CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id);
+            var scheme = await _schemeService.GetScheme(id, cancellationToken);
 
             if (scheme == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
             }
 
             var updatedScheme = await _schemeService.UpdateScheme(scheme,idConnection);
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(updatedScheme, options);
-
-            return Ok(json);
+            return Ok(updatedScheme);
         }
 
         /// <summary>
         /// Удаляет схему по её идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор схемы для удаления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат удаления схемы.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteScheme(int id)
+        public async Task<IActionResult> DeleteScheme(int id,CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id);
+            var scheme = await _schemeService.GetScheme(id, cancellationToken);
 
             if (scheme == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
             }
 
             await _schemeService.DeleteScheme(id);
@@ -99,15 +96,16 @@ namespace WebAPI.Controllers
         /// Получает схему по её идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор схемы.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Схема с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetScheme(int id)
+        public async Task<IActionResult> GetScheme(int id, CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id);
+            var scheme = await _schemeService.GetScheme(id,cancellationToken);
 
             if (scheme == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
             }
 
             return Ok(scheme);
@@ -117,15 +115,16 @@ namespace WebAPI.Controllers
         /// Получает все схемы по заданному идентификатору книги.
         /// </summary>
         /// <param name="id">Идентификатор для получения всех схем книги.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех схем для указанного идентификатора книги.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllScheme([FromBody] int id)
+        public async Task<IActionResult> GetAllScheme([FromBody] int id, CancellationToken cancellationToken)
         {
-            var schemes = await _schemeService.GetAllSchemes(id);
+            var schemes = await _schemeService.GetAllSchemes(id,cancellationToken);
 
             if (schemes == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Схемы", 3));
             }
 
             return Ok(schemes);

@@ -14,8 +14,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Character> CreateCharacter(Character character);
         Task<Character> UpdateCharacter(CharacterWithAnswers character,int id);
         Task<Character> DeleteCharacter(int id);
-        Task<CharacterWithAnswers> GetCharacter(int id);
-        Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook);
+        Task<CharacterWithAnswers> GetCharacter(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook, CancellationToken cancellationToken);
         Task<IEnumerable<QuestionData>> GetQuestions();
     }
 

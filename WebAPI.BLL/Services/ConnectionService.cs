@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.DB.Guide;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -46,18 +47,18 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(connectionData, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             var connection = _mapper.Map<Connection>(connectionData);
-            connection.TypeConnection = _context.TypeConnections.Where(t => t.Name == connectionData.TypeConnection).FirstOrDefault().Id;
+            connection.TypeConnection = _context.TypeConnections.Where(t => t.Name == connectionData.TypeConnection).FirstOrDefaultAsync().Id;
 
-            var scheme = _context.Schemes
+            var scheme = await _context.Schemes
                             .Where(s => s.NameScheme == "Главная схема" && s.BookId == connectionData.IdBook)
-                            .FirstOrDefault();
+                            .FirstOrDefaultAsync();
 
             _context.Connections.Add(connection);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Добавление связи в главную схему
             var belongToScheme = new BelongToScheme()
@@ -66,7 +67,7 @@ namespace WebAPI.BLL.Services
                 ConnectionId = connection.Id
             };
             _context.BelongToSchemes.Add(belongToScheme);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return connection;
         }
@@ -79,23 +80,23 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Connection> DeleteConnection(int id)
         {
-            var connection = _context.Connections.Find(id);
+            var connection = await _context.Connections.FindAsync(id);
             if (connection == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
             }
             
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.ConnectionId == id).ToList();
+            var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.ConnectionId == id).ToListAsync();
             // Удаление IdConnection удаляемой связи из схем
             foreach (var belongToScheme in belongToSchemes)
             {
                 _context.BelongToSchemes.Remove(belongToScheme);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Удаление связи
             _context.Connections.Remove(connection);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return connection;
         }
@@ -104,15 +105,16 @@ namespace WebAPI.BLL.Services
         /// Получает связь по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор связи.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Данные связи.</returns>
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
-        public async Task<ConnectionData> GetConnection(int id)
+        public async Task<ConnectionData> GetConnection(int id, CancellationToken cancellationToken)
         {
-            var connection = _context.Connections.Find(id);
+            var connection = await _context.Connections.FindAsync(id, cancellationToken);
 
             if (connection == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
             }
             var connectionData = _mapper.Map<ConnectionData>(connection);
             connectionData.Name1 = _context.Characters.Find(connection.Character1Id).Name;
@@ -126,18 +128,19 @@ namespace WebAPI.BLL.Services
         /// Получает все связи для указанной схемы.
         /// </summary>
         /// <param name="idScheme">Идентификатор схемы.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех связей.</returns>
-        public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme)
+        public async Task<IEnumerable<ConnectionAllData>> GetAllConnections(int idScheme, CancellationToken cancellationToken)
         {
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.SchemeId == idScheme).ToList();
+            var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.SchemeId == idScheme).ToListAsync(cancellationToken);
 
             var connections = new List<Connection>();
             foreach (var belongToScheme in belongToSchemes)
             {
-                var connection = _context.Connections.Find(belongToScheme.ConnectionId);
+                var connection = await _context.Connections.FindAsync(belongToScheme.ConnectionId, cancellationToken);
                 if (connection==null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
                 }
                 connections.Add(connection);
             }

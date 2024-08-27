@@ -13,8 +13,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Book> CreateBook(UserBookData userbook);
         Task<Book> UpdateBook(Book book);
         Task<Book> DeleteBook(int id);
-        Task<Book> GetBook(int id);
-        Task<IEnumerable<Book>> GetAllBooksForUser(int userId);
+        Task<Book> GetBook(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<Book>> GetAllBooksForUser(int userId, CancellationToken cancellationToken);
     }
 
 }

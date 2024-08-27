@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using WebAPI.BLL.Mappings;
 using AutoMapper;
 using System.Reflection;
+using WebAPI.Errors;
 
 namespace WebAPI
 {
@@ -75,14 +76,15 @@ namespace WebAPI
                 }
             }
 
-            // Configure the HTTP request pipeline.
+            //Миддлвейр для обработки ошибок
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
+            // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
 
             // Использование авторизации и аутентификации
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -7,6 +7,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -39,7 +40,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
 
             var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
@@ -51,34 +52,35 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="id">Идентификатор таймлайна.</param>
         /// <param name="idEvent">Идентификатор события для добавления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Обновлённый таймлайн.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent)
+        public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent,CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.GetTimeline(id);
+            var timeline = await _timelineService.GetTimeline(id, cancellationToken);
             if (timeline == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
             }
 
             var updatedTimeline = await _timelineService.UpdateTimeline(timeline, idEvent);
-            var options = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve };
-            string json = JsonSerializer.Serialize(updatedTimeline, options);
-            return Ok(json);
+            
+            return Ok(updatedTimeline);
         }
 
         /// <summary>
         /// Удаляет таймлайн по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор таймлайна для удаления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат удаления таймлайна.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTimeline(int id)
+        public async Task<IActionResult> DeleteTimeline(int id,CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.GetTimeline(id);
+            var timeline = await _timelineService.GetTimeline(id, cancellationToken);
             if (timeline == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
             }
 
             await _timelineService.DeleteTimeline(id);
@@ -88,14 +90,15 @@ namespace WebAPI.Controllers
         /// Получает таймлайн по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор таймлайна.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Таймлайн с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTimeline(int id)
+        public async Task<IActionResult> GetTimeline(int id, CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.GetTimeline(id);
+            var timeline = await _timelineService.GetTimeline(id,cancellationToken);
             if (timeline == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
             }
 
             return Ok(timeline);
@@ -105,15 +108,16 @@ namespace WebAPI.Controllers
         /// Получает все таймлайны по заданному идентификатору книги.
         /// </summary>
         /// <param name="id">Идентификатор книги для получения всех таймлайнов.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех таймлайнов для указанного идентификатора книги.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllTimeline([FromBody] int id)
+        public async Task<IActionResult> GetAllTimeline([FromBody] int id,CancellationToken cancellationToken)
         {
-            var timelines = await _timelineService.GetAllTimelines(id);
+            var timelines = await _timelineService.GetAllTimelines(id,cancellationToken);
 
             if (timelines == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Таймлайны", 3));
             }
 
             return Ok(timelines);

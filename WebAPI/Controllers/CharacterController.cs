@@ -7,6 +7,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebAPI.Errors;
 namespace WebAPI.Controllers
 {
     /// <summary>
@@ -47,17 +48,11 @@ namespace WebAPI.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
             var createdCharacter = await _characterService.CreateCharacter(character);
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(createdCharacter, options);
-
-            return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.Id }, json);
+            return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.Id }, createdCharacter);
         }
 
         /// <summary>
@@ -73,16 +68,10 @@ namespace WebAPI.Controllers
 
             if (existingCharacter == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Персонаж", 1));
             }
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(existingCharacter, options);
-            
-            return Ok(json);
+            return Ok(existingCharacter);
         }
         /// <summary>
         /// Удаляет персонажа по идентификатору.
@@ -100,15 +89,16 @@ namespace WebAPI.Controllers
         /// Получает персонажа по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор персонажа.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Персонаж с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCharacter(int id)
+        public async Task<IActionResult> GetCharacter(int id, CancellationToken cancellationToken)
         {
-            var character = await _characterService.GetCharacter(id);
+            var character = await _characterService.GetCharacter(id, cancellationToken);
 
             if (character == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Персонаж", 1));
             }
 
             return Ok(character);
@@ -118,15 +108,16 @@ namespace WebAPI.Controllers
         /// Получает всех персонажей книги.
         /// </summary>
         /// <param name="idBook">Идентификатор книги.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список персонажей для указанной книги.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllCharacters([FromBody] int idBook)
+        public async Task<IActionResult> GetAllCharacters([FromBody] int idBook, CancellationToken cancellationToken)
         {
-            var characters = await _characterService.GetAllCharacters(idBook);
+            var characters = await _characterService.GetAllCharacters(idBook, cancellationToken);
 
             if (characters == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Персонажи", 3));
             }
 
             return Ok(characters);
@@ -145,7 +136,7 @@ namespace WebAPI.Controllers
 
             if (questions == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Вопросы", 3));
             }
 
             return Ok(questions);
@@ -164,7 +155,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
 
             var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
@@ -176,15 +167,16 @@ namespace WebAPI.Controllers
         /// Изменяет существующий добавленный атрибут.
         /// </summary>
         /// <param name="ida">Идентификатор добавленного атрибута для обновления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <param name="content">Обновленное содержимое атрибута.</param>
         /// <returns>Результат обновления добавленного атрибута.</returns>
         [HttpPut("{idc}/addedattribute/{ida}")]
-        public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content)
+        public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content, CancellationToken cancellationToken)
         {
-            var existingAddedAttribute = await _addedAttributeService.GetAddedAttribute(ida);
+            var existingAddedAttribute = await _addedAttributeService.GetAddedAttribute(ida,cancellationToken);
             if (existingAddedAttribute == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Атрибут", 1));
             }
 
             existingAddedAttribute.ContentAttribute = content;
@@ -204,22 +196,23 @@ namespace WebAPI.Controllers
         {
             await _addedAttributeService.DeleteAddedAttribute(idc, ida);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
         /// Получает добавленный атрибут по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор добавленного атрибута.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Добавленный атрибут с указанным идентификатором.</returns>
         [HttpGet("addedattribute/{id}")]
-        public async Task<IActionResult> GetAddedAttribute(int id)
+        public async Task<IActionResult> GetAddedAttribute(int id, CancellationToken cancellationToken)
         {
-            var addedAttribute = await _addedAttributeService.GetAddedAttribute(id);
+            var addedAttribute = await _addedAttributeService.GetAddedAttribute(id,cancellationToken);
 
             if (addedAttribute == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Атрибут", 1));
             }
 
             return Ok(addedAttribute);

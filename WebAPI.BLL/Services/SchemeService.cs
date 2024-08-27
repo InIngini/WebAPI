@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -46,11 +47,11 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(scheme, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.Schemes.Add(scheme);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return scheme;
         }
@@ -64,10 +65,10 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Scheme> UpdateScheme(Scheme scheme, int idConnection)
         {
-            var connection = _context.Connections.Find(idConnection);
+            var connection = await _context.Connections.FindAsync(idConnection);
             if (connection == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
             }
 
             // Добавление соединения в схему
@@ -77,7 +78,7 @@ namespace WebAPI.BLL.Services
                 SchemeId = scheme.Id
             };
             _context.BelongToSchemes.Add(belongToScheme);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return scheme;
         }
@@ -90,21 +91,21 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> DeleteScheme(int id)
         {
-            var scheme = _context.Schemes.Find(id);
+            var scheme = await _context.Schemes.FindAsync(id);
 
             if (scheme == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Схема", 0));
             }
-            var belongToSchemes = _context.BelongToSchemes.Where(b=>b.SchemeId==id).ToList();
+            var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.SchemeId==id).ToListAsync();
             foreach(var belongToScheme in belongToSchemes)
             {
                 _context.BelongToSchemes.Remove(belongToScheme);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             _context.Schemes.Remove(scheme);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return scheme;
         }
@@ -113,15 +114,16 @@ namespace WebAPI.BLL.Services
         /// Получает схему по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор схемы.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Запрашиваемая схема.</returns>
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
-        public async Task<Scheme> GetScheme(int id)
+        public async Task<Scheme> GetScheme(int id, CancellationToken cancellationToken)
         {
-            var scheme = _context.Schemes.Find(id);
+            var scheme = await _context.Schemes.FindAsync(id, cancellationToken);
 
             if (scheme == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Схема", 0));
             }
 
             return scheme;
@@ -131,10 +133,11 @@ namespace WebAPI.BLL.Services
         /// Получает все схемы для указанной книги.
         /// </summary>
         /// <param name="idBook">Идентификатор книги.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех схем книги.</returns>
-        public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook)
+        public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook, CancellationToken cancellationToken)
         {
-            var schemes = _context.Schemes.Where(s => s.BookId == idBook).ToList();
+            var schemes = await _context.Schemes.Where(s => s.BookId == idBook).ToListAsync(cancellationToken);
 
             return schemes;
         }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -36,7 +37,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
            
             var createdGallery = await _galleryService.CreateGallery(galleryData);
@@ -56,7 +57,7 @@ namespace WebAPI.Controllers
 
             if (gallery == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return Ok();
@@ -66,15 +67,16 @@ namespace WebAPI.Controllers
         /// Получает галерею (формально одно изображение) по её идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор галереи.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Галерея с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGallery(int id)
+        public async Task<IActionResult> GetGallery(int id, CancellationToken cancellationToken)
         {
-            var gallery = await _galleryService.GetGallery(id);
+            var gallery = await _galleryService.GetGallery(id, cancellationToken);
 
             if (gallery == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return Ok(gallery);
@@ -84,15 +86,16 @@ namespace WebAPI.Controllers
         /// Получает все галереи (формально все изображения) по заданному идентификатору персонажа.
         /// </summary>
         /// <param name="id">Идентификатор персонажа, по которому ищутся все галереи.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех галерей для указанного идентификатора персонажа.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllGallery([FromBody] int id)
+        public async Task<IActionResult> GetAllGallery([FromBody] int id, CancellationToken cancellationToken)
         {
-            var galleries = await _galleryService.GetAllGalleries(id);
+            var galleries = await _galleryService.GetAllGalleries(id, cancellationToken);
 
             if (galleries == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return Ok(galleries);

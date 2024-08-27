@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -47,11 +48,11 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(timeline, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.Timelines.Add(timeline);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return timeline;
         }
@@ -65,10 +66,10 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent)
         {
-            var @event = _context.Events.Find(idEvent);
+            var @event = await _context.Events.FindAsync(idEvent);
             if (@event == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
             }
 
             // Добавление события в таймлайн
@@ -78,7 +79,7 @@ namespace WebAPI.BLL.Services
                 TimelineId = timeline.Id
             };
             _context.BelongToTimelines.Add(belongToTimeline);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return timeline;
         }
@@ -91,21 +92,21 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> DeleteTimeline(int id)
         {
-            var timeline = _context.Timelines.Find(id);
+            var timeline = await _context.Timelines.FindAsync(id);
             if (timeline == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
             }
 
-            var belongToTimelines = _context.BelongToTimelines.Where(b => b.TimelineId == id).ToList();
+            var belongToTimelines = await _context.BelongToTimelines.Where(b => b.TimelineId == id).ToListAsync();
             foreach (var belongToTimeline in belongToTimelines)
             {
                 _context.BelongToTimelines.Remove(belongToTimeline);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             _context.Timelines.Remove(timeline);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return timeline;
         }
@@ -114,15 +115,16 @@ namespace WebAPI.BLL.Services
         /// Получает таймлайн по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор таймлайна.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Запрашиваемый таймлайн.</returns>
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
-        public async Task<Timeline> GetTimeline(int id)
+        public async Task<Timeline> GetTimeline(int id, CancellationToken cancellationToken)
         {
-            var timeline = _context.Timelines.Find(id);
+            var timeline = await _context.Timelines.FindAsync(id, cancellationToken);
 
             if (timeline == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
             }
 
             return timeline;
@@ -132,11 +134,12 @@ namespace WebAPI.BLL.Services
         /// Получает все таймлайны для указанной книги.
         /// </summary>
         /// <param name="idBook">Идентификатор книги.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех таймлайнов книги.</returns>
-        public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook)
+        public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook, CancellationToken cancellationToken)
         {
-            var timelines = _context.Timelines.Where(t => t.BookId == idBook)
-                                                 .ToList();
+            var timelines = await _context.Timelines.Where(t => t.BookId == idBook)
+                                                 .ToListAsync(cancellationToken);
 
             return timelines;
         }

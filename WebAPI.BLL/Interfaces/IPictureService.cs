@@ -11,7 +11,7 @@ namespace WebAPI.BLL.Interfaces
     {
         Task<Picture> CreatePicture(Picture picture);
         Task<Picture> DeletePicture(int id);
-        Task<Picture> GetPicture(int id);
+        Task<Picture> GetPicture(int id, CancellationToken cancellationToken);
     }
 
 }

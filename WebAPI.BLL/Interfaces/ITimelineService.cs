@@ -13,8 +13,8 @@ namespace WebAPI.BLL.Interfaces
         Task<Timeline> CreateTimeline(TimelineData timeline);
         Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent);
         Task<Timeline> DeleteTimeline(int id);
-        Task<Timeline> GetTimeline(int id);
-        Task<IEnumerable<Timeline>> GetAllTimelines(int idBook);
+        Task<Timeline> GetTimeline(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<Timeline>> GetAllTimelines(int idBook, CancellationToken cancellationToken);
     }
 
 }

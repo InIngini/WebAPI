@@ -48,11 +48,12 @@ namespace WebAPI.Controllers
         /// Авторизирует пользователя.
         /// </summary>
         /// <param name="loginData">Данные для авторизации пользователя.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Токен пользователя, полученный в результате авторизации.</returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginData loginData)
+        public async Task<IActionResult> Login([FromBody] LoginData loginData,CancellationToken cancellationToken)
         {
-            var userToken = await _userService.Login(loginData);
+            var userToken = await _userService.Login(loginData,cancellationToken);
 
             //var token = user.Token;
 
@@ -63,11 +64,12 @@ namespace WebAPI.Controllers
         /// Получает информацию о пользователе по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор пользователя.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Информация о пользователе с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
+        public async Task<IActionResult> GetUser(int id,CancellationToken cancellationToken)
         {
-            var user = await _userService.GetUser(id);
+            var user = await _userService.GetUser(id,cancellationToken);
 
             return Ok(user);
         }

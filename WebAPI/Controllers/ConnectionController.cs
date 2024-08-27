@@ -7,6 +7,7 @@ using WebAPI.BLL.DTO;
 using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -39,17 +40,11 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
             var createdConnection = await _connectionService.CreateConnection(connectionData);
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-            string json = JsonSerializer.Serialize(createdConnection, options);
             
-            return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.Id }, json);
+            return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.Id }, createdConnection);
         }
 
         /// <summary>
@@ -64,25 +59,26 @@ namespace WebAPI.Controllers
 
             if (connection == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Связь", 0));
             }
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
         /// Получает связь по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор связи.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Связь с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetConnection(int id)
+        public async Task<IActionResult> GetConnection(int id, CancellationToken cancellationToken)
         {
-            var connection = await _connectionService.GetConnection(id);
+            var connection = await _connectionService.GetConnection(id, cancellationToken);
 
             if (connection == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Связь", 0));
             }
 
             return Ok(connection);
@@ -92,15 +88,16 @@ namespace WebAPI.Controllers
         /// Получает все связи схемы по идентификатору схемы.
         /// </summary>
         /// <param name="id">Идентификатор схемы.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех связей для указанной схемы.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllConnection([FromBody] int id)
+        public async Task<IActionResult> GetAllConnection([FromBody] int id, CancellationToken cancellationToken)
         {
-            var connections = await _connectionService.GetAllConnections(id);
+            var connections = await _connectionService.GetAllConnections(id, cancellationToken);
 
             if (connections == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Связи", 3));
             }
             
             return Ok(connections);

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -45,11 +46,11 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(picture, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.Pictures.Add(picture);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return picture;
         }
@@ -62,15 +63,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
         public async Task<Picture> DeletePicture(int id)
         {
-            var picture = _context.Pictures.Find(id);
+            var picture = await _context.Pictures.FindAsync(id);
 
             if (picture == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             _context.Pictures.Remove(picture);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return picture;
         }
@@ -79,15 +80,16 @@ namespace WebAPI.BLL.Services
         /// Получает изображение по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор изображения.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Запрашиваемое изображение.</returns>
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
-        public async Task<Picture> GetPicture(int id)
+        public async Task<Picture> GetPicture(int id, CancellationToken cancellationToken)
         {
-            var picture = _context.Pictures.Find(id);
+            var picture = await _context.Pictures.FindAsync(id, cancellationToken);
 
             if (picture == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return picture;

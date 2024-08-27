@@ -10,6 +10,7 @@ using WebAPI.DB;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using WebAPI.Errors;
 
 
 namespace WebAPI.BLL.Services
@@ -51,11 +52,11 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(addedAttribute, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.AddedAttributes.Add(addedAttribute);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return addedAttribute;
         }
@@ -68,7 +69,7 @@ namespace WebAPI.BLL.Services
         public async Task<AddedAttribute> UpdateAddedAttribute(AddedAttribute addedAttribute)
         {
             _context.AddedAttributes.Update(addedAttribute);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return addedAttribute;
         }
@@ -82,15 +83,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida)
         {
-            var addedAttribute = _context.AddedAttributes.Where(a=> a.Id==ida && a.CharacterId==idc).SingleOrDefault();
+            var addedAttribute = await _context.AddedAttributes.Where(a=> a.Id==ida && a.CharacterId==idc).FirstOrDefaultAsync();
 
             if (addedAttribute == null)
             {
-                throw new KeyNotFoundException("Атрибут не найден");
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Атрибут", 1));
             }
 
             _context.AddedAttributes.Remove(addedAttribute);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return addedAttribute;
 
@@ -99,15 +100,16 @@ namespace WebAPI.BLL.Services
         /// Получает добавленный атрибут по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор добавленного атрибута.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Добавленный атрибут с указанным идентификатором.</returns>
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
-        public async Task<AddedAttribute> GetAddedAttribute(int id)
+        public async Task<AddedAttribute> GetAddedAttribute(int id, CancellationToken cancellationToken)
         {
-            var addedAttribute = _context.AddedAttributes.Find(id);
+            var addedAttribute = await _context.AddedAttributes.FindAsync(id, cancellationToken);
 
             if (addedAttribute == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Атрибут", 1));
             }
             
             return addedAttribute;
@@ -117,10 +119,11 @@ namespace WebAPI.BLL.Services
         /// Получает все добавленные атрибуты для указанного персонажа.
         /// </summary>
         /// <param name="idCharacter">Идентификатор персонажа.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список добавленных атрибутов для указанного персонажа.</returns>
-        public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter)
+        public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter, CancellationToken cancellationToken)
         {
-            var addedAttributes = _context.AddedAttributes.Where(aa => aa.CharacterId == idCharacter).ToList();
+            var addedAttributes = await _context.AddedAttributes.Where(aa => aa.CharacterId == idCharacter).ToListAsync(cancellationToken);
 
             return addedAttributes;
         }

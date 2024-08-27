@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using WebAPI.DB.Guide;
 using AutoMapper;
+using WebAPI.Errors;
 
 namespace WebAPI.BLL.Services
 {
@@ -46,13 +47,13 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(character, validationContext, validationResults, true))
             {
-                throw new ArgumentException("Модель не валидна");
+                throw new ArgumentException(TypesOfErrors.NoValidModel());
             }
 
             _context.Characters.Add(character);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            var questions = _context.Questions.ToList();
+            var questions = await _context.Questions.ToListAsync();
             foreach (var question in questions)
             {
                 Answer answer = new Answer()
@@ -63,7 +64,7 @@ namespace WebAPI.BLL.Services
                 };
                 _context.Answers.Add(answer);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return character;
         }
@@ -78,7 +79,7 @@ namespace WebAPI.BLL.Services
         public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
-            var character = _context.Characters.Find(id);
+            var character = await _context.Characters.FindAsync(id);
             if (characterWithAnswers.PictureId!=null)
             {
                 character.PictureId = characterWithAnswers.PictureId;
@@ -91,20 +92,20 @@ namespace WebAPI.BLL.Services
             _context.Characters.Update(character);
 
             // Обновление блоков
-            for (int i=1;i<characterWithAnswers.Answers.Length;i++) 
+            for (int i=1;i<=characterWithAnswers.Answers.Length;i++) 
             {
                 if (characterWithAnswers.Answers[i-1] != "")
                 {
-                    var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefault();
+                    var answer = await _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefaultAsync();
                     if (answer == null)
                     {
-                        throw new KeyNotFoundException();
+                        throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Персонаж", 1));
                     }
                     answer.AnswerText = characterWithAnswers.Answers[i - 1];
                     _context.Answers.Update(answer);
                 }
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return character;
         }
@@ -117,20 +118,20 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<Character> DeleteCharacter(int id)
         {
-            var character = _context.Characters.Find(id);
+            var character = await _context.Characters.FindAsync(id);
 
             if (character == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Персонаж", 1));
             }
 
             // Удаление всех блоков персонажа
-            foreach (var question in _context.Questions.ToList())
+            foreach (var question in await _context.Questions.ToListAsync())
             {
-                var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefault();
+                var answer = await _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefaultAsync();
                 if (answer == null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Ответ", 1));
                 }
                 // Удаление блока
                 _context.Answers.Remove(answer);
@@ -138,18 +139,18 @@ namespace WebAPI.BLL.Services
             
  
             // Удаление всех добавленных атрибутов блока
-            var addedAttributes = _context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToList();
+            var addedAttributes = await _context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToListAsync();
             foreach (var addedAttribute in addedAttributes)
             {
                 _context.AddedAttributes.Remove(addedAttribute);
             }
 
             // Удаление всех записей в галерее
-            var galleryItems = _context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToList();
+            var galleryItems = await _context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToListAsync();
             foreach (var galleryItem in galleryItems)
             {
                 // Удаление всех изображений
-                var image = _context.Pictures.Find((int)galleryItem.PictureId);
+                var image = await _context.Pictures.FindAsync((int)galleryItem.PictureId);
                 _context.Pictures.Remove(image);
                 _context.BelongToGalleries.Remove(galleryItem);
             }
@@ -158,26 +159,26 @@ namespace WebAPI.BLL.Services
             if (character.PictureId != null)
             {
                 int idP = (int)character.PictureId;
-                var imageavatar = _context.Pictures.Find(idP);
+                var imageavatar = await _context.Pictures.FindAsync(idP);
                 _context.Pictures.Remove(imageavatar);
             }
             
             // Удаление связи
-            var connections = _context.Connections.Where(c=> c.Character1Id==character.Id||c.Character2Id==character.Id).ToList();
+            var connections = await _context.Connections.Where(c=> c.Character1Id==character.Id||c.Character2Id==character.Id).ToListAsync();
             foreach (var connection in connections)
             {
-                var belongToSchemes = _context.BelongToSchemes.Where(b=>b.ConnectionId==connection.Id).ToList();
+                var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.ConnectionId==connection.Id).ToListAsync();
                 foreach(var belongToScheme in belongToSchemes)
                 {
                     _context.BelongToSchemes.Remove(belongToScheme);
                 }
                 _context.Connections.Remove(connection);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Удаление персонажа
             _context.Characters.Remove(character);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return character;
         }
@@ -186,23 +187,24 @@ namespace WebAPI.BLL.Services
         /// Получает персонажа по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор персонажа.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Персонаж с заданным идентификатором.</returns>
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
-        public async Task<CharacterWithAnswers> GetCharacter(int id)
+        public async Task<CharacterWithAnswers> GetCharacter(int id, CancellationToken cancellationToken)
         {
-            var character = _context.Characters.Find(id);
+            var character = await _context.Characters.FindAsync(id);
             if (character == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Персонаж", 1));
             }
-
-            string[] answers = new string[_context.Questions.ToList().Count()-1];
-            foreach (var question in _context.Questions.ToList())
+            var questions = await _context.Questions.ToListAsync(cancellationToken);
+            string[] answers = new string[questions.Count()];
+            foreach (var question in questions)
             {
-                var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefault();
+                var answer = await _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefaultAsync(cancellationToken);
                 if (answer == null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Ответ", 1));
                 }
                 answers[question.Id - 1] = answer.AnswerText;
             }
@@ -217,10 +219,11 @@ namespace WebAPI.BLL.Services
         /// Получает всех персонажей для указанной книги.
         /// </summary>
         /// <param name="idBook">Идентификатор книги.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список персонажей с данными.</returns>
-        public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook)
+        public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook, CancellationToken cancellationToken)
         {
-            var characters = _context.Characters.Where(c => c.BookId == idBook).ToList();
+            var characters = await _context.Characters.Where(c => c.BookId == idBook).ToListAsync(cancellationToken);
             var charactersAllData = new List<CharacterAllData>();
             
             foreach (var character in characters)
@@ -240,7 +243,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех вопросов.</returns>
         public async Task<IEnumerable<QuestionData>> GetQuestions()
         {
-            var questions = _context.Questions.ToList();
+            var questions = await _context.Questions.ToListAsync();
             var questionsData = new List<QuestionData>();
 
             foreach (var question in questions)

@@ -4,6 +4,8 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading;
+using WebAPI.Errors;
 
 namespace WebAPI.Controllers
 {
@@ -36,7 +38,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
             }
 
             var createdPicture = await _pictureService.CreatePicture(picture);
@@ -48,15 +50,16 @@ namespace WebAPI.Controllers
         /// Удаляет изображение по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор изображения для удаления.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат удаления изображения.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePicture(int id)
+        public async Task<IActionResult> DeletePicture(int id, CancellationToken cancellationToken)
         {
-            var picture = await _pictureService.GetPicture(id);
+            var picture = await _pictureService.GetPicture(id, cancellationToken);
 
             if (picture == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             await _pictureService.DeletePicture(id);
@@ -68,15 +71,16 @@ namespace WebAPI.Controllers
         /// Получает изображение по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор изображения.</param>
+        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Изображение с указанным идентификатором.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPicture(int id)
+        public async Task<IActionResult> GetPicture(int id, CancellationToken cancellationToken)
         {
-            var picture = await _pictureService.GetPicture(id);
+            var picture = await _pictureService.GetPicture(id, cancellationToken);
 
             if (picture == null)
             {
-                return NotFound();
+                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
             }
 
             return Ok(picture);
