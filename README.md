@@ -4,18 +4,23 @@
 
 Создана в соотвествии с данным руководством на metanit.com: https://metanit.com/sharp/mvc5/23.5.php
 
-![Копия Диаграммки-Архитектура](https://github.com/user-attachments/assets/bad7716a-af0e-4075-a2c2-389c170d9651)
+(За исключением слоя DAL из руководства)
+
+![image](https://github.com/user-attachments/assets/4476f9c9-10cd-4b9e-90c6-6bcee2931fb6)
+
 
 ### БД
 БД создана с использованием Entity, MSSql. 
 
 ER-диаграмма на это дело:
 
-![схема (1)](https://github.com/user-attachments/assets/d313b31a-13d6-4b73-b3e4-7f9215091c33)
+![image](https://github.com/user-attachments/assets/62f8f3ed-e197-46fd-9c25-2e0beffa33e5)
+
 
 Справочники:
 
-![oF2xiQzUoTA](https://github.com/user-attachments/assets/d4803351-b48b-4914-baa4-260c3484505b)
+![image](https://github.com/user-attachments/assets/1e7092f6-7415-481c-86c3-e7be74c10537)
+
 
 ### Бэк
 
@@ -34,6 +39,10 @@ AutoMapper выполнен по этому видео: https://www.youtube.com/
 ### Authorize
 
 Через JWT-токен.
+
+### Ошибки
+
+Нормализованы через мидлвейр. В основном по этой статье: https://metanit.com/sharp/aspnet6/2.16.php?ysclid=m0ck8x0ceu613011550
 
 ### Тесты
 Тесты (в папке Test): файлы с http запросами. Для каждого контроллера свой.
