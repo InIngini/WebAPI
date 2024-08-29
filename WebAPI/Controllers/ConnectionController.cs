@@ -40,7 +40,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
             var createdConnection = await _connectionService.CreateConnection(connectionData);
             
@@ -59,7 +59,7 @@ namespace WebAPI.Controllers
 
             if (connection == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Связь", 0));
+                return NotFound(TypesOfErrors.NotFoundById("Связь", 0));
             }
 
             return Ok();
@@ -75,11 +75,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetConnection(int id, CancellationToken cancellationToken)
         {
             var connection = await _connectionService.GetConnection(id, cancellationToken);
-
-            if (connection == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Связь", 0));
-            }
 
             return Ok(connection);
         }
@@ -97,7 +92,7 @@ namespace WebAPI.Controllers
 
             if (connections == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Связи", 3));
+                return NotFound(TypesOfErrors.NotFoundById("Связи", 3));
             }
             
             return Ok(connections);

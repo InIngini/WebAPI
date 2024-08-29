@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 namespace WebAPI.BLL.Services
 {
@@ -47,7 +48,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(scheme, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             _context.Schemes.Add(scheme);
@@ -60,25 +61,17 @@ namespace WebAPI.BLL.Services
         /// Обновляет схему и добавляет связь.
         /// </summary>
         /// <param name="scheme">Схема, которую необходимо обновить.</param>
-        /// <param name="idConnection">Идентификатор связи.</param>
+        /// <param name="ConnectionId">Идентификатор связи.</param>
         /// <returns>Обновленная схема.</returns>
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
-        public async Task<Scheme> UpdateScheme(Scheme scheme, int idConnection)
+        public async Task<Scheme> UpdateScheme(int SchemeId, int ConnectionId)
         {
-            var connection = await _context.Connections.FindAsync(idConnection);
-            if (connection == null)
+            var scheme = _context.Schemes.Find(SchemeId);
+            if (scheme == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
-
-            // Добавление соединения в схему
-            var belongToScheme = new BelongToScheme()
-            {
-                ConnectionId = idConnection,
-                SchemeId = scheme.Id
-            };
-            _context.BelongToSchemes.Add(belongToScheme);
-            await _context.SaveChangesAsync();
+            Creation.CreateBelongToScheme(ConnectionId, SchemeId,_context);
 
             return scheme;
         }
@@ -95,17 +88,10 @@ namespace WebAPI.BLL.Services
 
             if (scheme == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Схема", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
-            var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.SchemeId==id).ToListAsync();
-            foreach(var belongToScheme in belongToSchemes)
-            {
-                _context.BelongToSchemes.Remove(belongToScheme);
-            }
-            await _context.SaveChangesAsync();
 
-            _context.Schemes.Remove(scheme);
-            await _context.SaveChangesAsync();
+            Deletion.DeleteScheme(id, _context);
 
             return scheme;
         }
@@ -123,7 +109,7 @@ namespace WebAPI.BLL.Services
 
             if (scheme == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Схема", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
 
             return scheme;

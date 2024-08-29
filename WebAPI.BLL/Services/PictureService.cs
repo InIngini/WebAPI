@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 namespace WebAPI.BLL.Services
 {
@@ -46,7 +47,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(picture, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             _context.Pictures.Add(picture);
@@ -67,11 +68,10 @@ namespace WebAPI.BLL.Services
 
             if (picture == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
-            _context.Pictures.Remove(picture);
-            await _context.SaveChangesAsync();
+            Deletion.DeletePicture(id, _context);
 
             return picture;
         }
@@ -89,7 +89,7 @@ namespace WebAPI.BLL.Services
 
             if (picture == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
             return picture;

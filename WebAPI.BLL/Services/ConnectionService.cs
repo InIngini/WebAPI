@@ -12,6 +12,9 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.DB.Guide;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
+using WebAPI.BLL.Errors;
+using System.Net;
 
 namespace WebAPI.BLL.Services
 {
@@ -47,27 +50,20 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(connectionData, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             var connection = _mapper.Map<Connection>(connectionData);
-            connection.TypeConnection = _context.TypeConnections.Where(t => t.Name == connectionData.TypeConnection).FirstOrDefaultAsync().Id;
-
-            var scheme = await _context.Schemes
-                            .Where(s => s.NameScheme == "Главная схема" && s.BookId == connectionData.IdBook)
-                            .FirstOrDefaultAsync();
-
-            _context.Connections.Add(connection);
-            await _context.SaveChangesAsync();
-
-            // Добавление связи в главную схему
-            var belongToScheme = new BelongToScheme()
+            var typeConnection = await _context.TypeConnections
+                    .FirstOrDefaultAsync(t => t.Name == connectionData.TypeConnection);
+            if (typeConnection == null)
             {
-                SchemeId = scheme.Id,
-                ConnectionId = connection.Id
-            };
-            _context.BelongToSchemes.Add(belongToScheme);
-            await _context.SaveChangesAsync();
+                throw new ApiException(TypesOfErrors.SomethingWentWrong("Нет такого типа связи."));
+            }
+
+            connection.TypeConnection = typeConnection.Id;
+
+            await Creation.CreateConnection(connection, (int)connectionData.BookId, _context);
 
             return connection;
         }
@@ -83,7 +79,7 @@ namespace WebAPI.BLL.Services
             var connection = await _context.Connections.FindAsync(id);
             if (connection == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Связь", 0));
             }
             
             var belongToSchemes = await _context.BelongToSchemes.Where(b=>b.ConnectionId == id).ToListAsync();
@@ -114,7 +110,7 @@ namespace WebAPI.BLL.Services
 
             if (connection == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Связь", 0));
             }
             var connectionData = _mapper.Map<ConnectionData>(connection);
             connectionData.Name1 = _context.Characters.Find(connection.Character1Id).Name;
@@ -140,7 +136,7 @@ namespace WebAPI.BLL.Services
                 var connection = await _context.Connections.FindAsync(belongToScheme.ConnectionId, cancellationToken);
                 if (connection==null)
                 {
-                    throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связь", 0));
+                    throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Связь", 0));
                 }
                 connections.Add(connection);
             }

@@ -40,7 +40,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
             
             var createdScheme = await _schemeService.CreateScheme(schemedata);
@@ -59,16 +59,14 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection,CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id, cancellationToken);
+            var scheme = await _schemeService.UpdateScheme(id,idConnection);
 
             if (scheme == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
+                return NotFound(TypesOfErrors.NotFoundById("Схема", 0));
             }
 
-            var updatedScheme = await _schemeService.UpdateScheme(scheme,idConnection);
-
-            return Ok(updatedScheme);
+            return Ok(scheme);
         }
 
         /// <summary>
@@ -80,16 +78,9 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteScheme(int id,CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id, cancellationToken);
-
-            if (scheme == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
-            }
-
             await _schemeService.DeleteScheme(id);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -105,7 +96,7 @@ namespace WebAPI.Controllers
 
             if (scheme == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Схема", 0));
+                return NotFound(TypesOfErrors.NotFoundById("Схема", 0));
             }
 
             return Ok(scheme);
@@ -124,7 +115,7 @@ namespace WebAPI.Controllers
 
             if (schemes == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Схемы", 3));
+                return NotFound(TypesOfErrors.NotFoundById("Схемы", 3));
             }
 
             return Ok(schemes);

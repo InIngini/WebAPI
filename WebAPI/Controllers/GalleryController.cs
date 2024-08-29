@@ -37,7 +37,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
            
             var createdGallery = await _galleryService.CreateGallery(galleryData);
@@ -53,12 +53,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{idPicture}")]
         public async Task<IActionResult> DeletePictureFromGallery(int idPicture)
         {
-            var gallery = await _galleryService.DeletePictureFromGallery(idPicture);
-
-            if (gallery == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
-            }
+            await _galleryService.DeletePictureFromGallery(idPicture);
 
             return Ok();
         }
@@ -76,7 +71,7 @@ namespace WebAPI.Controllers
 
             if (gallery == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
+                return NotFound(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
             return Ok(gallery);
@@ -95,7 +90,7 @@ namespace WebAPI.Controllers
 
             if (galleries == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
+                return NotFound(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
             return Ok(galleries);

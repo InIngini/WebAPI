@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 namespace WebAPI.BLL.Services
 {
@@ -47,41 +48,18 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(eventData, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
             Event @event = _mapper.Map<Event>(eventData);
+            Creation.CreateEvent(@event, (int)eventData.BookId, _context);
 
-            _context.Events.Add(@event);
-            await _context.SaveChangesAsync();
             if (eventData.CharactersId != null)
             {
-                foreach (var idCharacter in eventData.CharactersId)
+                foreach (var CharacterId in eventData.CharactersId)
                 {
-                    var character = await _context.Characters.FindAsync(idCharacter);
-                    if (character != null)
-                    {
-                        var belongToEvent=new BelongToEvent()
-                        { 
-                            EventId=@event.Id,
-                            CharacterId=character.Id
-                        };
-                        _context.BelongToEvents.Add(belongToEvent);
-                    }
+                    Creation.CreateBelongToEvent(@event.Id, CharacterId, _context);
                 }
             }
-            await _context.SaveChangesAsync();
-
-            var timeline = await _context.Timelines
-                            .Where(s => s.NameTimeline == "Главный таймлайн" && s.BookId == eventData.BookId)
-                            .FirstOrDefaultAsync();
-            // Добавление связи в главную схему
-            var belongToTimeline = new BelongToTimeline()
-            { 
-                EventId=@event.Id, 
-                TimelineId=timeline.Id
-            };
-            _context.BelongToTimelines.Add(belongToTimeline);
-            await _context.SaveChangesAsync();
 
             return @event;
         }
@@ -95,6 +73,10 @@ namespace WebAPI.BLL.Services
         public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
             Event @event = await _context.Events.FindAsync(id);
+            if (@event == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
+            }
             // Обновление события
             @event.Name = eventData.Name;
             @event.Content = eventData.Content;
@@ -108,30 +90,13 @@ namespace WebAPI.BLL.Services
                 {
                     if(!eventData.CharactersId.Contains(character.CharacterId))
                     {
-                        var belongToEvent = await _context.BelongToEvents.Where(b=>b.CharacterId==character.CharacterId&&b.EventId==id).FirstOrDefaultAsync();
-                        if (belongToEvent == null)
-                        {
-                            throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Событие", 0));
-                        }
-                        _context.BelongToEvents.Remove(belongToEvent);
+                        Deletion.DeleteBelongToEvent(id, character.CharacterId,_context);
                     }    
-                    
                 }
                 // Добавление новых. То есть после этого уже будет [2,3]
-                foreach (var idCharacter in eventData.CharactersId)
+                foreach (var CharacterId in eventData.CharactersId)
                 {
-                    var character = await _context.Characters.FindAsync(idCharacter);
-                    var belongToEvents = await _context.BelongToEvents.Where(b => b.CharacterId == character.Id && b.EventId == id).ToListAsync();
-                    //если такой персонаж существует и в белонгтуивант нет записи с этим персонажем и ивентом
-                    if (character != null && belongToEvents.Count()==0)
-                    {
-                        var belong = new BelongToEvent()
-                        {
-                            EventId = id,
-                            CharacterId=character.Id,
-                        };
-                        _context.BelongToEvents.Add(belong);
-                    }
+                    Creation.CreateBelongToEvent(id, CharacterId, _context);
                 }
             }
 
@@ -153,20 +118,10 @@ namespace WebAPI.BLL.Services
 
             if (@event == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Событие", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
             }
 
-            // Получение всех таймлайнов, связанных с событием
-            var belongToTimelines = await _context.BelongToTimelines.Where(t=>t.EventId == id).ToListAsync();
-
-            // Удаление IdConnection удаляемой связи из схем
-            foreach (var belongToTimeline in belongToTimelines)
-            {
-                _context.BelongToTimelines.Remove(belongToTimeline);
-            }
-
-            _context.Events.Remove(@event);
-            await _context.SaveChangesAsync();
+            Deletion.DeleteEvent(id, _context);
 
             return @event;
         }
@@ -184,7 +139,7 @@ namespace WebAPI.BLL.Services
 
             if (@event == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Событие", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
             }
             var eventdata = _mapper.Map<EventData>(@event);
 
@@ -212,7 +167,7 @@ namespace WebAPI.BLL.Services
                 var @event = await _context.Events.FindAsync(belongToTimeline.EventId, cancellationToken);
                 if (@event == null)
                 {
-                    throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Событие", 0));
+                    throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
                 }
                 events.Add(@event);
             }

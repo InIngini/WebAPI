@@ -38,7 +38,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
             var createdPicture = await _pictureService.CreatePicture(picture);
@@ -55,16 +55,9 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id, CancellationToken cancellationToken)
         {
-            var picture = await _pictureService.GetPicture(id, cancellationToken);
-
-            if (picture == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
-            }
-
             await _pictureService.DeletePicture(id);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -80,7 +73,7 @@ namespace WebAPI.Controllers
 
             if (picture == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Изображение", 2));
+                return NotFound(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
             return Ok(picture);

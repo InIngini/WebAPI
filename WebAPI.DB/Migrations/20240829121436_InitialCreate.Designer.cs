@@ -12,7 +12,7 @@ using WebAPI.DB;
 namespace WebAPI.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240826094858_InitialCreate")]
+    [Migration("20240829121436_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -584,6 +584,7 @@ namespace WebAPI.DB.Migrations
                     b.HasOne("WebAPI.DB.Entities.Character", "Character2")
                         .WithMany()
                         .HasForeignKey("Character2Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Character1");

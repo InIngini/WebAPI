@@ -36,8 +36,7 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             // Создаём сопоставление между сущностями Event и EventAllData
-            profile.CreateMap<Event, EventAllData>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
+            profile.CreateMap<Event, EventAllData>(); // Игнорируем IdEvent, если он генерируется в базе данных
         }
     }
 }

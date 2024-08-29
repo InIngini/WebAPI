@@ -47,7 +47,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var error = TypesOfErrors.NoValidModel(ModelState);
+                var error = TypesOfErrors.NotValidModel(ModelState);
                 return BadRequest(error);
             }
             var createdBook = await _bookService.CreateBook(bookdata);
@@ -64,17 +64,12 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book,CancellationToken cancellationToken)
         {
-            var existingBook = await _bookService.GetBook(id,cancellationToken);
+            var existingBook = await _bookService.UpdateBook(id,book);
 
             if (existingBook == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Книга",0));
+                return NotFound(TypesOfErrors.NotFoundById("Книга",0));
             }
-
-            // Обновление книги
-            existingBook.NameBook = book.NameBook;
-            existingBook.PictureId = book.PictureId;
-            await _bookService.UpdateBook(existingBook);
 
             return Ok(existingBook);
         }
@@ -88,15 +83,10 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id, CancellationToken cancellationToken)
         {
-            var book = await _bookService.GetBook(id, cancellationToken);
-            if (book == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Книга", 0));
-            }
 
             await _bookService.DeleteBook(id);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -112,7 +102,7 @@ namespace WebAPI.Controllers
 
             if (book == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Книга", 0));
+                return NotFound(TypesOfErrors.NotFoundById("Книга", 0));
             }
 
             return Ok(book);

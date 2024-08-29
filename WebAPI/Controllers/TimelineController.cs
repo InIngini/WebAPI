@@ -40,7 +40,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
             var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
@@ -57,34 +57,27 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent,CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.GetTimeline(id, cancellationToken);
+            var timeline = await _timelineService.UpdateTimeline(id, idEvent);
+            
             if (timeline == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
 
-            var updatedTimeline = await _timelineService.UpdateTimeline(timeline, idEvent);
-            
-            return Ok(updatedTimeline);
+            return Ok(timeline);
         }
 
         /// <summary>
         /// Удаляет таймлайн по его идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор таймлайна для удаления.</param>
-        /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат удаления таймлайна.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTimeline(int id,CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteTimeline(int id)
         {
-            var timeline = await _timelineService.GetTimeline(id, cancellationToken);
-            if (timeline == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
-            }
-
             await _timelineService.DeleteTimeline(id);
-            return NoContent();
+
+            return Ok();
         }
         /// <summary>
         /// Получает таймлайн по его идентификатору.
@@ -98,7 +91,7 @@ namespace WebAPI.Controllers
             var timeline = await _timelineService.GetTimeline(id,cancellationToken);
             if (timeline == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Таймлайн", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
 
             return Ok(timeline);
@@ -117,7 +110,7 @@ namespace WebAPI.Controllers
 
             if (timelines == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Таймлайны", 3));
+                return NotFound(TypesOfErrors.NotFoundById("Таймлайны", 3));
             }
 
             return Ok(timelines);

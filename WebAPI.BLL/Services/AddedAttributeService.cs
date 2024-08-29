@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using System.Threading;
 
 
 namespace WebAPI.BLL.Services
@@ -52,7 +53,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(addedAttribute, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             _context.AddedAttributes.Add(addedAttribute);
@@ -66,8 +67,16 @@ namespace WebAPI.BLL.Services
         /// </summary>
         /// <param name="addedAttribute">Добавленный атрибут для обновления.</param>
         /// <returns>Обновленный добавленный атрибут.</returns>
-        public async Task<AddedAttribute> UpdateAddedAttribute(AddedAttribute addedAttribute)
+        public async Task<AddedAttribute> UpdateAddedAttribute(int AttributeId, string content)
         {
+            var addedAttribute = await _context.AddedAttributes.FindAsync(AttributeId);
+            if (addedAttribute == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Атрибут", 1));
+            }
+
+            addedAttribute.ContentAttribute = content;
+
             _context.AddedAttributes.Update(addedAttribute);
             await _context.SaveChangesAsync();
 
@@ -87,7 +96,7 @@ namespace WebAPI.BLL.Services
 
             if (addedAttribute == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Атрибут", 1));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Атрибут", 1));
             }
 
             _context.AddedAttributes.Remove(addedAttribute);
@@ -109,7 +118,7 @@ namespace WebAPI.BLL.Services
 
             if (addedAttribute == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Атрибут", 1));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Атрибут", 1));
             }
             
             return addedAttribute;

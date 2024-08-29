@@ -17,7 +17,7 @@ namespace WebAPI.BLL.DTO
         /// <summary>
         /// Идентификатор книги (может быть null).
         /// </summary>
-        public int? IdBook { get; set; }
+        public int? BookId { get; set; }
 
         /// <summary>
         /// Идентификатор первого персонажа.
@@ -51,13 +51,15 @@ namespace WebAPI.BLL.DTO
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Connection, ConnectionData>()
-                .ForMember(dest => dest.IdBook, opt => opt.Ignore()) // Игнорируем IdBook
+                .ForMember(dest => dest.BookId, opt => opt.Ignore()) // Игнорируем IdBook
                 .ForMember(dest => dest.Name1, opt => opt.Ignore())  // Игнорируем имя первого персонажа
                 .ForMember(dest => dest.Name2, opt => opt.Ignore())  // Игнорируем имя второго персонажа
                 .ForMember(dest => dest.TypeConnection, opt => opt.Ignore()); // Игнорируем TypeConnection
 
             profile.CreateMap<ConnectionData, Connection>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TypeConnection, opt => opt.Ignore()); // Игнорируем TypeConnection при обратном сопоставлении
+            
         }
     }
 }

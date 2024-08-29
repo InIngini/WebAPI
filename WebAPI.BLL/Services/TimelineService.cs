@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 namespace WebAPI.BLL.Services
 {
@@ -48,7 +49,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(timeline, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             _context.Timelines.Add(timeline);
@@ -60,26 +61,19 @@ namespace WebAPI.BLL.Services
         /// <summary>
         /// Обновляет таймлайн, добавляя событие.
         /// </summary>
-        /// <param name="timeline">Таймлайн, который необходимо обновить.</param>
-        /// <param name="idEvent">Идентификатор события.</param>
+        /// <param name="TimelineId">Идентификатор таймлайна.</param>
+        /// <param name="EventId">Идентификатор события.</param>
         /// <returns>Обновленный таймлайн.</returns>
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
-        public async Task<Timeline> UpdateTimeline(Timeline timeline, int idEvent)
+        public async Task<Timeline> UpdateTimeline(int TimelineId, int EventId)
         {
-            var @event = await _context.Events.FindAsync(idEvent);
-            if (@event == null)
+            var timeline = _context.Timelines.Find(TimelineId);
+            if (timeline == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
 
-            // Добавление события в таймлайн
-            var belongToTimeline = new BelongToTimeline()
-            {
-                EventId = idEvent,
-                TimelineId = timeline.Id
-            };
-            _context.BelongToTimelines.Add(belongToTimeline);
-            await _context.SaveChangesAsync();
+            Creation.CreateBelongToTimeline(EventId, TimelineId,_context);
 
             return timeline;
         }
@@ -95,18 +89,10 @@ namespace WebAPI.BLL.Services
             var timeline = await _context.Timelines.FindAsync(id);
             if (timeline == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 0));
             }
 
-            var belongToTimelines = await _context.BelongToTimelines.Where(b => b.TimelineId == id).ToListAsync();
-            foreach (var belongToTimeline in belongToTimelines)
-            {
-                _context.BelongToTimelines.Remove(belongToTimeline);
-            }
-            await _context.SaveChangesAsync();
-
-            _context.Timelines.Remove(timeline);
-            await _context.SaveChangesAsync();
+            Deletion.DeleteTimeline(id, _context);
 
             return timeline;
         }
@@ -124,7 +110,7 @@ namespace WebAPI.BLL.Services
 
             if (timeline == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Таймлайн", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 0));
             }
 
             return timeline;

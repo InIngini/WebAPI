@@ -40,16 +40,16 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCharacter([FromBody] BookCharacterData bookCharacterData)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
+            }   
+
             Character character = new Character()
             {
                 BookId = bookCharacterData.BookId,
                 PictureId = bookCharacterData.PictureId
             };
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
-            }
             var createdCharacter = await _characterService.CreateCharacter(character);
 
             return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.Id }, createdCharacter);
@@ -68,7 +68,7 @@ namespace WebAPI.Controllers
 
             if (existingCharacter == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Персонаж", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
 
             return Ok(existingCharacter);
@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
 
             if (character == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Персонаж", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
 
             return Ok(character);
@@ -117,7 +117,7 @@ namespace WebAPI.Controllers
 
             if (characters == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Персонажи", 3));
+                return NotFound(TypesOfErrors.NotFoundById("Персонажи", 3));
             }
 
             return Ok(characters);
@@ -136,7 +136,7 @@ namespace WebAPI.Controllers
 
             if (questions == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Вопросы", 3));
+                return NotFound(TypesOfErrors.NotFoundById("Вопросы", 3));
             }
 
             return Ok(questions);
@@ -155,7 +155,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
             var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
@@ -173,14 +173,12 @@ namespace WebAPI.Controllers
         [HttpPut("{idc}/addedattribute/{ida}")]
         public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content, CancellationToken cancellationToken)
         {
-            var existingAddedAttribute = await _addedAttributeService.GetAddedAttribute(ida,cancellationToken);
+            var existingAddedAttribute = await _addedAttributeService.UpdateAddedAttribute(ida,content);
+
             if (existingAddedAttribute == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Атрибут", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Атрибут", 1));
             }
-
-            existingAddedAttribute.ContentAttribute = content;
-            await _addedAttributeService.UpdateAddedAttribute(existingAddedAttribute);
 
             return Ok(existingAddedAttribute);
         }
@@ -212,7 +210,7 @@ namespace WebAPI.Controllers
 
             if (addedAttribute == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Атрибут", 1));
+                return NotFound(TypesOfErrors.NotFoundById("Атрибут", 1));
             }
 
             return Ok(addedAttribute);

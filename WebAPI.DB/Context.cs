@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
 
 
 namespace WebAPI.DB
@@ -23,19 +24,19 @@ namespace WebAPI.DB
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> без параметров.
         /// </summary>
-        public Context()
-        {
-            //Database.EnsureDeleted();
-            Database.EnsureCreated();
-            //Database.Migrate();
-        }
+        //public Context()
+        //{
+        //    //Database.EnsureDeleted();
+        //    Database.EnsureCreated();
+        //    //Database.Migrate();
+        //}
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
         /// </summary>
         /// <param name="options">Параметры для настройки контекста.</param>
         public Context(DbContextOptions<Context> options) : base(options)
         {
-            
+
         }
         /// <summary>
         /// Конфигурирует параметры контекста базы данных.
@@ -60,10 +61,29 @@ namespace WebAPI.DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Connection>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Connection>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd(); // Это обязательно
+
+            modelBuilder.Entity<Connection>()
+                .Property(c => c.TypeConnection)
+                .IsRequired();
+
+            modelBuilder.Entity<Connection>()
+                .Property(c => c.Character1Id)
+                .IsRequired();
+
+            modelBuilder.Entity<Connection>()
+                .Property(c => c.Character2Id)
+                .IsRequired();
+
+            modelBuilder.Entity<Connection>()
                 .HasOne(c => c.Character2)
                 .WithMany()
                 .HasForeignKey(c => c.Character2Id)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<BelongToScheme>()
                 .HasOne(c => c.Scheme)

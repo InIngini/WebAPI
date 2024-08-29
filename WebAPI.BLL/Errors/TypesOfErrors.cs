@@ -12,7 +12,7 @@ namespace WebAPI.Errors
         /// </summary>
         /// <param name="modelState">Модель.</param>
         /// <returns>Тип <see cref="ApiError"/> с сообщением об ошибке.</returns>
-        public static ApiError NoValidModel(ModelStateDictionary modelState)
+        public static ApiError NotValidModel(ModelStateDictionary modelState)
         {
             return new ApiError
             {
@@ -22,10 +22,10 @@ namespace WebAPI.Errors
             };
         }
         /// <summary>
-        /// Для ошибки, когда модель не валидна.
+        /// Для ошибки, когда модель не валидна. (для сервисов)
         /// </summary>
         /// <returns>Сообщение об ошибке.</returns>
-        public static string NoValidModel()
+        public static string NotValidModel()
         {
             return "Модель не валидна.";
         }
@@ -36,7 +36,7 @@ namespace WebAPI.Errors
         /// <param name="objName">Название объекта, который не найден.</param>
         /// <param name="genderOrNumber">Род или число, чтобы склонять сообщение (0 - ж род, 1 - м род, 2 - ср род, 3 - мн число).</param>
         /// <returns>Строка с пояснением ошибки.</returns>
-        public static string NoFoundById(string objName,int genderOrNumber)
+        public static string NotFoundById(string objName,int genderOrNumber)
         {
             switch (genderOrNumber)
             {
@@ -71,7 +71,8 @@ namespace WebAPI.Errors
         /// <summary>
         /// Для ошибки, когда токен не прошел валидацию.
         /// </summary>
-        /// <returns>Строка с пояснением ошибки.</returns>
+        /// <param name="ex">Ошибка.</param>
+        /// <returns>Объект с информацией об ошибке.</returns>
         public static ApiError TokenNotValid(Exception ex)
         {
             //return $"Токен не валиден.";
@@ -83,6 +84,24 @@ namespace WebAPI.Errors
                 {
                     ex.Message, // Сообщение об ошибке
                     ex.StackTrace // Стек вызовов
+                }
+            };
+        }
+
+        /// <summary>
+        /// Для ошибки, когда что-то пошло не так.
+        /// </summary>
+        /// <param name="message">Сообщение об ошибке в качестве детали.</param>
+        /// <returns>Строка с пояснением ошибки.</returns>
+        public static ApiError SomethingWentWrong(string message)
+        {
+            return new ApiError
+            {
+                Message = "Что-то пошло не так...",
+                Code = "InternalServerError",
+                Details = new List<string>
+                {
+                    message
                 }
             };
         }

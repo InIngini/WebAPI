@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 
 namespace WebAPI.BLL.Services
@@ -47,7 +48,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(userbook, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
 
@@ -56,32 +57,13 @@ namespace WebAPI.BLL.Services
             await _context.SaveChangesAsync();
 
             // Создание сущности BelongTo
-            BelongToBook belongToBook = new BelongToBook
-            {
-                UserId = userbook.UserId,
-                BookId = book.Id,
-                TypeBelong = 1 // автор
-            };
-            _context.BelongToBooks.Add(belongToBook);
-            await _context.SaveChangesAsync();
+            Creation.CreateBelongToBook(userbook.UserId, book.Id, "Автор", _context);
 
             // Создание главной схемы 
-            Scheme scheme = new Scheme()
-            {
-                NameScheme = "Главная схема",
-                BookId = book.Id,
-            };
-            _context.Schemes.Add(scheme);
-            await _context.SaveChangesAsync();
+            Creation.CreateScheme("Главная схема", book.Id, _context);
 
             // Создание главного таймлайна
-            Timeline timeline = new Timeline()
-            {
-                NameTimeline = "Главный таймлайн",
-                BookId = book.Id,
-            };
-            _context.Timelines.Add(timeline);
-            await _context.SaveChangesAsync();
+            Creation.CreateTimeline("Главный таймлайн", book.Id, _context);
 
             return book;
         }
@@ -91,12 +73,22 @@ namespace WebAPI.BLL.Services
         /// </summary>
         /// <param name="book">Книга для обновления.</param>
         /// <returns>Обновленная книга.</returns>
-        public async Task<Book> UpdateBook(Book book)
+        public async Task<Book> UpdateBook(int BookId, Book book)
         {
-            _context.Books.Update(book);
+            var existingBook = await _context.Books.FindAsync(BookId);
+
+            if (existingBook == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
+            }
+
+            existingBook.NameBook = book.NameBook;
+            existingBook.PictureId = book.PictureId;
+
+            _context.Books.Update(existingBook);
             await _context.SaveChangesAsync();
 
-            return book;
+            return existingBook;
         }
 
         /// <summary>
@@ -110,76 +102,31 @@ namespace WebAPI.BLL.Services
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Книга", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
             }
 
             // Удаление связанных записей из таблицы BelongToBook
-            var belongToBook = await _context.BelongToBooks.Where(b=>b.BookId== book.Id).FirstOrDefaultAsync();
-            if (belongToBook == null)
-            {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Книга", 0));
-            }
-            _context.BelongToBooks.Remove(belongToBook);
-            await _context.SaveChangesAsync();
+            Deletion.DeleteBelongToBook(book.Id, _context);
 
             // Удаление всех схем книги
             var schemes = await _context.Schemes.Where(s => s.BookId == id).ToListAsync();
             foreach (var scheme in schemes)
             {
-                if (scheme.NameScheme == "Главная схема")
-                {
-                    // Удаление всех связей схемы
-                    var belongToSchemes = await _context.BelongToSchemes.Where(b => b.SchemeId == scheme.Id).ToListAsync();
-                    foreach (var belongToScheme in belongToSchemes)
-                    {
-                        _context.BelongToSchemes.Remove(belongToScheme);
-
-                        var connection = await _context.Connections.FindAsync(belongToScheme.ConnectionId);
-                        if (connection == null)
-                        {
-                            throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Связи из главной схемы", 3));
-                        }
-                        _context.Connections.Remove(connection);
-                        
-                    }
-                }
-                // Удаление схемы
-                _context.Schemes.Remove(scheme);
+                Deletion.DeleteScheme(scheme.Id, _context);
             }
-            await _context.SaveChangesAsync();
 
             // Удаление всех таймлайнов книги
             var timelines = await _context.Timelines.Where(s => s.BookId == id).ToListAsync();
             foreach (var timeline in timelines)
             {
-                if (timeline.NameTimeline == "Главый таймлайн")
-                {
-                    // Удаление всех связей схемы
-                    var belongToTimelines = await _context.BelongToTimelines.Where(b => b.TimelineId == timeline.Id).ToListAsync();
-                    foreach (var belongToTimeline in belongToTimelines)
-                    {
-                        _context.BelongToTimelines.Remove(belongToTimeline);
-                        var @event = await _context.Events.FindAsync(belongToTimeline.EventId);
-                        if (@event == null)
-                        {
-                            throw new KeyNotFoundException(TypesOfErrors.NoFoundById("События из главного таймлайна", 3));
-                        }
-                        _context.Events.Remove(@event);
-                    }
-                }
-                // Удаление схемы
-                _context.Timelines.Remove(timeline);
+                Deletion.DeleteTimeline(timeline.Id, _context);
             }
-            await _context.SaveChangesAsync();
 
             // Удаление обложки
             if (book.PictureId != null)
             {
-                int idP = (int)book.PictureId;
-                var image = await _context.Pictures.FindAsync(idP);
-                _context.Pictures.Remove(image);
+                Deletion.DeletePicture((int)book.PictureId, _context);
             }
-            await _context.SaveChangesAsync();
 
             // Удаление всех персонажей книги
             var characters = await _context.Characters.Where(c => c.BookId == id).ToListAsync();
@@ -209,7 +156,7 @@ namespace WebAPI.BLL.Services
 
             if (book == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Книга", 0));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
             }
 
             return book;
@@ -227,7 +174,7 @@ namespace WebAPI.BLL.Services
             var user = await _context.Users.FindAsync(idUser);
             if (user == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Пользователь", 1));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Пользователь", 1));
             }
             //var books = await _context.Books.Where(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToListAsync();
             var books = new List<Book>();

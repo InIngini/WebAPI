@@ -50,7 +50,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(loginData, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             // Используем AutoMapper для маппинга LoginData в User
@@ -104,7 +104,7 @@ namespace WebAPI.BLL.Services
 
             if (user == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Пользователь", 1));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Пользователь", 1));
             }
 
             return user;

@@ -8,6 +8,7 @@ using WebAPI.BLL.Interfaces;
 using WebAPI.DB.Entities;
 using Microsoft.AspNetCore.Authorization;
 using WebAPI.Errors;
+using Microsoft.Extensions.Logging;
 
 namespace WebAPI.Controllers
 {
@@ -40,7 +41,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(TypesOfErrors.NoValidModel(ModelState));
+                return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
             
             var createdEvent = await _eventService.CreateEvent(eventData);
@@ -58,14 +59,12 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData, CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id, cancellationToken);
-
-            if (@event == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
-            }
-
             var updatedEvent = await _eventService.UpdateEvent(eventData, id);
+
+            if (updatedEvent == null)
+            {
+                return NotFound(TypesOfErrors.NotFoundById("Событие", 2));
+            }
 
             return Ok(updatedEvent);
         }
@@ -79,12 +78,6 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id,CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id, cancellationToken);
-
-            if (@event == null)
-            {
-                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
-            }
             await _eventService.DeleteEvent(id);
 
             return Ok();
@@ -103,7 +96,7 @@ namespace WebAPI.Controllers
 
             if (@event == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("Событие", 2));
+                return NotFound(TypesOfErrors.NotFoundById("Событие", 2));
             }
 
             return Ok(@event);
@@ -122,7 +115,7 @@ namespace WebAPI.Controllers
 
             if (events == null)
             {
-                return NotFound(TypesOfErrors.NoFoundById("События", 3));
+                return NotFound(TypesOfErrors.NotFoundById("События", 3));
             }
 
             return Ok(events);

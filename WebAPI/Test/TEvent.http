@@ -5,35 +5,35 @@
 # создание события
 POST {{WebAPI_HostAddress}}/User/Book/Timeline/Event
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ3NzI1MDIsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.oEHs3z1il8_nepy2JrmeBCGGpLTXGgWTZojv_4oOSqs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ5MzczNTUsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.o3ASrC2LA94RJUr8oOoy0J_sLhAQNoVfEz1TzNWsDts
 
 {
     "BookId": "1",
     "Name": "Новое имя",
     "Content": "Какой-то контент",
     "Time": "10.06.2024-20.06.2024",
-    "CharacterId": [1,2]
+    "CharactersId": [1,2]
 }
 ###
 GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/all
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ3NzI1MDIsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.oEHs3z1il8_nepy2JrmeBCGGpLTXGgWTZojv_4oOSqs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ5MzczNTUsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.o3ASrC2LA94RJUr8oOoy0J_sLhAQNoVfEz1TzNWsDts
 
 "1"
 ###
-GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/2
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ3NzI1MDIsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.oEHs3z1il8_nepy2JrmeBCGGpLTXGgWTZojv_4oOSqs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ5MzczNTUsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.o3ASrC2LA94RJUr8oOoy0J_sLhAQNoVfEz1TzNWsDts
 
 ###
 # изменение события
-PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ3NzI1MDIsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.oEHs3z1il8_nepy2JrmeBCGGpLTXGgWTZojv_4oOSqs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3MjQ5MzczNTUsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.o3ASrC2LA94RJUr8oOoy0J_sLhAQNoVfEz1TzNWsDts
 
 {
     "Name": "Новое имя2",
     "Content": "Какой-то",
     "Time": "10.06.2024-20.06.2024",
-    "CharactersId": [2]
+    "CharactersId": [6]
 }

@@ -11,6 +11,7 @@ using WebAPI.DB;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
+using WebAPI.BLL.Additional;
 
 namespace WebAPI.BLL.Services
 {
@@ -47,7 +48,7 @@ namespace WebAPI.BLL.Services
 
             if (!Validator.TryValidateObject(gallery, validationContext, validationResults, true))
             {
-                throw new ArgumentException(TypesOfErrors.NoValidModel());
+                throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
             _context.BelongToGalleries.Add(gallery);
@@ -59,30 +60,24 @@ namespace WebAPI.BLL.Services
         /// <summary>
         /// Удаляет изображение из галереи по идентификатору изображения.
         /// </summary>
-        /// <param name="idPicture">Идентификатор изображения.</param>
+        /// <param name="PictureId">Идентификатор изображения.</param>
         /// <returns>Галерея, из которой было удалено изображение.</returns>
         /// <exception cref="KeyNotFoundException">Если галерея или изображение не найдены.</exception>
-        public async Task<BelongToGallery> DeletePictureFromGallery(int idPicture)
+        public async Task<BelongToGallery> DeletePictureFromGallery(int PictureId)
         {
-            var gallery = await _context.BelongToGalleries.FindAsync(idPicture);
+            var gallery = await _context.BelongToGalleries.FindAsync(PictureId);
             if (gallery == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
-            var picture = await _context.Pictures.FindAsync(idPicture);
+            var picture = await _context.Pictures.FindAsync(PictureId);
             if (picture == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
-            // Удаление записи из галереи
-            _context.BelongToGalleries.Remove(gallery);
-            await _context.SaveChangesAsync();
-
-            // Удаление картинки из галереи
-            _context.Pictures.Remove(picture);
-            await _context.SaveChangesAsync();
+            Deletion.DeletePicture(PictureId, _context);
 
             return gallery;
         }
@@ -100,7 +95,7 @@ namespace WebAPI.BLL.Services
 
             if (gallery == null)
             {
-                throw new KeyNotFoundException(TypesOfErrors.NoFoundById("Изображение", 2));
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
             return gallery;
