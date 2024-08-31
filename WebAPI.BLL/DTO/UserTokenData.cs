@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные о пользователе.
     /// </summary>
-    public class UserTokenData : IMapWith<User>
+    public class UserTokenData
     {
         /// <summary>
         /// Идентификатор пользователя.
@@ -33,16 +33,5 @@ namespace WebAPI.BLL.DTO
         /// Токен аутентификации.
         /// </summary>
         public string Token { get; set; } = null!;
-
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="User"/> и <see cref="UserTokenData"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<User, UserTokenData>()
-             .ForMember(dest => dest.Token, opt => opt.Ignore()); // Игнорируем, если это не нужно в маппинге
-        }
     }
 }

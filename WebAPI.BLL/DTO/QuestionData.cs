@@ -13,7 +13,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные вопроса.
     /// </summary>
-    public class QuestionData : IMapWith<Question>
+    public class QuestionData
     {
         /// <summary>
         /// Идентификатор вопроса.
@@ -30,14 +30,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public string Block { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="Question"/> и <see cref="QuestionData"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<Question, QuestionData>()
-                .ForMember(dest => dest.Block, opt => opt.Ignore()); // Если Id генерируется в базе данных, то можно игнорировать
-        }
     }
 }

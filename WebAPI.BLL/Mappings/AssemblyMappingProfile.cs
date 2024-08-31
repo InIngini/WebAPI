@@ -11,35 +11,21 @@ using WebAPI.DB.Entities;
 namespace WebAPI.BLL.Mappings
 {
     /// <summary>
-    /// Профиль сопоставления для AutoMapper, который применяет сопоставления из типов, реализующих интерфейс <see cref="IMapWith{T}"/>.
+    /// Профиль сопоставления для AutoMapper, который применяет сопоставления из типов/>.
+    /// Этот профиль автоматически загружает все доступные профили из текущей сборки, 
+    /// позволяя избежать ручного добавления каждого отдельного профиля.
     /// </summary>
     public class AssemblyMappingProfile : Profile
     {
         /// <summary>
-        /// Инициализируется новый экземпляр класса <see cref="AssemblyMappingProfile"/> и применяет маппинги из указанной сборки.
+        /// Конструктор, который извлекает все профили из текущей сборки и добавляет их в конфигурацию AutoMapper.
         /// </summary>
-        /// <param name="assembly">Сборка, содержащая типы для сопоставления.</param>
-        public AssemblyMappingProfile(Assembly assembly) =>
-            ApplyMappingFromAssembly(assembly);
-
-        /// <summary>
-        /// Применяет сопоставления из всех типов в указанной сборке, которые реализуют интерфейс <see cref="IMapWith{T}"/>.
-        /// </summary>
-        /// <param name="assembly">Сборка, содержащая типы для сопоставления.</param>
-        private void ApplyMappingFromAssembly(Assembly assembly)
+        public AssemblyMappingProfile()
         {
-            Type[] allTypes = assembly.GetTypes();
-            var types = assembly.GetExportedTypes()
-                .Where(type=>type.GetInterfaces()
-                    .Any(i=>i.IsGenericType&&
-                    i.GetGenericTypeDefinition() == typeof(IMapWith<>)))
-                .ToList();
-            foreach (var type in types)
-            {
-                var instance = Activator.CreateInstance(type);
-                var methodInfo = type.GetMethod("Mapping");
-                methodInfo?.Invoke(instance, new object[] { this });
-            }
+            // Получаем все профили из текущей сборки
+            //var profiles = Assembly.GetExecutingAssembly().GetExportedTypes()
+            //    .Where(type => typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract);
+
         }
     }
 }

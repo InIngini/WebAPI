@@ -7,7 +7,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные для создания персонажа книги.
     /// </summary>
-    public class BookCharacterData : IMapWith<Character>
+    public class BookCharacterData
     {
         /// <summary>
         /// Идентификатор книги.
@@ -19,16 +19,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public int? PictureId { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="BookCharacterData"/> и <see cref="Character/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<BookCharacterData, Character>()
-                .ForMember(dest => dest.BookId, opt => opt.MapFrom(src => src.BookId))
-                .ForMember(dest => dest.PictureId, opt => opt.MapFrom(src => src.PictureId))
-                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорировать, если Id генерируется в базе данных
-        }
     }
 }

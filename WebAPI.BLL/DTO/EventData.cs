@@ -7,7 +7,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные о событии, включая информацию о связанных книгах и персонажах.
     /// </summary>
-    public class EventData : IMapWith<Event>
+    public class EventData
     {
         /// <summary>
         /// Идентификатор книги (может быть null).
@@ -34,18 +34,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public int[]? CharactersId { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="Event"/> и <see cref="EventData"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            // Создаём сопоставление между сущностью Event и классом EventData
-            profile.CreateMap<Event, EventData>();
-
-            // Создаём обратное сопоставление от EventData к Event
-            profile.CreateMap<EventData, Event>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Игнорируем IdEvent, если он генерируется в базе данных
-        }
     }
 }

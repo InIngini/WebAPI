@@ -151,7 +151,7 @@ namespace WebAPI.Controllers
         /// <param name="aa">Данные о добавляемом атрибуте.</param>
         /// <returns>Результат создания добавленного атрибута.</returns>
         [HttpPost("{id}/addedattribute")]
-        public async Task<IActionResult> CreateAddedAttribute(int id, [FromBody] AAData aa)
+        public async Task<IActionResult> CreateAddedAttribute(int id, [FromBody] AddedAttributeData aa)
         {
             if (!ModelState.IsValid)
             {

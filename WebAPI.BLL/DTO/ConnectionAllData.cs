@@ -13,7 +13,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные о связи между персонажами.
     /// </summary>
-    public class ConnectionAllData : IMapWith<Connection>
+    public class ConnectionAllData
     {
         /// <summary>
         /// Идентификатор связи.
@@ -35,14 +35,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public string TypeConnection { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="Connection"/> и <see cref="ConnectionAllData"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<Connection, ConnectionAllData>()
-                .ForMember(dest => dest.TypeConnection, opt => opt.Ignore()); // Игнорируем TypeConnection, если значения генерируются
-        }
     }
 }

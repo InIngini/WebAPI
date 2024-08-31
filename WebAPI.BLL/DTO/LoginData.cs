@@ -7,7 +7,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные для входа пользователя.
     /// </summary>
-    public class LoginData : IMapWith<User>
+    public class LoginData
     {
         /// <summary>
         /// Логин пользователя.
@@ -19,16 +19,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public string Password { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="LoginData"/> и <see cref="User"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<LoginData, User>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Login, opt => opt.MapFrom(src => src.Login))
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password)); // Если IdUser генерируется в базе данных, то можно игнорировать
-        }
     }
 }

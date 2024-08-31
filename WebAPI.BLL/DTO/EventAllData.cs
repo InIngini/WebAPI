@@ -12,7 +12,7 @@ namespace WebAPI.BLL.DTO
     /// <summary>
     /// Данные полного списка событии.
     /// </summary>
-    public class EventAllData : IMapWith<Event>
+    public class EventAllData
     {
         /// <summary>
         /// Идентификатор события.
@@ -29,14 +29,5 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public string Time { get; set; }
 
-        /// <summary>
-        /// Конфигурация сопоставления между <see cref="Event"/> и <see cref="EventAllData"/>.
-        /// </summary>
-        /// <param name="profile">Профиль AutoMapper для создания сопоставлений.</param>
-        public void Mapping(Profile profile)
-        {
-            // Создаём сопоставление между сущностями Event и EventAllData
-            profile.CreateMap<Event, EventAllData>(); // Игнорируем IdEvent, если он генерируется в базе данных
-        }
     }
 }

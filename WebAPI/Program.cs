@@ -33,32 +33,98 @@ namespace WebAPI
 
         public static void Main(string[] args)
         {
-            //using (var context = new Context()) { }
-            
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
 
-            // Регистрация контекста базы данных
-            builder.Services.AddDbContext<Context>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Добавить контроллеры
-            builder.Services.AddControllers();
-   
-
-            // Регистрация ITokenService и ITokenValidator
-            builder.Services.AddTransient<ITokenService, TokenService>();
-            builder.Services.AddScoped<ITokenValidator, TokenValidator>();
-
-            // Вызов метода ConfigureServices
-            ConfigureServices(builder.Services);
-
-            // Добавление авторизации
-            builder.Services.AddAuthorization();
+            // Конфигурация сервисов
+            ConfigureServices(builder.Services, builder.Configuration);
 
             var app = builder.Build();
 
             // Инициализация данных
+            InitializeData(app);
+
+            // Настройка Middleware
+            ConfigureMiddleware(app);
+
+            // Запуск приложения
+            app.Run();
+        }
+
+        /// <summary>
+        /// Конфигурирует сервисы приложения и регистрирует зависимые сервисы.
+        /// </summary>
+        /// <param name="services">Сборка сервисов для добавления зависимостей.</param>
+        /// <param name="configuration">Конфигурация приложения для доступа к настройкам.</param>
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        {
+            // Регистрация контекста базы данных
+            services.AddDbContext<Context>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+            // Добавить контроллеры
+            services.AddControllers();
+
+            // Регистрация ITokenService и ITokenValidator
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddScoped<ITokenValidator, TokenValidator>();
+
+            // Аутентификация
+            services.AddAuthentication()
+                .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuthentication", options => { });
+
+            // AutoMapper
+            ConfigureAutoMapper(services);
+
+            // Регистрация сервисов
+            RegisterApplicationServices(services);
+
+            // Добавление авторизации
+            services.AddAuthorization();
+        }
+
+        /// <summary>
+        /// Конфигурирует AutoMapper и регистрирует профили в контейнере сервисов.
+        /// </summary>
+        /// <param name="services">Сборка сервисов для добавления профилей AutoMapper.</param>
+        public static void ConfigureAutoMapper(IServiceCollection services)
+        {
+            var assembly = Assembly.Load("WebAPI.BLL");
+            var profiles = assembly.GetExportedTypes()
+                .Where(type => typeof(Profile).IsAssignableFrom(type)
+                               && !type.IsAbstract
+                               && type.Namespace == "WebAPI.BLL.Mappings.ProfileForMapping");
+
+            services.AddAutoMapper(cfg => cfg.AddMaps(profiles));
+        }
+
+        /// <summary>
+        /// Регистрирует сервисы приложения в контейнере зависимостей.
+        /// </summary>
+        /// <param name="services">Сборка сервисов для добавления зависимостей.</param>
+        public static void RegisterApplicationServices(IServiceCollection services)
+        {
+            services.AddTransient<IAddedAttributeService, AddedAttributeService>();
+            services.AddTransient<IBookService, BookService>();
+            services.AddTransient<ICharacterService, CharacterService>();
+            services.AddTransient<IConnectionService, ConnectionService>();
+            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IGalleryService, GalleryService>();
+            services.AddTransient<IPictureService, PictureService>();
+            services.AddTransient<ISchemeService, SchemeService>();
+            services.AddTransient<ITimelineService, TimelineService>();
+            services.AddTransient<IUserService, UserService>();
+
+            // Регистрация класса для добавления данных
+            services.AddTransient<AddedData>();
+        }
+
+        /// <summary>
+        /// Инициализирует данные в базе данных при старте приложения, если таких данных еще нет.
+        /// </summary>
+        /// <param name="app">Экземпляр приложения для создания области видимости сервисов.</param>
+        public static void InitializeData(WebApplication app)
+        {
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -75,8 +141,15 @@ namespace WebAPI
                     logger.LogError(ex, "Ошибка при инициализации данных.");
                 }
             }
+        }
 
-            //Миддлвейр для обработки ошибок
+        /// <summary>
+        /// Настраивает промежуточное программное обеспечение (middleware) для обработки запросов и ошибок.
+        /// </summary>
+        /// <param name="app">Экземпляр приложения для настройки middleware.</param>
+        public static void ConfigureMiddleware(WebApplication app)
+        {
+            // Миддлвейр для обработки ошибок
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
@@ -87,46 +160,6 @@ namespace WebAPI
             app.UseAuthorization();
 
             app.MapControllers();
-
-            app.Run();
-        }     
-
-        public static void ConfigureServices(IServiceCollection services)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            services.AddDbContext<Context>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddAuthentication()
-                .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuthentication", options => { });
-
-            //mapper
-            services.AddAutoMapper(config =>
-            {
-                //config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
-                config.AddProfile(new AssemblyMappingProfile(Assembly.Load("WebAPI.BLL")));
-                config.AddProfile(new AssemblyMappingProfile(Assembly.Load("WebAPI.DB")));
-            });
-
-
-            // Регистрация сервисов
-            services.AddTransient<IAddedAttributeService, AddedAttributeService>();
-            services.AddTransient<IBookService, BookService>();
-            services.AddTransient<ICharacterService, CharacterService>();
-            services.AddTransient<IConnectionService, ConnectionService>();
-            services.AddTransient<IEventService, EventService>();
-            services.AddTransient<IGalleryService, GalleryService>();
-            services.AddTransient<IPictureService, PictureService>();
-            services.AddTransient<ISchemeService, SchemeService>();
-            services.AddTransient<ITimelineService, TimelineService>();
-            services.AddTransient<IUserService, UserService>();
-
-            // Регистрация класса для добавления данных
-            services.AddTransient<AddedData>();
         }
     }
 }

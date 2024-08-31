@@ -42,7 +42,7 @@ namespace WebAPI.BLL.Services
         /// <param name="aa">Данные для добавленного атрибута.</param>
         /// <returns>Созданный добавленный атрибут.</returns>
         /// <exception cref="ArgumentException">Если модель не валидна.</exception>
-        public async Task<AddedAttribute> CreateAddedAttribute(int id,AAData aa)
+        public async Task<AddedAttribute> CreateAddedAttribute(int id,AddedAttributeData aa)
         {
             var addedAttribute = _mapper.Map<AddedAttribute>(aa);
             addedAttribute.ContentAttribute = String.Empty;
