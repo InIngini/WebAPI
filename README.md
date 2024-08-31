@@ -32,7 +32,7 @@ ER-диаграмма на это дело:
 
 ### AutoMapper
 
-AutoMapper выполнен по этому видео: https://www.youtube.com/watch?v=Ssh3cBPjd4Y&list=PLEtg-LdqEKXbpq4RtUp1hxZ6ByGjnvQs4&index=5
+AutoMapper выполнен по этой статье: https://dev.to/sardarmudassaralikhan/automapper-in-aspnet-core-7-web-api-jce
 
 И по этой статье: https://metanit.com/sharp/mvc5/23.4.php?ysclid=lz5dui5i7p894485598
 
