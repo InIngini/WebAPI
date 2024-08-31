@@ -66,7 +66,7 @@ namespace WebAPI.BLL.Additional
         public static void DeleteBelongToScheme(BelongToScheme belongToScheme, Context context)
         {
             context.BelongToSchemes.Remove(belongToScheme);
-             context.SaveChanges();
+            context.SaveChanges();
         }
         /// <summary>
         /// Удаляет связь по заданному идентификатору связи и все связанные с ней связи.

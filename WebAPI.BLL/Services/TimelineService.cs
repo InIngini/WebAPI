@@ -52,8 +52,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            _context.Timelines.Add(timeline);
-            await _context.SaveChangesAsync();
+            Creation.CreateTimeline(timeline, _context);
 
             return timeline;
         }

@@ -51,8 +51,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            _context.Schemes.Add(scheme);
-            await _context.SaveChangesAsync();
+            Creation.CreateScheme(scheme,_context);
 
             return scheme;
         }

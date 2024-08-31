@@ -69,7 +69,11 @@ namespace WebAPI.BLL.Services
         public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
-            var character = await _context.Characters.FindAsync(id);
+            var character = _context.Characters.Find(id);
+            if (character == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
+            }
             if (characterWithAnswers.PictureId!=null)
             {
                 character.PictureId = characterWithAnswers.PictureId;
@@ -86,7 +90,7 @@ namespace WebAPI.BLL.Services
             {
                 if (characterWithAnswers.Answers[i-1] != "")
                 {
-                    var answer = await _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefaultAsync();
+                    var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefault();
                     if (answer == null)
                     {
                         throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
@@ -95,7 +99,7 @@ namespace WebAPI.BLL.Services
                     _context.Answers.Update(answer);
                 }
             }
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return character;
         }

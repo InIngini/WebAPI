@@ -25,10 +25,10 @@ namespace WebAPI.BLL.Additional
         /// <param name="BookId">Идентификатор книги, к которой предоставляется доступ.</param>
         /// <param name="TypeBelong">Тип доступа к книге (например, автор, читатель и т.д.).</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void CreateBelongToBook(int UserId,int BookId,string TypeBelong,Context context)
+        public static void CreateBelongToBook(int UserId,int BookId,string TypeBelongName,Context context)
         {
-            var TypeBelongId = context.TypeBelongToBooks.Where(t => t.Name == TypeBelong).FirstOrDefault();
-            if(TypeBelongId == null)
+            var TypeBelong = context.TypeBelongToBooks.Where(t => t.Name == TypeBelongName).FirstOrDefault();
+            if(TypeBelong == null)
             {
                 throw new ApiException(TypesOfErrors.SomethingWentWrong("Неправильный тип доступа к книге"));
             }
@@ -37,7 +37,7 @@ namespace WebAPI.BLL.Additional
             {
                 UserId = UserId,
                 BookId = BookId,
-                TypeBelong = 1 // автор
+                TypeBelong = TypeBelong.Id // автор
             };
             context.BelongToBooks.Add(belongToBook);
             context.SaveChanges();
@@ -48,13 +48,8 @@ namespace WebAPI.BLL.Additional
         /// <param name="Name">Имя схемы, которую необходимо создать.</param>
         /// <param name="BookId">Идентификатор книги, к которой относится схема.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void CreateScheme(string Name, int BookId,Context context)
+        public static void CreateScheme(Scheme scheme,Context context)
         {
-            Scheme scheme = new Scheme()
-            {
-                NameScheme = Name,
-                BookId = BookId,
-            };
             context.Schemes.Add(scheme);
             context.SaveChanges();
         }
@@ -114,13 +109,8 @@ namespace WebAPI.BLL.Additional
         /// <param name="Name">Имя таймлайна, который нужно создать.</param>
         /// <param name="BookId">Идентификатор книги, к которой относится таймлайн.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void CreateTimeline(string Name, int BookId, Context context)
+        public static void CreateTimeline(Timeline timeline, Context context)
         {
-            Timeline timeline = new Timeline()
-            {
-                NameTimeline = Name,
-                BookId = BookId,
-            };
             context.Timelines.Add(timeline);
             context.SaveChanges();
         }

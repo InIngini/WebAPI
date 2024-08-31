@@ -60,10 +60,20 @@ namespace WebAPI.BLL.Services
             Creation.CreateBelongToBook(userbook.UserId, book.Id, "Автор", _context);
 
             // Создание главной схемы 
-            Creation.CreateScheme("Главная схема", book.Id, _context);
+            Scheme scheme = new Scheme()
+            { 
+                NameScheme = "Главная схема",
+                BookId = book.Id,
+            };
+            Creation.CreateScheme(scheme, _context);
 
             // Создание главного таймлайна
-            Creation.CreateTimeline("Главный таймлайн", book.Id, _context);
+            Timeline timeline = new Timeline()
+            { 
+                NameTimeline = "Главный таймлайн",
+                BookId = book.Id 
+            };
+            Creation.CreateTimeline(timeline, _context);
 
             return book;
         }

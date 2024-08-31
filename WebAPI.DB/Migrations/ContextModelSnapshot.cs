@@ -581,7 +581,6 @@ namespace WebAPI.DB.Migrations
                     b.HasOne("WebAPI.DB.Entities.Character", "Character2")
                         .WithMany()
                         .HasForeignKey("Character2Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Character1");

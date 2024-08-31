@@ -22,21 +22,14 @@ namespace WebAPI.DB
     public class Context : DbContext
     {
         /// <summary>
-        /// Инициализирует новый экземпляр <see cref="Context"/> без параметров.
-        /// </summary>
-        //public Context()
-        //{
-        //    //Database.EnsureDeleted();
-        //    Database.EnsureCreated();
-        //    //Database.Migrate();
-        //}
-        /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
         /// </summary>
         /// <param name="options">Параметры для настройки контекста.</param>
         public Context(DbContextOptions<Context> options) : base(options)
         {
-
+            //Database.EnsureDeleted();
+            Database.EnsureCreated();
+            //Database.Migrate();
         }
         /// <summary>
         /// Конфигурирует параметры контекста базы данных.
@@ -44,13 +37,6 @@ namespace WebAPI.DB
         /// <param name="optionsBuilder">Объект, используемый для задания параметров.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-            //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=DB;Trusted_Connection=True;");
-            //optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\VOROB\SOURCE\REPOS\WEBAPI\WEBAPI.DB\BIN\DEBUG\NET8.0\DB\DB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             optionsBuilder.LogTo(System.Console.WriteLine);
         }
 
@@ -60,37 +46,18 @@ namespace WebAPI.DB
         /// <param name="modelBuilder">Объект, используемый для настройки модели.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Connection>()
-                .HasKey(c => c.Id);
-
-            modelBuilder.Entity<Connection>()
-                .Property(c => c.Id)
-                .ValueGeneratedOnAdd(); // Это обязательно
-
-            modelBuilder.Entity<Connection>()
-                .Property(c => c.TypeConnection)
-                .IsRequired();
-
-            modelBuilder.Entity<Connection>()
-                .Property(c => c.Character1Id)
-                .IsRequired();
-
-            modelBuilder.Entity<Connection>()
-                .Property(c => c.Character2Id)
-                .IsRequired();
 
             modelBuilder.Entity<Connection>()
                 .HasOne(c => c.Character2)
                 .WithMany()
                 .HasForeignKey(c => c.Character2Id)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<BelongToScheme>()
                 .HasOne(c => c.Scheme)
                 .WithMany()
                 .HasForeignKey(c => c.SchemeId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
-
 
         }
         public DbSet<User> Users { get; set; }

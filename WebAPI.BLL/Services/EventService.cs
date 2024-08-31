@@ -72,7 +72,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленное событие.</returns>
         public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
-            Event @event = await _context.Events.FindAsync(id);
+            Event @event = _context.Events.Find(id);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
@@ -84,24 +84,23 @@ namespace WebAPI.BLL.Services
 
             if (eventData.CharactersId != null)
             {
-                var characters = await _context.BelongToEvents.Where(b=>b.EventId==id).ToListAsync();
-                // Удаление ненужных связей персонажей с событием. Допустим было [1,2], мы передали [2,3], значит будет [2]
-                foreach (var character in characters)
-                {
-                    if(!eventData.CharactersId.Contains(character.CharacterId))
-                    {
-                        Deletion.DeleteBelongToEvent(id, character.CharacterId,_context);
-                    }    
-                }
-                // Добавление новых. То есть после этого уже будет [2,3]
+                var oldInvolvedCharactersId = _context.BelongToEvents.Where(b => b.EventId == id).Select(a=>a.CharacterId).ToList();
                 foreach (var CharacterId in eventData.CharactersId)
                 {
-                    Creation.CreateBelongToEvent(id, CharacterId, _context);
+                    if(!oldInvolvedCharactersId.Contains(CharacterId))//если его там не было, добавляем
+                        Creation.CreateBelongToEvent(id, CharacterId, _context);
+                    else //если он там был, удаляем из списка старых, потому что он уже новый 
+                        oldInvolvedCharactersId.Remove(CharacterId);             
+                }
+                //перебираем, что осталось и удаляем, так как должен остаться только список на удаление
+                foreach (var characterId in oldInvolvedCharactersId)
+                {
+                    Deletion.DeleteBelongToEvent(id, characterId, _context);
                 }
             }
 
             _context.Events.Update(@event);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return @event;
         }

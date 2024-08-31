@@ -64,7 +64,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithAnswers characterWithAnswers)
         {
-            var existingCharacter = _characterService.UpdateCharacter(characterWithAnswers,id);
+            var existingCharacter = await _characterService.UpdateCharacter(characterWithAnswers,id);
 
             if (existingCharacter == null)
             {

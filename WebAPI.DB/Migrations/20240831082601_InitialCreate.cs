@@ -352,8 +352,7 @@ namespace WebAPI.DB.Migrations
                         name: "FK_Connections_Characters_Character2Id",
                         column: x => x.Character2Id,
                         principalTable: "Characters",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
