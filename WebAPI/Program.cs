@@ -20,6 +20,7 @@ using WebAPI.BLL.Mappings;
 using AutoMapper;
 using System.Reflection;
 using WebAPI.Errors;
+using WebAPI.ConfigurationValidation;
 
 namespace WebAPI
 {
@@ -78,6 +79,9 @@ namespace WebAPI
 
             // Регистрация сервисов
             RegisterApplicationServices(services);
+
+            // Валидация контекста
+            services.AddConfigurationValidation(configuration);
 
             // Добавление авторизации
             services.AddAuthorization();
