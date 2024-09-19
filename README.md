@@ -40,6 +40,10 @@ AutoMapper выполнен по этой статье: https://dev.to/sardarmud
 
 Через JWT-токен.
 
+### Валидатор
+
+Валидация конфигурации на наличие значений changeme. По этой статье: https://andrewlock.net/adding-validation-to-strongly-typed-configuration-objects-using-flentvalidation/
+
 ### Ошибки
 
 Нормализованы через мидлвейр. В основном по этой статье: https://metanit.com/sharp/aspnet6/2.16.php?ysclid=m0ck8x0ceu613011550
