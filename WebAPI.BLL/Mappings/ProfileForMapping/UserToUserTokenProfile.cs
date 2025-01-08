@@ -14,6 +14,7 @@ namespace WebAPI.BLL.Mappings.ProfileForMapping
         public UserToUserTokenProfile()
         {
             CreateMap<User, UserTokenData>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Token, opt => opt.Ignore()); // Игнорируем, если это не нужно в маппинге
         }
     }

@@ -20,7 +20,6 @@ using WebAPI.BLL.Mappings;
 using AutoMapper;
 using System.Reflection;
 using WebAPI.Errors;
-using WebAPI.ConfigurationValidation;
 
 namespace WebAPI
 {
@@ -41,6 +40,9 @@ namespace WebAPI
             ConfigureServices(builder.Services, builder.Configuration);
 
             var app = builder.Build();
+            
+            // Применяет политику CORS
+            app.UseCors("AllowAll");
 
             // Инициализация данных
             InitializeData(app);
@@ -80,11 +82,19 @@ namespace WebAPI
             // Регистрация сервисов
             RegisterApplicationServices(services);
 
-            // Валидация контекста
-            services.AddConfigurationValidation(configuration);
-
             // Добавление авторизации
             services.AddAuthorization();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin() // Разрешает запросы с любого источника (поменять на что-то более конкретное, а то не безопасновое...)
+                               .AllowAnyMethod() // Разрешает любые HTTP методы (GET, POST и т.д.)
+                               .AllowAnyHeader(); // Разрешает любые заголовки
+                    });
+            });
         }
 
         /// <summary>

@@ -115,7 +115,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список книг для указанного пользователя.</returns>
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllBooksForUser([FromBody] int userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllBooksForUser([FromQuery] int userId, CancellationToken cancellationToken)
         {
 
             var books = await _bookService.GetAllBooksForUser(userId,cancellationToken);
