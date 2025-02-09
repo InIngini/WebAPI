@@ -1,4 +1,4 @@
-@WebAPI_HostAddress = http://localhost:5153
+@WebAPI_HostAddress = http://192.168.1.33:5153
 
 # для юзера
 # создание юзера

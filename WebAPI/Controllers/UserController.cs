@@ -34,6 +34,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Регистрирует нового пользователя.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///       "login": "username2",
+        ///       "password": "password"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="loginData">Данные для регистрации пользователя.</param>
         /// <returns>Результат создания пользователя.</returns>
         [HttpPost("register")]
@@ -47,6 +56,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Авторизирует пользователя.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///       "login": "username",
+        ///       "password": "password"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="loginData">Данные для авторизации пользователя.</param>
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Токен пользователя, полученный в результате авторизации.</returns>

@@ -30,6 +30,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новую галерею (то есть добавляет изображение к персонажу).
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///         "CharacterId": "1",
+        ///         "PictureId": "1"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="galleryData">Данные о галерее, которую необходимо создать.</param>
         /// <returns>Результат создания галереи.</returns>
         [HttpPost]

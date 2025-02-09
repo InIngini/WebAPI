@@ -33,6 +33,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новый таймлайн.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///         "BookId": "1",
+        ///         "NameTimeline": "Новое имя"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="timelinedata">Данные о таймлайне, который необходимо создать.</param>
         /// <returns>Результат создания таймлайна.</returns>
         [HttpPost]

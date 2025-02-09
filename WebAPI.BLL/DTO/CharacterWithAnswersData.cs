@@ -19,8 +19,7 @@ namespace WebAPI.BLL.DTO
         /// </summary>
         public string Name { get; set; }
 
-        // Ответы по личности
-        /// <summary> Ответ 1 по личным качествам. </summary>
+        /// Ответы (должно приходить столько, сколько всего есть вопросов, даже пустые ответы)
         public string[] Answers { get; set; }
 
     }

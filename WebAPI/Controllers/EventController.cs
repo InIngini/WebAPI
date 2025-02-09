@@ -34,6 +34,18 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новое событие.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        ///
+        ///     {
+        ///         "BookId": "1",
+        ///         "Name": "Новое имя",
+        ///         "Content": "Какой-то контент",
+        ///         "Time": "10.06.2024-20.06.2024",
+        ///         "CharactersId": [1,2]
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="eventData">Данные о событии, которое необходимо создать.</param>
         /// <returns>Результат создания события.</returns>
         [HttpPost]
@@ -52,6 +64,17 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Обновляет существующее событие.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        ///
+        ///     {
+        ///         "Name": "Новое имя",
+        ///         "Content": "Какой-то",
+        ///         "Time": "10.06.2024-20.06.2024",
+        ///         "CharactersId": [1]
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="id">Идентификатор события для обновления.</param>
         /// <param name="eventData">Обновленные данные о событии.</param>
         /// <param name="cancellationToken">Токен для отмены запроса.</param>

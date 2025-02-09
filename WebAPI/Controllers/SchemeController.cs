@@ -33,6 +33,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новую схему.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///         "BookId": "1",
+        ///         "NameScheme": "Новое имя"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="schemedata">Данные о схеме, которую необходимо создать.</param>
         /// <returns>Результат создания схемы.</returns>
         [HttpPost]

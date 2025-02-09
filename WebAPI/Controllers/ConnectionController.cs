@@ -33,6 +33,17 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новую связь.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///         "BookId": "1",
+        ///         "Character1Id": "1",
+        ///         "Character2Id": "2",
+        ///         "TypeConnection": "Сиблинг"
+        ///     }
+        ///
+        /// </remarks>
         /// <param name="connectionData">Данные о связи, которую необходимо создать.</param>
         /// <returns>Результат создания связи.</returns>
         [HttpPost]

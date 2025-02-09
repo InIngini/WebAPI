@@ -40,6 +40,15 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Создает новую книгу.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///          "UserId": "1",
+        ///          "NameBook": "Моя новая книга"
+        ///     }
+        ///     
+        /// </remarks>
         /// <param name="bookdata">Данные о книге, которые необходимо создать.</param>
         /// <returns>Результат создания книги.</returns>
         [HttpPost]
@@ -54,9 +63,18 @@ namespace WebAPI.Controllers
 
             return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
         }
+
         /// <summary>
         /// Обновляет существующую книгу.
         /// </summary>
+        /// <remarks>
+        /// Пример для использования: 
+        /// 
+        ///     {
+        ///          "NameBook": "Измененное название книги"
+        ///     }
+        ///     
+        /// </remarks>
         /// <param name="id">Идентификатор книги для обновления.</param>
         /// <param name="book">Новые данные о книге.</param>
         /// <param name="cancellationToken">Токен для отмены запроса.</param>

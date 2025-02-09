@@ -20,6 +20,7 @@ using WebAPI.BLL.Mappings;
 using AutoMapper;
 using System.Reflection;
 using WebAPI.Errors;
+using Microsoft.OpenApi.Models;
 
 namespace WebAPI
 {
@@ -78,6 +79,40 @@ namespace WebAPI
 
             // AutoMapper
             ConfigureAutoMapper(services);
+
+            // Swagger
+            services.AddSwaggerGen(options =>
+            {
+                var basePath = AppContext.BaseDirectory;
+
+                var xmlPath = Path.Combine(basePath, "xml\\WebAPI.xml");
+                options.IncludeXmlComments(xmlPath);
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"Введите JWT токен авторизации (можно взять в запросе User/login).",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                        },
+                        new List<string>()
+                    }
+                });
+            });
 
             // Регистрация сервисов
             RegisterApplicationServices(services);
@@ -165,6 +200,13 @@ namespace WebAPI
         {
             // Миддлвейр для обработки ошибок
             app.UseMiddleware<ErrorHandlingMiddleware>();
+
+            // Swagger
+            app.UseSwagger()
+               .UseSwaggerUI(c =>
+               {
+                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+               });
 
             // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
