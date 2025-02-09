@@ -47,6 +47,7 @@ namespace WebAPI.Controllers
         /// <param name="connectionData">Данные о связи, которую необходимо создать.</param>
         /// <returns>Результат создания связи.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Connection), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateConnection([FromBody] ConnectionData connectionData)
         {
             if (!ModelState.IsValid)
@@ -83,6 +84,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Связь с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ConnectionData), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetConnection(int id, CancellationToken cancellationToken)
         {
             var connection = await _connectionService.GetConnection(id, cancellationToken);
@@ -97,6 +99,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех связей для указанной схемы.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<ConnectionAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllConnection([FromBody] int id, CancellationToken cancellationToken)
         {
             var connections = await _connectionService.GetAllConnections(id, cancellationToken);

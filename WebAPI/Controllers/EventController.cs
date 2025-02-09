@@ -49,6 +49,7 @@ namespace WebAPI.Controllers
         /// <param name="eventData">Данные о событии, которое необходимо создать.</param>
         /// <returns>Результат создания события.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Event), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateEvent([FromBody] EventData eventData)
         {
             if (!ModelState.IsValid)
@@ -80,6 +81,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат обновления события.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData, CancellationToken cancellationToken)
         {
             var updatedEvent = await _eventService.UpdateEvent(eventData, id);
@@ -113,6 +115,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Событие с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(EventData), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetEvent(int id, CancellationToken cancellationToken)
         {
             var @event = await _eventService.GetEvent(id, cancellationToken);
@@ -132,6 +135,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех событий для указанного идентификатора таймлайна.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<EventAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllEvents([FromBody] int id, CancellationToken cancellationToken)
         {
             var events = await _eventService.GetAllEvents(id, cancellationToken);

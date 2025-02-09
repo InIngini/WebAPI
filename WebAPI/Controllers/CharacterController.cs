@@ -46,6 +46,7 @@ namespace WebAPI.Controllers
         /// <param name="bookCharacterData">Данные о персонаже, который необходимо создать.</param>
         /// <returns>Результат создания персонажа.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Character), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateCharacter([FromBody] BookCharacterData bookCharacterData)
         {
             if (!ModelState.IsValid)
@@ -109,6 +110,7 @@ namespace WebAPI.Controllers
         /// <param name="characterWithAnswers">Новые данные о персонаже с ответами.</param>
         /// <returns>Результат обновления персонажа.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Character), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithAnswers characterWithAnswers)
         {
             var existingCharacter = await _characterService.UpdateCharacter(characterWithAnswers,id);
@@ -141,6 +143,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Персонаж с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(CharacterWithAnswers), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCharacter(int id, CancellationToken cancellationToken)
         {
             var character = await _characterService.GetCharacter(id, cancellationToken);
@@ -160,6 +163,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список персонажей для указанной книги.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<CharacterAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllCharacters([FromBody] int idBook, CancellationToken cancellationToken)
         {
             var characters = await _characterService.GetAllCharacters(idBook, cancellationToken);
@@ -179,6 +183,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <returns>Список вопросов.</returns>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<QuestionData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetQuestions()
         {
             var questions = await _characterService.GetQuestions();
@@ -209,6 +214,7 @@ namespace WebAPI.Controllers
         /// <param name="aa">Данные о добавляемом атрибуте.</param>
         /// <returns>Результат создания добавленного атрибута.</returns>
         [HttpPost("{id}/addedattribute")]
+        [ProducesResponseType(typeof(AddedAttribute), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAddedAttribute(int id, [FromBody] AddedAttributeData aa)
         {
             if (!ModelState.IsValid)
@@ -229,6 +235,7 @@ namespace WebAPI.Controllers
         /// <param name="content">Обновленное содержимое атрибута.</param>
         /// <returns>Результат обновления добавленного атрибута.</returns>
         [HttpPut("{idc}/addedattribute/{ida}")]
+        [ProducesResponseType(typeof(AddedAttribute), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content, CancellationToken cancellationToken)
         {
             var existingAddedAttribute = await _addedAttributeService.UpdateAddedAttribute(ida,content);
@@ -262,6 +269,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Добавленный атрибут с указанным идентификатором.</returns>
         [HttpGet("addedattribute/{id}")]
+        [ProducesResponseType(typeof(AddedAttribute), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAddedAttribute(int id, CancellationToken cancellationToken)
         {
             var addedAttribute = await _addedAttributeService.GetAddedAttribute(id,cancellationToken);

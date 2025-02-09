@@ -46,6 +46,7 @@ namespace WebAPI.Controllers
         /// <param name="loginData">Данные для регистрации пользователя.</param>
         /// <returns>Результат создания пользователя.</returns>
         [HttpPost("register")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateUser([FromBody] LoginData loginData)
         {
             var createdUser = await _userService.CreateUser(loginData);
@@ -69,6 +70,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Токен пользователя, полученный в результате авторизации.</returns>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(UserTokenData), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] LoginData loginData,CancellationToken cancellationToken)
         {
             var userToken = await _userService.Login(loginData,cancellationToken);
@@ -85,6 +87,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Информация о пользователе с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUser(int id,CancellationToken cancellationToken)
         {
             var user = await _userService.GetUser(id,cancellationToken);

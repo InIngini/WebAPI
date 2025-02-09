@@ -42,6 +42,7 @@ namespace WebAPI.Controllers
         /// <param name="galleryData">Данные о галерее, которую необходимо создать.</param>
         /// <returns>Результат создания галереи.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(BelongToGallery), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateGallery([FromBody] GalleryData galleryData)
         {
             if (!ModelState.IsValid)
@@ -74,6 +75,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Галерея с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BelongToGallery), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGallery(int id, CancellationToken cancellationToken)
         {
             var gallery = await _galleryService.GetGallery(id, cancellationToken);
@@ -93,6 +95,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех галерей для указанного идентификатора персонажа.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<BelongToGallery>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllGallery([FromBody] int id, CancellationToken cancellationToken)
         {
             var galleries = await _galleryService.GetAllGalleries(id, cancellationToken);

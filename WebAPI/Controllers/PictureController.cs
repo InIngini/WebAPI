@@ -34,6 +34,7 @@ namespace WebAPI.Controllers
         /// <param name="picture">Данные о изображении, которое необходимо создать.</param>
         /// <returns>Результат создания изображения.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Picture), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreatePicture([FromBody] Picture picture)
         {
             if (!ModelState.IsValid)
@@ -67,6 +68,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Изображение с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Picture), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPicture(int id, CancellationToken cancellationToken)
         {
             var picture = await _pictureService.GetPicture(id, cancellationToken);

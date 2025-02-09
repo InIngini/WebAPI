@@ -45,6 +45,7 @@ namespace WebAPI.Controllers
         /// <param name="schemedata">Данные о схеме, которую необходимо создать.</param>
         /// <returns>Результат создания схемы.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Scheme), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateScheme([FromBody] SchemeData schemedata)
         {
             if (!ModelState.IsValid)
@@ -66,6 +67,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Обновлённая схема.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Scheme), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection,CancellationToken cancellationToken)
         {
             var scheme = await _schemeService.UpdateScheme(id,idConnection);
@@ -99,6 +101,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Схема с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Scheme), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetScheme(int id, CancellationToken cancellationToken)
         {
             var scheme = await _schemeService.GetScheme(id,cancellationToken);
@@ -118,6 +121,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех схем для указанного идентификатора книги.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<Scheme>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllScheme([FromBody] int id, CancellationToken cancellationToken)
         {
             var schemes = await _schemeService.GetAllSchemes(id,cancellationToken);

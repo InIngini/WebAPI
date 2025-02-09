@@ -52,6 +52,7 @@ namespace WebAPI.Controllers
         /// <param name="bookdata">Данные о книге, которые необходимо создать.</param>
         /// <returns>Результат создания книги.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Book), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateBook([FromBody] UserBookData bookdata)
         {
             if (!ModelState.IsValid)
@@ -80,6 +81,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Результат выполнения операции обновления.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Book), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book,CancellationToken cancellationToken)
         {
             var existingBook = await _bookService.UpdateBook(id,book);
@@ -114,6 +116,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Книга с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Book), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBook(int id,CancellationToken cancellationToken)
         {
             var book = await _bookService.GetBook(id,cancellationToken);
@@ -133,6 +136,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список книг для указанного пользователя.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(List<Book>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllBooksForUser([FromQuery] int userId, CancellationToken cancellationToken)
         {
 

@@ -45,6 +45,7 @@ namespace WebAPI.Controllers
         /// <param name="timelinedata">Данные о таймлайне, который необходимо создать.</param>
         /// <returns>Результат создания таймлайна.</returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Timeline), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateTimeline([FromBody] TimelineData timelinedata)
         {
             if (!ModelState.IsValid)
@@ -64,6 +65,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Обновлённый таймлайн.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Timeline), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent,CancellationToken cancellationToken)
         {
             var timeline = await _timelineService.UpdateTimeline(id, idEvent);
@@ -95,6 +97,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Таймлайн с указанным идентификатором.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Timeline), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTimeline(int id, CancellationToken cancellationToken)
         {
             var timeline = await _timelineService.GetTimeline(id,cancellationToken);
@@ -113,6 +116,7 @@ namespace WebAPI.Controllers
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Список всех таймлайнов для указанного идентификатора книги.</returns>
         [HttpGet("all")]
+        [ProducesResponseType(typeof(IEnumerable<Timeline>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTimeline([FromBody] int id,CancellationToken cancellationToken)
         {
             var timelines = await _timelineService.GetAllTimelines(id,cancellationToken);
