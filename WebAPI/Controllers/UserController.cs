@@ -77,7 +77,7 @@ namespace WebAPI.Controllers
 
             //var token = user.Token;
 
-            return Ok(new { userToken });
+            return Ok(userToken);
         }
 
         /// <summary>
