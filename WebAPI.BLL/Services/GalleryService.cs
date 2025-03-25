@@ -20,18 +20,20 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class GalleryService : IGalleryService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="GalleryService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public GalleryService(Context context, IMapper mapper)
+        public GalleryService(IContext context, IMapper mapper, DeletionRepository deletionRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
-            Deletion.DeletePicture(PictureId, _context);
+            await DeletionRepository.DeletePicture(PictureId, _context);
 
             return gallery;
         }

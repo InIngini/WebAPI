@@ -14,9 +14,9 @@ namespace WebAPI.DB
     /// </summary>
     public class AddedData
     {
-        private readonly Context _context;
+        private readonly IContext _context;
 
-        public AddedData(Context context)
+        public AddedData(IContext context)
         {
             _context = context; // Сохранение контекста для использования в методах
         }
@@ -42,7 +42,7 @@ namespace WebAPI.DB
 
             // Добавление блоков в контекст и сохранение изменений
             _context.NumberBlocks.AddRange(blocks);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             // Инициализация вопросов
             var questions = new List<Question>
@@ -80,7 +80,7 @@ namespace WebAPI.DB
 
             // Добавление вопросов в контекст и сохранение изменений
             _context.Questions.AddRange(questions);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             // Инициализация типов сексуальной принадлежности
             var sexs = new List<Sex>
@@ -91,7 +91,7 @@ namespace WebAPI.DB
 
             // Добавление типов сексуальной принадлежности в контекст и сохранение изменений
             _context.Sex.AddRange(sexs);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             // Инициализация типов принадлежности к книге
             var typesBelong = new List<TypeBelongToBook>
@@ -102,7 +102,7 @@ namespace WebAPI.DB
 
             // Добавление типов принадлежности к книге в контекст и сохранение изменений
             _context.TypeBelongToBooks.AddRange(typesBelong);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             // Инициализация типов связей
             var typesConnection = new List<TypeConnection>
@@ -114,7 +114,7 @@ namespace WebAPI.DB
 
             // Добавление типов связей в контекст и сохранение изменений
             _context.TypeConnections.AddRange(typesConnection);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
         }
     }

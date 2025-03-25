@@ -20,7 +20,7 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
@@ -30,7 +30,7 @@ namespace WebAPI.BLL.Services
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="tokenService">Сервис для работы с токенами.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public UserService(Context context, ITokenService tokenService,IMapper mapper)
+        public UserService(IContext context, ITokenService tokenService, IMapper mapper)
         {
             _context = context;
             _tokenService = tokenService;

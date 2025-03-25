@@ -20,18 +20,22 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class TimelineService : ITimelineService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
+        private CreationRepository CreationRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TimelineService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public TimelineService(Context context, IMapper mapper)
+        public TimelineService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -52,7 +56,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            Creation.CreateTimeline(timeline, _context);
+            CreationRepository.CreateTimeline(timeline, _context);
 
             return timeline;
         }
@@ -72,7 +76,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
 
-            Creation.CreateBelongToTimeline(EventId, TimelineId,_context);
+            CreationRepository.CreateBelongToTimeline(EventId, TimelineId,_context);
 
             return timeline;
         }
@@ -91,7 +95,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 0));
             }
 
-            Deletion.DeleteTimeline(id, _context);
+            await DeletionRepository.DeleteTimeline(id, _context);
 
             return timeline;
         }

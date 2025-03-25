@@ -21,18 +21,22 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class EventService : IEventService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
+        private CreationRepository CreationRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="EventService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public EventService(Context context, IMapper mapper)
+        public EventService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -51,13 +55,13 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
             Event @event = _mapper.Map<Event>(eventData);
-            Creation.CreateEvent(@event, (int)eventData.BookId, _context);
+            CreationRepository.CreateEvent(@event, (int)eventData.BookId, _context);
 
             if (eventData.CharactersId != null)
             {
                 foreach (var CharacterId in eventData.CharactersId)
                 {
-                    Creation.CreateBelongToEvent(@event.Id, CharacterId, _context);
+                    CreationRepository.CreateBelongToEvent(@event.Id, CharacterId, _context);
                 }
             }
 
@@ -88,19 +92,19 @@ namespace WebAPI.BLL.Services
                 foreach (var CharacterId in eventData.CharactersId)
                 {
                     if(!oldInvolvedCharactersId.Contains(CharacterId))//если его там не было, добавляем
-                        Creation.CreateBelongToEvent(id, CharacterId, _context);
+                        CreationRepository.CreateBelongToEvent(id, CharacterId, _context);
                     else //если он там был, удаляем из списка старых, потому что он уже новый 
                         oldInvolvedCharactersId.Remove(CharacterId);             
                 }
                 //перебираем, что осталось и удаляем, так как должен остаться только список на удаление
                 foreach (var characterId in oldInvolvedCharactersId)
                 {
-                    Deletion.DeleteBelongToEvent(id, characterId, _context);
+                    await DeletionRepository.DeleteBelongToEvent(id, characterId, _context);
                 }
             }
 
             _context.Events.Update(@event);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             return @event;
         }
@@ -120,7 +124,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
             }
 
-            Deletion.DeleteEvent(id, _context);
+            await DeletionRepository.DeleteEvent(id, _context);
 
             return @event;
         }

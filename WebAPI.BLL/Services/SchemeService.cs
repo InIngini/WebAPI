@@ -20,18 +20,22 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class SchemeService : ISchemeService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
+        private CreationRepository CreationRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="SchemeService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public SchemeService(Context context, IMapper mapper)
+        public SchemeService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            Creation.CreateScheme(scheme,_context);
+            CreationRepository.CreateScheme(scheme,_context);
 
             return scheme;
         }
@@ -70,7 +74,7 @@ namespace WebAPI.BLL.Services
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
-            Creation.CreateBelongToScheme(ConnectionId, SchemeId,_context);
+            CreationRepository.CreateBelongToScheme(ConnectionId, SchemeId,_context);
 
             return scheme;
         }
@@ -90,7 +94,7 @@ namespace WebAPI.BLL.Services
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
 
-            Deletion.DeleteScheme(id, _context);
+            await DeletionRepository.DeleteScheme(id, _context);
 
             return scheme;
         }

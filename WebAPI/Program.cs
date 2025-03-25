@@ -21,6 +21,9 @@ using AutoMapper;
 using System.Reflection;
 using WebAPI.Errors;
 using Microsoft.OpenApi.Models;
+using WebAPI.Auth;
+using WebAPI.BLL.Additional;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebAPI
 {
@@ -66,6 +69,9 @@ namespace WebAPI
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+            // Регистрация интерфейса IContext
+            services.AddScoped<IContext, Context>();
+
             // Добавить контроллеры
             services.AddControllers();
 
@@ -85,7 +91,7 @@ namespace WebAPI
             {
                 var basePath = AppContext.BaseDirectory;
 
-                var xmlPath = Path.Combine(basePath, "xml\\WebAPI.xml");
+                var xmlPath = "WebAPI.xml";
                 options.IncludeXmlComments(xmlPath);
 
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -163,9 +169,12 @@ namespace WebAPI
             services.AddTransient<ISchemeService, SchemeService>();
             services.AddTransient<ITimelineService, TimelineService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAuthService, AuthService>();
 
             // Регистрация класса для добавления данных
             services.AddTransient<AddedData>();
+            services.AddTransient<CreationRepository>();
+            services.AddTransient<DeletionRepository>();
         }
 
         /// <summary>
@@ -177,10 +186,10 @@ namespace WebAPI
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var addedData = services.GetRequiredService<AddedData>();
 
                 try
                 {
+                    var addedData = services.GetRequiredService<AddedData>();
                     addedData.Initialize();
                 }
                 catch (Exception ex)
@@ -192,6 +201,7 @@ namespace WebAPI
             }
         }
 
+
         /// <summary>
         /// Настраивает промежуточное программное обеспечение (middleware) для обработки запросов и ошибок.
         /// </summary>
@@ -200,6 +210,8 @@ namespace WebAPI
         {
             // Миддлвейр для обработки ошибок
             app.UseMiddleware<ErrorHandlingMiddleware>();
+
+            app.UseMiddleware<BasicAuthMiddleware>();
 
             // Swagger
             app.UseSwagger()

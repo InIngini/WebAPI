@@ -17,13 +17,13 @@ namespace WebAPI.BLL.Token
     public class TokenValidator : ITokenValidator
     {
         private readonly IConfiguration _configuration;
-        private readonly Context _context;
+        private readonly IContext _context;
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TokenValidator"/>.
         /// </summary>
         /// <param name="configuration">Конфигурация приложения.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public TokenValidator(IConfiguration configuration, Context context)
+        public TokenValidator(IConfiguration configuration, IContext context)
         {
             _configuration = configuration;
             _context = context;

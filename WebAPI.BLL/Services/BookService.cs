@@ -21,18 +21,22 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class BookService : IBookService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
+        private CreationRepository CreationRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="BookService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public BookService(Context context, IMapper mapper)
+        public BookService(IContext context, IMapper mapper, DeletionRepository deletionRepository, CreationRepository creationRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace WebAPI.BLL.Services
             await _context.SaveChangesAsync();
 
             // Создание сущности BelongTo
-            Creation.CreateBelongToBook(userbook.UserId, book.Id, "Автор", _context);
+            CreationRepository.CreateBelongToBook(userbook.UserId, book.Id, "Автор", _context);
 
             // Создание главной схемы 
             Scheme scheme = new Scheme()
@@ -65,7 +69,7 @@ namespace WebAPI.BLL.Services
                 NameScheme = "Главная схема",
                 BookId = book.Id,
             };
-            Creation.CreateScheme(scheme, _context);
+            CreationRepository.CreateScheme(scheme, _context);
 
             // Создание главного таймлайна
             Timeline timeline = new Timeline()
@@ -73,7 +77,7 @@ namespace WebAPI.BLL.Services
                 NameTimeline = "Главный таймлайн",
                 BookId = book.Id 
             };
-            Creation.CreateTimeline(timeline, _context);
+            CreationRepository.CreateTimeline(timeline, _context);
 
             return book;
         }
@@ -116,31 +120,31 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление связанных записей из таблицы BelongToBook
-            Deletion.DeleteBelongToBook(book.Id, _context);
+            DeletionRepository.DeleteBelongToBook(book.Id, _context);
 
             // Удаление всех схем книги
             var schemes = await _context.Schemes.Where(s => s.BookId == id).ToListAsync();
             foreach (var scheme in schemes)
             {
-                Deletion.DeleteScheme(scheme.Id, _context);
+                DeletionRepository.DeleteScheme(scheme.Id, _context);
             }
 
             // Удаление всех таймлайнов книги
             var timelines = await _context.Timelines.Where(s => s.BookId == id).ToListAsync();
             foreach (var timeline in timelines)
             {
-                Deletion.DeleteTimeline(timeline.Id, _context);
+                await DeletionRepository.DeleteTimeline(timeline.Id, _context);
             }
 
             // Удаление обложки
             if (book.PictureId != null)
             {
-                Deletion.DeletePicture((int)book.PictureId, _context);
+                await DeletionRepository.DeletePicture((int)book.PictureId, _context);
             }
 
             // Удаление всех персонажей книги
             var characters = await _context.Characters.Where(c => c.BookId == id).ToListAsync();
-            CharacterService characterService = new CharacterService(_context,_mapper);
+            CharacterService characterService = new CharacterService(_context,_mapper,DeletionRepository,CreationRepository);
             foreach (var character in characters)
             {
                 await characterService.DeleteCharacter(character.Id);

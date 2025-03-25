@@ -21,7 +21,7 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class AddedAttributeService : IAddedAttributeService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace WebAPI.BLL.Services
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public AddedAttributeService(Context context, IMapper mapper)
+        public AddedAttributeService(IContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

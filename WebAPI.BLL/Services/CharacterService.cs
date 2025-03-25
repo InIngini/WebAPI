@@ -21,18 +21,22 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class CharacterService : ICharacterService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private DeletionRepository DeletionRepository;
+        private CreationRepository CreationRepository;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="CharacterService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public CharacterService(Context context, IMapper mapper)
+        public CharacterService(IContext context, IMapper mapper, DeletionRepository deletionRepository, CreationRepository creationRepository)
         {
             _context = context;
             _mapper = mapper;
+            DeletionRepository = deletionRepository;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace WebAPI.BLL.Services
             _context.Characters.Add(character);
             await _context.SaveChangesAsync();
 
-            Creation.CreateAllAnswerByCharacter(character.Id, _context);
+            CreationRepository.CreateAllAnswerByCharacter(character.Id, _context);
 
             return character;
         }
@@ -99,7 +103,7 @@ namespace WebAPI.BLL.Services
                     _context.Answers.Update(answer);
                 }
             }
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             return character;
         }
@@ -119,7 +123,7 @@ namespace WebAPI.BLL.Services
             }
 
             // Удаление всех ответом персонажа
-            Deletion.DeleteAllAnswerByCharacter(character.Id,_context);
+            await DeletionRepository.DeleteAllAnswerByCharacter(character.Id, _context);
 
             // Удаление всех добавленных атрибутов блока
             var addedAttributes = await _context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToListAsync();
@@ -132,20 +136,20 @@ namespace WebAPI.BLL.Services
             var galleryItems = await _context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToListAsync();
             foreach (var galleryItem in galleryItems)
             {
-                Deletion.DeletePicture((int)galleryItem.PictureId,_context);
+                await DeletionRepository.DeletePicture((int)galleryItem.PictureId, _context);
             }
 
             // Удаление аватарки
             if (character.PictureId != null)
             {
-                Deletion.DeletePicture((int)character.PictureId, _context);
+                await DeletionRepository.DeletePicture((int)character.PictureId, _context);
             }
             
             // Удаление связи
             var connections = await _context.Connections.Where(c=> c.Character1Id==character.Id||c.Character2Id==character.Id).ToListAsync();
             foreach (var connection in connections)
             {
-                Deletion.DeleteConnection(connection.Id, _context);
+                await DeletionRepository.DeleteConnection(connection.Id, _context);
             }
 
             // Удаление персонажа

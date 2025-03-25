@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPI.BLL.Errors;
+﻿using WebAPI.DB;
 using WebAPI.DB.Entities;
-using WebAPI.DB;
 using WebAPI.Errors;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebAPI.BLL.Additional
 {
     /// <summary>
     /// Класс для удаления каких-то записей из таблиц.
     /// </summary>
-    public static class Deletion
+    public class DeletionRepository
     {
+        public DeletionRepository() { }
+
         /// <summary>
         /// Удаляет связь между книгой и пользователем.
         /// </summary>
         /// <param name="BookId">Идентификатор книги, связи которой необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteBelongToBook(int BookId, Context context)
+        public async Task DeleteBelongToBook(int BookId, IContext context)
         {
             var belongToBook =  context.BelongToBooks.Where(b => b.BookId == BookId).FirstOrDefault();
             if (belongToBook == null)
@@ -30,7 +24,7 @@ namespace WebAPI.BLL.Additional
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
             }
             context.BelongToBooks.Remove(belongToBook);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет схему по заданному идентификатору и все связи, связанные с этой схемой.
@@ -38,7 +32,7 @@ namespace WebAPI.BLL.Additional
         /// </summary>
         /// <param name="SchemeId">Идентификатор схемы, которую необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteScheme(int SchemeId, Context context)
+        public async Task DeleteScheme(int SchemeId, IContext context)
         {
             var scheme =  context.Schemes.Find(SchemeId);
             if (scheme == null)
@@ -56,24 +50,24 @@ namespace WebAPI.BLL.Additional
                 }
             }
             context.Schemes.Remove(scheme);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь между персонажами.
         /// </summary>
         /// <param name="belongToScheme">Объект, представляющий связь, которую нужно удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteBelongToScheme(BelongToScheme belongToScheme, Context context)
+        public async Task DeleteBelongToScheme(BelongToScheme belongToScheme, IContext context)
         {
             context.BelongToSchemes.Remove(belongToScheme);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь по заданному идентификатору связи и все связанные с ней связи.
         /// </summary>
         /// <param name="ConnectionId">Идентификатор связи, которую необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteConnection(int ConnectionId,Context context)
+        public async Task DeleteConnection(int ConnectionId,IContext context)
         {
             var connection =  context.Connections.Find(ConnectionId);
             if (connection == null)
@@ -84,10 +78,10 @@ namespace WebAPI.BLL.Additional
             var belongToSchemes =  context.BelongToSchemes.Where(b => b.ConnectionId == connection.Id).ToList();
             foreach (var belongToScheme in belongToSchemes)
             {
-                DeleteBelongToScheme(belongToScheme,context);
+                await DeleteBelongToScheme(belongToScheme,context);
             }
             context.Connections.Remove(connection);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет таймлайн по заданному идентификатору и все связи, связанные с этим таймлайном.
@@ -95,7 +89,7 @@ namespace WebAPI.BLL.Additional
         /// </summary>
         /// <param name="TimelineId">Идентификатор таймлайна, который необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteTimeline(int TimelineId, Context context)
+        public async Task DeleteTimeline(int TimelineId, IContext context)
         {
             var timeline =  context.Timelines.Find(TimelineId);
             if (timeline == null)
@@ -113,24 +107,24 @@ namespace WebAPI.BLL.Additional
                 }
             }
             context.Timelines.Remove(timeline);
-             context.SaveChanges();
+             await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь между таймлайном и событием.
         /// </summary>
         /// <param name="belongToTimeline">Объект, представляющий связь, которую нужно удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteBelongToTimeline(BelongToTimeline belongToTimeline, Context context)
+        public async Task DeleteBelongToTimeline(BelongToTimeline belongToTimeline, IContext context)
         {
             context.BelongToTimelines.Remove(belongToTimeline);
-             context.SaveChanges();
+             await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет событие по заданному идентификатору и все связи, связанные с этим событием.
         /// </summary>
         /// <param name="EventId">Идентификатор события, которое необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteEvent(int EventId, Context context)
+        public async Task DeleteEvent(int EventId, IContext context)
         {
             var @event =  context.Events.Find(EventId);
             if (@event == null)
@@ -144,7 +138,7 @@ namespace WebAPI.BLL.Additional
                 DeleteBelongToTimeline(belongToTimeline, context);
             }
             context.Events.Remove(@event);
-             context.SaveChanges();
+             await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь между событием и персонажем по идентификаторам события и персонажа.
@@ -152,7 +146,7 @@ namespace WebAPI.BLL.Additional
         /// <param name="EventId">Идентификатор события, связи которого нужно удалить.</param>
         /// <param name="CharacterId">Идентификатор персонажа, связи которого нужно удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteBelongToEvent(int EventId, int CharacterId, Context context)
+        public async Task DeleteBelongToEvent(int EventId, int CharacterId, IContext context)
         {
             var character = context.Characters.Find(CharacterId);
             if (character == null)
@@ -172,7 +166,7 @@ namespace WebAPI.BLL.Additional
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
             }
             context.BelongToEvents.Remove(belongToEvent);
-             context.SaveChanges();
+             await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет изображение по заданному идентификатору, а также устраняет все связи этого изображения
@@ -180,7 +174,7 @@ namespace WebAPI.BLL.Additional
         /// </summary>
         /// <param name="PictureId">Идентификатор изображения, которое необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeletePicture(int PictureId, Context context)
+        public async Task DeletePicture(int PictureId, IContext context)
         {
             var picture =  context.Pictures.Find(PictureId);
             if (picture == null)
@@ -205,7 +199,7 @@ namespace WebAPI.BLL.Additional
                 context.Books.Update(book);
             }
             context.Pictures.Remove(picture);
-             context.SaveChanges();
+             await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет все ответы, связанные с заданным идентификатором персонажа,
@@ -213,7 +207,7 @@ namespace WebAPI.BLL.Additional
         /// </summary>
         /// <param name="CharacterId">Идентификатор персонажа, ответы которого нужно удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public static void DeleteAllAnswerByCharacter(int CharacterId, Context context)
+        public async Task DeleteAllAnswerByCharacter(int CharacterId, IContext context)
         {
             foreach (var question in  context.Questions.ToList())
             {
@@ -224,7 +218,7 @@ namespace WebAPI.BLL.Additional
                 }
                 // Удаление ответов
                 context.Answers.Remove(answer);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

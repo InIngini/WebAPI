@@ -23,18 +23,20 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class ConnectionService : IConnectionService
     {
-        private readonly Context _context;
+        private readonly IContext _context;
         private readonly IMapper _mapper;
+        private CreationRepository CreationRepository { get;}
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ConnectionService"/>.
         /// </summary>
         /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
-        public ConnectionService(Context context, IMapper mapper)
+        public ConnectionService(IContext context, IMapper mapper, CreationRepository creationRepository)
         {
             _context = context;
             _mapper = mapper;
+            CreationRepository = creationRepository;
         }
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace WebAPI.BLL.Services
 
             connection.TypeConnection = typeConnection.Id;
 
-            await Creation.CreateConnection(connection, (int)connectionData.BookId, _context);
+            await CreationRepository.CreateConnection(connection, (int)connectionData.BookId, _context);
 
             return connection;
         }

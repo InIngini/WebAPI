@@ -7,7 +7,7 @@
     <InvariantGlobalization>false</InvariantGlobalization>
     <UserSecretsId>aspnet-WebAPI-b4fb5b75-6221-4a2f-9de4-8e33e39a9059</UserSecretsId>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net8.0\xml\WebAPI.xml</DocumentationFile>
+    <DocumentationFile>WebAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

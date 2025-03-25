@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.DB.CommonAppModel;
 using WebAPI.DB.Entities;
 using WebAPI.DB.Guide;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.Extensions.Configuration;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Diagnostics;
-using Microsoft.Extensions.Options;
 
 
 namespace WebAPI.DB
@@ -19,7 +9,7 @@ namespace WebAPI.DB
     /// <summary>
     /// Контекст базы данных для управления сущностями и их связями в базе данных.
     /// </summary>
-    public class Context : DbContext
+    public class Context : DbContext, IContext
     {
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="Context"/> с заданными параметрами.
@@ -60,6 +50,8 @@ namespace WebAPI.DB
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
         }
+        
+        public DbSet<SwaggerLogin> SwaggerLogins { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<BelongToBook> BelongToBooks { get; set; }
         public DbSet<Book> Books { get; set; }
