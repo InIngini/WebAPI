@@ -1,35 +1,22 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Abstractions;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.Resource;
-using Microsoft.IdentityModel.Tokens;
-using System.IO;
-using System.Text;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using WebAPI.Auth;
+using WebAPI.BLL.Additional;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.Services;
 using WebAPI.BLL.Token;
 using WebAPI.DB;
-using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
-using WebAPI.BLL.Mappings;
-using AutoMapper;
-using System.Reflection;
 using WebAPI.Errors;
-using Microsoft.OpenApi.Models;
-using WebAPI.Auth;
-using WebAPI.BLL.Additional;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebAPI
 {
     public class Program
     {
-        //dotnet ef migrations add InitialCreate --project C:\Users\vorob\source\repos\WebAPI\WebAPI.DB\WebAPI.DB.csproj - писала в консольку дл€ создани€ миграции
+        //dotnet ef migrations add InitialCreate --project WebAPI.DB --startup-project WebAPI - писала в консольку дл€ создани€ миграции
+        //не забывать мен€ть им€ InitialCreate
 
         //dotnet ef dbcontext scaffold "Data Source=(localdb)\MSSQLLocalDB;
         //AttachDbFileName=C:\Users\vorob\source\repos\WebAPI\DB\bin\Debug\net8.0\DB\DB.mdf;Integrated Security=True;"
@@ -48,8 +35,9 @@ namespace WebAPI
             // ѕримен€ет политику CORS
             app.UseCors("AllowAll");
 
-            // »нициализаци€ данных
-            InitializeData(app);
+            // ¬ажно: сначала миграции, потом инициализаци€ данных
+            ApplyMigrations(app);     // Ќовый метод дл€ миграций
+            InitializeData(app);      // —уществующий метод
 
             // Ќастройка Middleware
             ConfigureMiddleware(app);
@@ -175,6 +163,18 @@ namespace WebAPI
             services.AddTransient<AddedData>();
             services.AddTransient<CreationRepository>();
             services.AddTransient<DeletionRepository>();
+        }
+
+        /// <summary>
+        /// ѕримен€ет все ожидающие миграции базы данных
+        /// </summary>
+        private static void ApplyMigrations(WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<Context>();
+                db.Database.Migrate(); // јвтоматически примен€ет все миграции
+            }
         }
 
         /// <summary>

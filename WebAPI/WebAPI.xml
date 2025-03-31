@@ -623,6 +623,11 @@
             </summary>
             <param name="services">Сборка сервисов для добавления зависимостей.</param>
         </member>
+        <member name="M:WebAPI.Program.ApplyMigrations(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Применяет все ожидающие миграции базы данных
+            </summary>
+        </member>
         <member name="M:WebAPI.Program.InitializeData(Microsoft.AspNetCore.Builder.WebApplication)">
             <summary>
             Инициализирует данные в базе данных при старте приложения, если таких данных еще нет.

@@ -18,7 +18,7 @@ namespace WebAPI.DB
         public Context(DbContextOptions<Context> options) : base(options)
         {
             //Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
             //Database.Migrate();
         }
         /// <summary>
