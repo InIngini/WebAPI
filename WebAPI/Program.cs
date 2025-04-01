@@ -173,9 +173,22 @@ namespace WebAPI
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<Context>();
-                db.Database.Migrate(); // јвтоматически примен€ет все миграции
+
+                // ѕопробуем выполнить миграции
+                try
+                {
+                    // ѕримен€ем только ожидающие миграции
+                    db.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    // «десь вы можете обработать ошибки по своему усмотрению,
+                    // например, логгировать без остановки приложени€
+                    Console.WriteLine($"ќшибка при применении миграций: {ex.Message}");
+                }
             }
         }
+
 
         /// <summary>
         /// »нициализирует данные в базе данных при старте приложени€, если таких данных еще нет.

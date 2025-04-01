@@ -164,7 +164,7 @@ namespace WebAPI.Controllers
         /// <returns>Список персонажей для указанной книги.</returns>
         [HttpGet("all")]
         [ProducesResponseType(typeof(IEnumerable<CharacterAllData>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllCharacters([FromBody] int idBook, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllCharacters([FromQuery] int idBook, CancellationToken cancellationToken)
         {
             var characters = await _characterService.GetAllCharacters(idBook, cancellationToken);
 
