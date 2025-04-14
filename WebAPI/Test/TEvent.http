@@ -1,0 +1,39 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для события
+# создание события
+POST {{WebAPI_HostAddress}}/User/Book/Timeline/Event
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+{
+    "BookId": "1",
+    "Name": "Новое имя",
+    "Content": "Какой-то контент",
+    "Time": "10.06.2024-20.06.2024",
+    "CharactersId": [1,2]
+}
+###
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/all
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+"1"
+###
+GET {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+###
+# изменение события
+PUT {{WebAPI_HostAddress}}/User/Book/Timeline/Event/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+{
+    "Name": "Новое имя",
+    "Content": "Какой-то",
+    "Time": "10.06.2024-20.06.2024",
+    "CharactersId": [1]
+}

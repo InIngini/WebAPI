@@ -1,0 +1,38 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+###
+# для книги
+# создание книги
+POST {{WebAPI_HostAddress}}/User/Book
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+{
+    "UserId": "1",
+    "NameBook": "Моя новая книга"
+}
+###
+# получение всех книг + проверка токена (если что, то его поменять надо)
+# формально, запускается первым делом, после входа, и без него никуда дальше не уйти 
+GET {{WebAPI_HostAddress}}/User/Book/all?userId=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+###
+GET {{WebAPI_HostAddress}}/User/Book/1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+###
+# изменение книги (1 - id книги)
+PUT {{WebAPI_HostAddress}}/User/Book/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
+
+{
+    "NameBook": "Измененное название книги"
+}
+
+###
+# удаление книги
+DELETE {{WebAPI_HostAddress}}/User/Book/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcm5hbWUiLCJleHAiOjE3NDQxMTkyNzgsImlzcyI6InlvdXJfaXNzdWVyIiwiYXVkIjoieW91cl9hdWRpZW5jZSJ9.mpm4OsDa01WFyXQL4H8nx1ug7w5y3-xKcFcjcu0JuS4
