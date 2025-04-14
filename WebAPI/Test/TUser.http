@@ -1,0 +1,25 @@
+@WebAPI_HostAddress = http://localhost:5153
+
+# для юзера
+# создание юзера
+POST {{WebAPI_HostAddress}}/User/register
+Content-Type: application/json
+
+{ 
+  "login": "username", 
+  "password": "password" 
+}
+
+###
+GET {{WebAPI_HostAddress}}/User/1
+Accept: application/json
+
+###
+# авторизация юзера
+POST {{WebAPI_HostAddress}}/User/login
+Content-Type: application/json
+
+{
+    "login": "username",
+    "password": "password"
+}
