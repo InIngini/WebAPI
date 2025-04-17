@@ -4,36 +4,54 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using WebAPI.DB;
 using WebAPI.DB.CommonAppModel;
+using WebAPI.BLL.Interfaces;
 
 namespace WebAPI.Auth
 {
     /// <summary>
-    /// Контроллер для управления аутентификацией в сваггере
+    /// Контроллер для аутентификации
     /// </summary>
     [Authorize]
     [ApiController]
     [Route("SwaggerLogin/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
-        private IContext Context { get; }
+        private readonly IContext Context;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса AuthController
+        /// </summary>
+        /// <param name="context">Контекст базы данных</param>
         public AuthController(IContext context)
-        { 
+        {
             Context = context;
         }
 
+        /// <summary>
+        /// Получает данные для входа в Swagger
+        /// </summary>
+        /// <returns>Данные для входа</returns>
         [HttpGet]
-        public async Task<SwaggerLogin> GetSwaggerLogin()
+        public ActionResult<SwaggerLogin> GetSwaggerLogin()
         {
-            return await Context.SwaggerLogins.FirstOrDefaultAsync();
+            var login = Context.SwaggerLogins.FirstOrDefault();
+            return login ?? new SwaggerLogin();
         }
 
+        /// <summary>
+        /// Добавляет новые данные для входа в Swagger
+        /// </summary>
+        /// <param name="login">Данные для входа</param>
+        /// <returns>Результат операции</returns>
         [HttpPost]
-        public async Task AddNewSwaggerLogin(SwaggerLogin swaggerLogin)
+        public async Task AddNewSwaggerLogin([FromBody] SwaggerLogin login)
         {
-            var swaggerLogins = await Context.SwaggerLogins.ToListAsync();
-            Context.SwaggerLogins.RemoveRange(swaggerLogins);
+            if (login == null)
+            {
+                throw new ArgumentNullException(nameof(login));
+            }
 
-            Context.SwaggerLogins.Add(swaggerLogin);
+            Context.SwaggerLogins.Add(login);
             await Context.SaveChangesAsync();
         }
     }

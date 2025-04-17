@@ -1,19 +1,31 @@
 ﻿using System.Net;
 using WebAPI.Auth;
+using Microsoft.AspNetCore.Http;
 
 namespace WebAPI.Auth
 {
+    /// <summary>
+    /// Middleware для базовой аутентификации
+    /// </summary>
     public class BasicAuthMiddleware
     {
         private readonly RequestDelegate _next;
 
-        // Конструктор получает ТОЛЬКО RequestDelegate
+        /// <summary>
+        /// Инициализирует новый экземпляр класса BasicAuthMiddleware
+        /// </summary>
+        /// <param name="next">Следующий делегат в цепочке middleware</param>
         public BasicAuthMiddleware(RequestDelegate next)
         {
             _next = next;
         }
 
-        // IAuthService получаем через DI в InvokeAsync
+        /// <summary>
+        /// Обрабатывает HTTP-запрос
+        /// </summary>
+        /// <param name="context">Контекст HTTP-запроса</param>
+        /// <param name="authService">Сервис аутентификации</param>
+        /// <returns>Задача, представляющая асинхронную операцию</returns>
         public async Task InvokeAsync(HttpContext context, IAuthService authService)
         {
             if (context.Request.Path.StartsWithSegments("/swagger"))

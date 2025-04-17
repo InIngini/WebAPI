@@ -22,7 +22,7 @@ namespace WebAPI
         //AttachDbFileName=C:\Users\vorob\source\repos\WebAPI\DB\bin\Debug\net8.0\DB\DB.mdf;Integrated Security=True;"
         //Microsoft.EntityFrameworkCore.SqlServer - писала в консольку для получения классов 
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Создаем билдер
             var builder = WebApplication.CreateBuilder(args);
@@ -37,7 +37,7 @@ namespace WebAPI
 
             // Важно: сначала миграции, потом инициализация данных
             ApplyMigrations(app);     // Новый метод для миграций
-            InitializeData(app);      // Существующий метод
+            await InitializeData(app);      // Существующий метод
 
             // Настройка Middleware
             ConfigureMiddleware(app);
@@ -194,7 +194,7 @@ namespace WebAPI
         /// Инициализирует данные в базе данных при старте приложения, если таких данных еще нет.
         /// </summary>
         /// <param name="app">Экземпляр приложения для создания области видимости сервисов.</param>
-        public static void InitializeData(WebApplication app)
+        public static async Task InitializeData(WebApplication app)
         {
             using (var scope = app.Services.CreateScope())
             {
@@ -203,7 +203,7 @@ namespace WebAPI
                 try
                 {
                     var addedData = services.GetRequiredService<AddedData>();
-                    addedData.Initialize();
+                    await addedData.Initialize();
                 }
                 catch (Exception ex)
                 {

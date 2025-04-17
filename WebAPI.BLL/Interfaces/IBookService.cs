@@ -11,9 +11,9 @@ namespace WebAPI.BLL.Interfaces
     public interface IBookService
     {
         Task<Book> CreateBook(UserBookData userbook);
-        Task<Book> UpdateBook(int id,Book book);
-        Task<Book> DeleteBook(int id);
-        Task<Book> GetBook(int id, CancellationToken cancellationToken);
+        Task<Book> UpdateBook(int userId, int id, Book book);
+        Task<Book> DeleteBook(int userId, int id);
+        Task<Book> GetBook(int userId, int id, CancellationToken cancellationToken);
         Task<IEnumerable<Book>> GetAllBooksForUser(int userId, CancellationToken cancellationToken);
     }
 

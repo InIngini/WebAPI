@@ -20,8 +20,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class PictureService : IPictureService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public PictureService(IContext context, IMapper mapper, DeletionRepository deletionRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
         }
 
@@ -52,8 +52,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            _context.Pictures.Add(picture);
-            await _context.SaveChangesAsync();
+            Context.Pictures.Add(picture);
+            await Context.SaveChangesAsync();
 
             return picture;
         }
@@ -66,14 +66,14 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
         public async Task<Picture> DeletePicture(int id)
         {
-            var picture = await _context.Pictures.FindAsync(id);
+            var picture = await Context.Pictures.FirstOrDefaultAsync(x => x.Id == id);
 
             if (picture == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
 
-            await DeletionRepository.DeletePicture(id, _context);
+            await DeletionRepository.DeletePicture(id, Context);
 
             return picture;
         }
@@ -87,7 +87,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если изображение не найдено.</exception>
         public async Task<Picture> GetPicture(int id, CancellationToken cancellationToken)
         {
-            var picture = await _context.Pictures.FindAsync(id, cancellationToken);
+            var picture = await Context.Pictures.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (picture == null)
             {

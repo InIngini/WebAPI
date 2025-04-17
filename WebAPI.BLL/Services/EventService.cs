@@ -21,8 +21,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class EventService : IEventService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
         private CreationRepository CreationRepository;
 
@@ -33,8 +33,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public EventService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
             CreationRepository = creationRepository;
         }
@@ -54,14 +54,14 @@ namespace WebAPI.BLL.Services
             {
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
-            Event @event = _mapper.Map<Event>(eventData);
-            CreationRepository.CreateEvent(@event, (int)eventData.BookId, _context);
+            Event @event = Mapper.Map<Event>(eventData);
+            await CreationRepository.CreateEvent(@event, (int)eventData.BookId, Context);
 
             if (eventData.CharactersId != null)
             {
                 foreach (var CharacterId in eventData.CharactersId)
                 {
-                    CreationRepository.CreateBelongToEvent(@event.Id, CharacterId, _context);
+                    await CreationRepository.CreateBelongToEvent(@event.Id, CharacterId, Context);
                 }
             }
 
@@ -76,7 +76,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленное событие.</returns>
         public async Task<Event> UpdateEvent(EventData eventData, int id)
         {
-            Event @event = _context.Events.Find(id);
+            Event @event = await Context.Events.FirstOrDefaultAsync(x => x.Id == id);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
@@ -88,23 +88,23 @@ namespace WebAPI.BLL.Services
 
             if (eventData.CharactersId != null)
             {
-                var oldInvolvedCharactersId = _context.BelongToEvents.Where(b => b.EventId == id).Select(a=>a.CharacterId).ToList();
+                var oldInvolvedCharactersId = Context.BelongToEvents.Where(b => b.EventId == id).Select(a=>a.CharacterId).ToList();
                 foreach (var CharacterId in eventData.CharactersId)
                 {
                     if(!oldInvolvedCharactersId.Contains(CharacterId))//если его там не было, добавляем
-                        CreationRepository.CreateBelongToEvent(id, CharacterId, _context);
+                        await CreationRepository.CreateBelongToEvent(id, CharacterId, Context);
                     else //если он там был, удаляем из списка старых, потому что он уже новый 
                         oldInvolvedCharactersId.Remove(CharacterId);             
                 }
                 //перебираем, что осталось и удаляем, так как должен остаться только список на удаление
                 foreach (var characterId in oldInvolvedCharactersId)
                 {
-                    await DeletionRepository.DeleteBelongToEvent(id, characterId, _context);
+                    await DeletionRepository.DeleteBelongToEvent(id, characterId, Context);
                 }
             }
 
-            _context.Events.Update(@event);
-            _context.SaveChangesAsync();
+            Context.Events.Update(@event);
+            await Context.SaveChangesAsync();
 
             return @event;
         }
@@ -117,14 +117,14 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Event> DeleteEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await Context.Events.FirstOrDefaultAsync(x => x.Id == id);
 
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
             }
 
-            await DeletionRepository.DeleteEvent(id, _context);
+            await DeletionRepository.DeleteEvent(id, Context);
 
             return @event;
         }
@@ -138,15 +138,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдена.</exception>
         public async Task<EventData> GetEvent(int id, CancellationToken cancellationToken)
         {
-            var @event = await _context.Events.FindAsync(id, cancellationToken);
+            var @event = await Context.Events.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
             }
-            var eventdata = _mapper.Map<EventData>(@event);
+            var eventdata = Mapper.Map<EventData>(@event);
 
-            var characters = await _context.BelongToEvents.Where(b => b.EventId == id).ToListAsync(cancellationToken);
+            var characters = await Context.BelongToEvents.Where(b => b.EventId == id).ToListAsync(cancellationToken);
             int[] ints = new int[characters.Count];
             for(int i = 0;i<ints.Length;i++)
                 ints[i] = characters[i].CharacterId;
@@ -162,12 +162,12 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех событий таймлайна.</returns>
         public async Task<IEnumerable<EventAllData>> GetAllEvents(int idTimeline, CancellationToken cancellationToken)
         {
-            var belongToTimelines = await _context.BelongToTimelines.Where(b => b.TimelineId == idTimeline).ToListAsync(cancellationToken);
+            var belongToTimelines = await Context.BelongToTimelines.Where(b => b.TimelineId == idTimeline).ToListAsync(cancellationToken);
 
             var events = new List<Event>();
             foreach (var belongToTimeline in belongToTimelines)
             {
-                var @event = await _context.Events.FindAsync(belongToTimeline.EventId, cancellationToken);
+                var @event = await Context.Events.FirstOrDefaultAsync(x => x.Id == belongToTimeline.EventId, cancellationToken);
                 if (@event == null)
                 {
                     throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 0));
@@ -178,7 +178,7 @@ namespace WebAPI.BLL.Services
             var eventsData = new List<EventAllData>();
             foreach (var @event in events)
             {
-                var eventData = _mapper.Map<EventAllData>(@event);
+                var eventData = Mapper.Map<EventAllData>(@event);
                 eventsData.Add(eventData);
             }
             return eventsData;

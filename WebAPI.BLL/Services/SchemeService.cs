@@ -20,8 +20,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class SchemeService : ISchemeService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
         private CreationRepository CreationRepository;
 
@@ -32,8 +32,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public SchemeService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
             CreationRepository = creationRepository;
         }
@@ -46,7 +46,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="ArgumentException">Если модели не валидны.</exception>
         public async Task<Scheme> CreateScheme(SchemeData schemedata)
         {
-            var scheme = _mapper.Map<Scheme>(schemedata);
+            var scheme = Mapper.Map<Scheme>(schemedata);
             var validationContext = new ValidationContext(scheme);
             var validationResults = new List<ValidationResult>();
 
@@ -55,7 +55,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            CreationRepository.CreateScheme(scheme,_context);
+            await CreationRepository.CreateScheme(scheme, Context);
 
             return scheme;
         }
@@ -69,12 +69,12 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если связь не найдена.</exception>
         public async Task<Scheme> UpdateScheme(int SchemeId, int ConnectionId)
         {
-            var scheme = _context.Schemes.Find(SchemeId);
+            var scheme = await Context.Schemes.FirstOrDefaultAsync(x => x.Id == SchemeId);
             if (scheme == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
-            CreationRepository.CreateBelongToScheme(ConnectionId, SchemeId,_context);
+            await CreationRepository.CreateBelongToScheme(ConnectionId, SchemeId,Context);
 
             return scheme;
         }
@@ -87,14 +87,14 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> DeleteScheme(int id)
         {
-            var scheme = await _context.Schemes.FindAsync(id);
+            var scheme = await Context.Schemes.FirstOrDefaultAsync(x => x.Id == id);
 
             if (scheme == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
 
-            await DeletionRepository.DeleteScheme(id, _context);
+            await DeletionRepository.DeleteScheme(id, Context);
 
             return scheme;
         }
@@ -108,7 +108,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если схема не найдена.</exception>
         public async Task<Scheme> GetScheme(int id, CancellationToken cancellationToken)
         {
-            var scheme = await _context.Schemes.FindAsync(id, cancellationToken);
+            var scheme = await Context.Schemes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (scheme == null)
             {
@@ -126,7 +126,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех схем книги.</returns>
         public async Task<IEnumerable<Scheme>> GetAllSchemes(int idBook, CancellationToken cancellationToken)
         {
-            var schemes = await _context.Schemes.Where(s => s.BookId == idBook).ToListAsync(cancellationToken);
+            var schemes = await Context.Schemes.Where(s => s.BookId == idBook).ToListAsync(cancellationToken);
 
             return schemes;
         }

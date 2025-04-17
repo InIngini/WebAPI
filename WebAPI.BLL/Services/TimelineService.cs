@@ -20,8 +20,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class TimelineService : ITimelineService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
         private CreationRepository CreationRepository;
 
@@ -32,8 +32,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public TimelineService(IContext context, IMapper mapper, CreationRepository creationRepository, DeletionRepository deletionRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
             CreationRepository = creationRepository;
         }
@@ -46,7 +46,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<Timeline> CreateTimeline(TimelineData timelinedata)
         {
-            var timeline = _mapper.Map<Timeline>(timelinedata);
+            var timeline = Mapper.Map<Timeline>(timelinedata);
 
             var validationContext = new ValidationContext(timeline);
             var validationResults = new List<ValidationResult>();
@@ -56,7 +56,7 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            CreationRepository.CreateTimeline(timeline, _context);
+            await CreationRepository.CreateTimeline(timeline, Context);
 
             return timeline;
         }
@@ -70,13 +70,13 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если событие не найдено.</exception>
         public async Task<Timeline> UpdateTimeline(int TimelineId, int EventId)
         {
-            var timeline = _context.Timelines.Find(TimelineId);
+            var timeline = await Context.Timelines.FirstOrDefaultAsync(x => x.Id == TimelineId);
             if (timeline == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
 
-            CreationRepository.CreateBelongToTimeline(EventId, TimelineId,_context);
+            await CreationRepository.CreateBelongToTimeline(EventId, TimelineId,Context);
 
             return timeline;
         }
@@ -89,13 +89,13 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> DeleteTimeline(int id)
         {
-            var timeline = await _context.Timelines.FindAsync(id);
+            var timeline = await Context.Timelines.FirstOrDefaultAsync(x => x.Id == id);
             if (timeline == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 0));
             }
 
-            await DeletionRepository.DeleteTimeline(id, _context);
+            await DeletionRepository.DeleteTimeline(id, Context);
 
             return timeline;
         }
@@ -109,7 +109,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если таймлайн не найден.</exception>
         public async Task<Timeline> GetTimeline(int id, CancellationToken cancellationToken)
         {
-            var timeline = await _context.Timelines.FindAsync(id, cancellationToken);
+            var timeline = await Context.Timelines.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (timeline == null)
             {
@@ -127,7 +127,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех таймлайнов книги.</returns>
         public async Task<IEnumerable<Timeline>> GetAllTimelines(int idBook, CancellationToken cancellationToken)
         {
-            var timelines = await _context.Timelines.Where(t => t.BookId == idBook)
+            var timelines = await Context.Timelines.Where(t => t.BookId == idBook)
                                                  .ToListAsync(cancellationToken);
 
             return timelines;

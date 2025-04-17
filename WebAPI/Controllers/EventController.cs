@@ -20,7 +20,7 @@ namespace WebAPI.Controllers
     [Route("User/Book/Timeline/[controller]")]
     public class EventController : Controller
     {
-        private readonly IEventService _eventService;
+        private readonly IEventService EventService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="EventController"/>.
@@ -28,7 +28,7 @@ namespace WebAPI.Controllers
         /// <param name="eventService">Сервис для работы с событиями.</param>
         public EventController(IEventService eventService)
         {
-            _eventService = eventService;
+            EventService = eventService;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
             
-            var createdEvent = await _eventService.CreateEvent(eventData);
+            var createdEvent = await EventService.CreateEvent(eventData);
 
             return CreatedAtAction(nameof(GetEvent), new { id = createdEvent.Id }, createdEvent);
         }
@@ -84,7 +84,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventData eventData, CancellationToken cancellationToken)
         {
-            var updatedEvent = await _eventService.UpdateEvent(eventData, id);
+            var updatedEvent = await EventService.UpdateEvent(eventData, id);
 
             if (updatedEvent == null)
             {
@@ -103,7 +103,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id,CancellationToken cancellationToken)
         {
-            await _eventService.DeleteEvent(id);
+            await EventService.DeleteEvent(id);
 
             return Ok();
         }
@@ -118,7 +118,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(EventData), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetEvent(int id, CancellationToken cancellationToken)
         {
-            var @event = await _eventService.GetEvent(id, cancellationToken);
+            var @event = await EventService.GetEvent(id, cancellationToken);
 
             if (@event == null)
             {
@@ -138,7 +138,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<EventAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllEvents([FromBody] int id, CancellationToken cancellationToken)
         {
-            var events = await _eventService.GetAllEvents(id, cancellationToken);
+            var events = await EventService.GetAllEvents(id, cancellationToken);
 
             if (events == null)
             {
