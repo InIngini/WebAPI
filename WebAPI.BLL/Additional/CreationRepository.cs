@@ -27,10 +27,10 @@ namespace WebAPI.BLL.Additional
         /// <param name="BookId">Идентификатор книги, к которой предоставляется доступ.</param>
         /// <param name="TypeBelong">Тип доступа к книге (например, автор, читатель и т.д.).</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateBelongToBook(int UserId,int BookId,string TypeBelongName,IContext context)
+        public async Task CreateBelongToBook(int UserId, int BookId, string TypeBelongName, IContext context)
         {
-            var TypeBelong = context.TypeBelongToBooks.Where(t => t.Name == TypeBelongName).FirstOrDefault();
-            if(TypeBelong == null)
+            var TypeBelong = await context.TypeBelongToBooks.Where(t => t.Name == TypeBelongName).FirstOrDefaultAsync();
+            if (TypeBelong == null)
             {
                 throw new ApiException(TypesOfErrors.SomethingWentWrong("Неправильный тип доступа к книге"));
             }
@@ -42,7 +42,7 @@ namespace WebAPI.BLL.Additional
                 TypeBelong = TypeBelong.Id // автор
             };
             context.BelongToBooks.Add(belongToBook);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Создает новую схему для заданной книги с указанным именем.
@@ -50,10 +50,10 @@ namespace WebAPI.BLL.Additional
         /// <param name="Name">Имя схемы, которую необходимо создать.</param>
         /// <param name="BookId">Идентификатор книги, к которой относится схема.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateScheme(Scheme scheme,IContext context)
+        public async Task CreateScheme(Scheme scheme, IContext context)
         {
             context.Schemes.Add(scheme);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Создает новую связь для заданной книги и автоматом связывает ее с "Главной схемой".
@@ -85,13 +85,13 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task CreateBelongToScheme(int ConnectionId, int SchemeId, IContext context)
         {
-            var connection = await context.Connections.FindAsync(ConnectionId); // Используем асинхронный поиск
+            var connection = await context.Connections.FirstOrDefaultAsync(x => x.Id == ConnectionId); // Используем асинхронный поиск
             if (connection == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Связь", 0));
             }
 
-            var scheme = await context.Schemes.FindAsync(SchemeId); // Используем асинхронный поиск
+            var scheme = await context.Schemes.FirstOrDefaultAsync(x => x.Id == SchemeId); // Используем асинхронный поиск
             if (scheme == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
@@ -111,10 +111,10 @@ namespace WebAPI.BLL.Additional
         /// <param name="Name">Имя таймлайна, который нужно создать.</param>
         /// <param name="BookId">Идентификатор книги, к которой относится таймлайн.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateTimeline(Timeline timeline, IContext context)
+        public async Task CreateTimeline(Timeline timeline, IContext context)
         {
             context.Timelines.Add(timeline);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Создает новое событие и автоматически связывает его с "Главным таймлайном".
@@ -122,19 +122,21 @@ namespace WebAPI.BLL.Additional
         /// <param name="@event">Объект события, который нужно создать.</param>
         /// <param name="BookId">Идентификатор книги, к которой может относиться событие.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateEvent(Event @event, int BookId, IContext context)
+        public async Task CreateEvent(Event @event, int BookId, IContext context)
         {
             context.Events.Add(@event);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-            var timeline = context.Timelines
-                             .Where(s => s.NameTimeline == "Главный таймлайн" && s.BookId == BookId)
-                             .FirstOrDefault();
+            var timeline = await context.Timelines
+                .Where(s => s.NameTimeline == "Главный таймлайн" && s.BookId == BookId)
+                .FirstOrDefaultAsync();
+
             if (timeline == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Главный таймлайн", 1));
             }
-            CreateBelongToTimeline(@event.Id, timeline.Id, context);
+
+            await CreateBelongToTimeline(@event.Id, timeline.Id, context);
         }
         /// <summary>
         /// Создает связь между событием и таймлайном.
@@ -142,15 +144,15 @@ namespace WebAPI.BLL.Additional
         /// <param name="EventId">Идентификатор события, которое нужно связать с таймлайном.</param>
         /// <param name="TimelineId">Идентификатор таймлайна, с которым связывается событие.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateBelongToTimeline(int EventId, int TimelineId, IContext context)
+        public async Task CreateBelongToTimeline(int EventId, int TimelineId, IContext context)
         {
-            var @event = context.Events.Find(EventId);
+            var @event = await context.Events.FirstOrDefaultAsync(x => x.Id == EventId);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
             }
 
-            var timeline = context.Timelines.Find(TimelineId);
+            var timeline = await context.Timelines.FirstOrDefaultAsync(x => x.Id == TimelineId);
             if (timeline == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 1));
@@ -162,7 +164,7 @@ namespace WebAPI.BLL.Additional
                 EventId = EventId
             };
             context.BelongToTimelines.Add(belongToTimeline);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Создает связь между событием и персонажем.
@@ -170,15 +172,15 @@ namespace WebAPI.BLL.Additional
         /// <param name="EventId">Идентификатор события, с которым связывается персонаж.</param>
         /// <param name="CharacterId">Идентификатор персонажа, который связывается с событием.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateBelongToEvent(int EventId, int CharacterId, IContext context)
+        public async Task CreateBelongToEvent(int EventId, int CharacterId, IContext context)
         {
-            var character = context.Characters.Find(CharacterId);
+            var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == CharacterId);
             if (character == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
 
-            var @event = context.Events.Find(EventId);
+            var @event = await context.Events.FirstOrDefaultAsync(x => x.Id == EventId);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
@@ -190,16 +192,17 @@ namespace WebAPI.BLL.Additional
                 EventId = EventId
             };
             context.BelongToEvents.Add(belongToEvent);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Создает ответы для всех заданных вопросов, связывая их с указанным персонажем.
         /// </summary>
         /// <param name="CharacterId">Идентификатор персонажа, для которого создаются ответы.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public void CreateAllAnswerByCharacter(int CharacterId, IContext context)
+        public async Task CreateAllAnswerByCharacter(int CharacterId, IContext context)
         {
-            foreach (var question in context.Questions.ToList())
+            var questions = await context.Questions.ToListAsync();
+            foreach (var question in questions)
             {
                 Answer answer = new Answer()
                 {
@@ -208,8 +211,8 @@ namespace WebAPI.BLL.Additional
                     AnswerText = ""
                 };
                 context.Answers.Add(answer);
-                context.SaveChangesAsync();
             }
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
     [Route("User/Book/Scheme/[controller]")]
     public class ConnectionController : Controller
     {
-        private readonly IConnectionService _connectionService;
+        private readonly IConnectionService ConnectionService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ConnectionController"/>.
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         /// <param name="connectionService">Сервис для работы со связями.</param>
         public ConnectionController(IConnectionService connectionService)
         {
-            _connectionService = connectionService;
+            ConnectionService = connectionService;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
-            var createdConnection = await _connectionService.CreateConnection(connectionData);
+            var createdConnection = await ConnectionService.CreateConnection(connectionData);
             
             return CreatedAtAction(nameof(GetConnection), new { id = createdConnection.Id }, createdConnection);
         }
@@ -67,7 +67,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConnection(int id)
         {
-            var connection = await _connectionService.DeleteConnection(id);
+            var connection = await ConnectionService.DeleteConnection(id);
 
             if (connection == null)
             {
@@ -87,7 +87,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ConnectionData), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetConnection(int id, CancellationToken cancellationToken)
         {
-            var connection = await _connectionService.GetConnection(id, cancellationToken);
+            var connection = await ConnectionService.GetConnection(id, cancellationToken);
 
             return Ok(connection);
         }
@@ -102,7 +102,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<ConnectionAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllConnection([FromBody] int id, CancellationToken cancellationToken)
         {
-            var connections = await _connectionService.GetAllConnections(id, cancellationToken);
+            var connections = await ConnectionService.GetAllConnections(id, cancellationToken);
 
             if (connections == null)
             {

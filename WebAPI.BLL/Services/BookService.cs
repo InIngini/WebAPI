@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using WebAPI.Errors;
 using WebAPI.BLL.Additional;
+using System.Net;
 
 
 namespace WebAPI.BLL.Services
@@ -21,8 +22,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class BookService : IBookService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
         private CreationRepository CreationRepository;
 
@@ -33,8 +34,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public BookService(IContext context, IMapper mapper, DeletionRepository deletionRepository, CreationRepository creationRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
             CreationRepository = creationRepository;
         }
@@ -55,29 +56,28 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-
-            Book book = _mapper.Map<Book>(userbook);
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
+            Book book = Mapper.Map<Book>(userbook);
+            Context.Books.Add(book);
+            await Context.SaveChangesAsync();
 
             // Создание сущности BelongTo
-            CreationRepository.CreateBelongToBook(userbook.UserId, book.Id, "Автор", _context);
+            await CreationRepository.CreateBelongToBook(userbook.UserId, book.Id, "Автор", Context);
 
             // Создание главной схемы 
             Scheme scheme = new Scheme()
-            { 
+            {
                 NameScheme = "Главная схема",
                 BookId = book.Id,
             };
-            CreationRepository.CreateScheme(scheme, _context);
+            await CreationRepository.CreateScheme(scheme, Context);
 
             // Создание главного таймлайна
             Timeline timeline = new Timeline()
-            { 
+            {
                 NameTimeline = "Главный таймлайн",
-                BookId = book.Id 
+                BookId = book.Id
             };
-            CreationRepository.CreateTimeline(timeline, _context);
+            await CreationRepository.CreateTimeline(timeline, Context);
 
             return book;
         }
@@ -87,20 +87,26 @@ namespace WebAPI.BLL.Services
         /// </summary>
         /// <param name="book">Книга для обновления.</param>
         /// <returns>Обновленная книга.</returns>
-        public async Task<Book> UpdateBook(int BookId, Book book)
+        public async Task<Book> UpdateBook(int userId, int BookId, Book book)
         {
-            var existingBook = await _context.Books.FindAsync(BookId);
+            var existingBook = await Context.Books.FirstOrDefaultAsync(x => x.Id == BookId);
 
             if (existingBook == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
             }
 
+            var belongToBook = await Context.BelongToBooks.FirstOrDefaultAsync(x => x.BookId == BookId && x.UserId == userId);
+            if (belongToBook == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotYour("Книга", 0));
+            }
+
             existingBook.NameBook = book.NameBook;
             existingBook.PictureId = book.PictureId;
 
-            _context.Books.Update(existingBook);
-            await _context.SaveChangesAsync();
+            Context.Books.Update(existingBook);
+            await Context.SaveChangesAsync();
 
             return existingBook;
         }
@@ -111,48 +117,54 @@ namespace WebAPI.BLL.Services
         /// <param name="id">Идентификатор книги.</param>
         /// <returns>Удаленная книга.</returns>
         /// <exception cref="KeyNotFoundException">Если книга не найдена.</exception>
-        public async Task<Book> DeleteBook(int id)
+        public async Task<Book> DeleteBook(int userId, int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await Context.Books.FirstOrDefaultAsync(x => x.Id == id);
             if (book == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
             }
 
+            var belongToBook = await Context.BelongToBooks.FirstOrDefaultAsync(x => x.BookId == id && x.UserId == userId);
+            if (belongToBook == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotYour("Книга", 0));
+            }
+
             // Удаление связанных записей из таблицы BelongToBook
-            DeletionRepository.DeleteBelongToBook(book.Id, _context);
+            await DeletionRepository.DeleteBelongToBook(book.Id, Context);
 
             // Удаление всех схем книги
-            var schemes = await _context.Schemes.Where(s => s.BookId == id).ToListAsync();
+            var schemes = await Context.Schemes.Where(s => s.BookId == id).ToListAsync();
             foreach (var scheme in schemes)
             {
-                DeletionRepository.DeleteScheme(scheme.Id, _context);
+                await DeletionRepository.DeleteScheme(scheme.Id, Context);
             }
 
             // Удаление всех таймлайнов книги
-            var timelines = await _context.Timelines.Where(s => s.BookId == id).ToListAsync();
+            var timelines = await Context.Timelines.Where(s => s.BookId == id).ToListAsync();
             foreach (var timeline in timelines)
             {
-                await DeletionRepository.DeleteTimeline(timeline.Id, _context);
+                await DeletionRepository.DeleteTimeline(timeline.Id, Context);
             }
 
             // Удаление обложки
             if (book.PictureId != null)
             {
-                await DeletionRepository.DeletePicture((int)book.PictureId, _context);
+                await DeletionRepository.DeletePicture((int)book.PictureId, Context);
             }
 
             // Удаление всех персонажей книги
-            var characters = await _context.Characters.Where(c => c.BookId == id).ToListAsync();
-            CharacterService characterService = new CharacterService(_context,_mapper,DeletionRepository,CreationRepository);
+            var characters = await Context.Characters.Where(c => c.BookId == id).ToListAsync();
+            CharacterService characterService = new CharacterService(Context, Mapper, DeletionRepository, CreationRepository);
             foreach (var character in characters)
             {
                 await characterService.DeleteCharacter(character.Id);
             }
 
             // Удаление книги
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
+            Context.Books.Remove(book);
+            await Context.SaveChangesAsync();
 
             return book;
         }
@@ -164,9 +176,15 @@ namespace WebAPI.BLL.Services
         /// <param name="cancellationToken">Токен для отмены запроса.</param>
         /// <returns>Книга с указанным идентификатором.</returns>
         /// <exception cref="KeyNotFoundException">Если книга не найдена.</exception>
-        public async Task<Book> GetBook(int id, CancellationToken cancellationToken)
+        public async Task<Book> GetBook(int userId, int id, CancellationToken cancellationToken)
         {
-            var book = await _context.Books.FindAsync(id,cancellationToken);
+            var belongToBook = await Context.BelongToBooks.FirstOrDefaultAsync(x => x.BookId == id && x.UserId == userId);
+            if (belongToBook == null)
+            {
+                throw new KeyNotFoundException(TypesOfErrors.NotYour("Книга", 0));
+            }
+
+            var book = await Context.Books.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (book == null)
             {
@@ -185,17 +203,17 @@ namespace WebAPI.BLL.Services
         /// <exception cref="ArgumentException">Если пользователь с указанным идентификатором не существует.</exception>
         public async Task<IEnumerable<Book>> GetAllBooksForUser(int idUser, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(idUser);
+            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id == idUser);
             if (user == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Пользователь", 1));
             }
-            //var books = await _context.Books.Where(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToListAsync();
+            //var books = await Context.Books.Where(b => b.BelongToBooks.Any(u => u.IdUser == userId)).ToListAsync();
             var books = new List<Book>();
-            var belongToBooks = await _context.BelongToBooks.Where(b=>b.UserId == idUser).ToListAsync(cancellationToken);
+            var belongToBooks = await Context.BelongToBooks.Where(b => b.UserId == idUser).ToListAsync(cancellationToken);
             foreach (var belongToBook in belongToBooks)
             {
-                var book = await _context.Books.FindAsync(belongToBook.BookId);
+                var book = await Context.Books.FirstOrDefaultAsync(x => x.Id == belongToBook.BookId);
                 if (book != null)
                 {
                     var bookDtos = new Book

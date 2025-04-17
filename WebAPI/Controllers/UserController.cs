@@ -16,11 +16,12 @@ namespace WebAPI.Controllers
     /// Контроллер для управления пользователями.
     /// </summary>
     [ApiController]
+    [AllowAnonymous]
     [Route("[controller]")]
     //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserService UserService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="UserController"/>.
@@ -28,7 +29,7 @@ namespace WebAPI.Controllers
         /// <param name="userService">Сервис для работы с пользователями.</param>
         public UserController(IUserService userService)
         {
-            _userService = userService;
+            UserService = userService;
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateUser([FromBody] LoginData loginData)
         {
-            var createdUser = await _userService.CreateUser(loginData);
+            var createdUser = await UserService.CreateUser(loginData);
 
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
         }
@@ -73,7 +74,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(UserTokenData), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] LoginData loginData,CancellationToken cancellationToken)
         {
-            var userToken = await _userService.Login(loginData,cancellationToken);
+            var userToken = await UserService.Login(loginData,cancellationToken);
 
             //var token = user.Token;
 
@@ -90,7 +91,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUser(int id,CancellationToken cancellationToken)
         {
-            var user = await _userService.GetUser(id,cancellationToken);
+            var user = await UserService.GetUser(id,cancellationToken);
 
             return Ok(user);
         }

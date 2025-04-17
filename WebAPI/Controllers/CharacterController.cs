@@ -18,8 +18,8 @@ namespace WebAPI.Controllers
     [Route("User/Book/[controller]")]
     public class CharacterController : Controller
     {
-        private readonly ICharacterService _characterService;
-        private readonly IAddedAttributeService _addedAttributeService;
+        private readonly ICharacterService CharacterService;
+        private readonly IAddedAttributeService AddedAttributeService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="CharacterController"/>.
@@ -28,8 +28,8 @@ namespace WebAPI.Controllers
         /// <param name="addedAttributeService">Сервис для работы с добавленными атрибутами.</param>
         public CharacterController(ICharacterService characterService, IAddedAttributeService addedAttributeService)
         {
-            _characterService = characterService;
-            _addedAttributeService = addedAttributeService;
+            CharacterService = characterService;
+            AddedAttributeService = addedAttributeService;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace WebAPI.Controllers
                 BookId = bookCharacterData.BookId,
                 PictureId = bookCharacterData.PictureId
             };
-            var createdCharacter = await _characterService.CreateCharacter(character);
+            var createdCharacter = await CharacterService.CreateCharacter(character);
 
             return CreatedAtAction(nameof(GetCharacter), new { id = createdCharacter.Id }, createdCharacter);
         }
@@ -113,7 +113,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Character), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] CharacterWithAnswers characterWithAnswers)
         {
-            var existingCharacter = await _characterService.UpdateCharacter(characterWithAnswers,id);
+            var existingCharacter = await CharacterService.UpdateCharacter(characterWithAnswers,id);
 
             if (existingCharacter == null)
             {
@@ -131,7 +131,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCharacter(int id)
         {
-            await _characterService.DeleteCharacter(id);
+            await CharacterService.DeleteCharacter(id);
 
             return Ok();
         }
@@ -146,7 +146,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(CharacterWithAnswers), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCharacter(int id, CancellationToken cancellationToken)
         {
-            var character = await _characterService.GetCharacter(id, cancellationToken);
+            var character = await CharacterService.GetCharacter(id, cancellationToken);
 
             if (character == null)
             {
@@ -166,7 +166,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<CharacterAllData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllCharacters([FromQuery] int idBook, CancellationToken cancellationToken)
         {
-            var characters = await _characterService.GetAllCharacters(idBook, cancellationToken);
+            var characters = await CharacterService.GetAllCharacters(idBook, cancellationToken);
 
             if (characters == null)
             {
@@ -186,7 +186,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<QuestionData>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetQuestions()
         {
-            var questions = await _characterService.GetQuestions();
+            var questions = await CharacterService.GetQuestions();
 
             if (questions == null)
             {
@@ -222,7 +222,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
-            var createdAddedAttribute = await _addedAttributeService.CreateAddedAttribute(id,aa);
+            var createdAddedAttribute = await AddedAttributeService.CreateAddedAttribute(id,aa);
 
             return CreatedAtAction(nameof(GetAddedAttribute), new { id = createdAddedAttribute.Id }, createdAddedAttribute);
         }
@@ -238,7 +238,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(AddedAttribute), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateAddedAttribute(int ida, [FromBody] string content, CancellationToken cancellationToken)
         {
-            var existingAddedAttribute = await _addedAttributeService.UpdateAddedAttribute(ida,content);
+            var existingAddedAttribute = await AddedAttributeService.UpdateAddedAttribute(ida,content);
 
             if (existingAddedAttribute == null)
             {
@@ -257,7 +257,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{idc}/addedattribute/{ida}")]
         public async Task<IActionResult> DeleteAddedAttribute(int idc,int ida)
         {
-            await _addedAttributeService.DeleteAddedAttribute(idc, ida);
+            await AddedAttributeService.DeleteAddedAttribute(idc, ida);
 
             return Ok();
         }
@@ -272,7 +272,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(AddedAttribute), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAddedAttribute(int id, CancellationToken cancellationToken)
         {
-            var addedAttribute = await _addedAttributeService.GetAddedAttribute(id,cancellationToken);
+            var addedAttribute = await AddedAttributeService.GetAddedAttribute(id,cancellationToken);
 
             if (addedAttribute == null)
             {

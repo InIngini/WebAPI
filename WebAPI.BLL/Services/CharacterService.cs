@@ -21,8 +21,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class CharacterService : ICharacterService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
         private DeletionRepository DeletionRepository;
         private CreationRepository CreationRepository;
 
@@ -33,8 +33,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public CharacterService(IContext context, IMapper mapper, DeletionRepository deletionRepository, CreationRepository creationRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
             DeletionRepository = deletionRepository;
             CreationRepository = creationRepository;
         }
@@ -55,10 +55,10 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            _context.Characters.Add(character);
-            await _context.SaveChangesAsync();
+            Context.Characters.Add(character);
+            await Context.SaveChangesAsync();
 
-            CreationRepository.CreateAllAnswerByCharacter(character.Id, _context);
+            await CreationRepository.CreateAllAnswerByCharacter(character.Id, Context);
 
             return character;
         }
@@ -73,37 +73,37 @@ namespace WebAPI.BLL.Services
         public async Task<Character> UpdateCharacter(CharacterWithAnswers characterWithAnswers, int id)
         {
             // Получение персонажа из базы данных
-            var character = _context.Characters.Find(id);
+            var character = await Context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
-            if (characterWithAnswers.PictureId!=null)
+            if (characterWithAnswers.PictureId != null)
             {
                 character.PictureId = characterWithAnswers.PictureId;
             }
-            if(characterWithAnswers.Name!=null)
+            if (characterWithAnswers.Name != null)
             {
-                character.Name=characterWithAnswers.Name;
+                character.Name = characterWithAnswers.Name;
             }
             // Обновление персонажа
-            _context.Characters.Update(character);
+            Context.Characters.Update(character);
 
             // Обновление блоков
-            for (int i=1;i<=characterWithAnswers.Answers.Length;i++) 
+            for (int i = 1; i <= characterWithAnswers.Answers.Length; i++)
             {
-                if (characterWithAnswers.Answers[i-1] != "")
+                if (characterWithAnswers.Answers[i - 1] != "")
                 {
-                    var answer = _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefault();
+                    var answer = await Context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == i).FirstOrDefaultAsync();
                     if (answer == null)
                     {
                         throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
                     }
                     answer.AnswerText = characterWithAnswers.Answers[i - 1];
-                    _context.Answers.Update(answer);
+                    Context.Answers.Update(answer);
                 }
             }
-            _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
             return character;
         }
@@ -116,45 +116,45 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<Character> DeleteCharacter(int id)
         {
-            var character = await _context.Characters.FindAsync(id);
+            var character = await Context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
 
             // Удаление всех ответом персонажа
-            await DeletionRepository.DeleteAllAnswerByCharacter(character.Id, _context);
+            await DeletionRepository.DeleteAllAnswerByCharacter(character.Id, Context);
 
             // Удаление всех добавленных атрибутов блока
-            var addedAttributes = await _context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToListAsync();
+            var addedAttributes = await Context.AddedAttributes.Where(aa => aa.CharacterId == character.Id).ToListAsync();
             foreach (var addedAttribute in addedAttributes)
             {
-                _context.AddedAttributes.Remove(addedAttribute);
+                Context.AddedAttributes.Remove(addedAttribute);
             }
 
             // Удаление всех записей в галерее
-            var galleryItems = await _context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToListAsync();
+            var galleryItems = await Context.BelongToGalleries.Where(gi => gi.CharacterId == id).ToListAsync();
             foreach (var galleryItem in galleryItems)
             {
-                await DeletionRepository.DeletePicture((int)galleryItem.PictureId, _context);
+                await DeletionRepository.DeletePicture((int)galleryItem.PictureId, Context);
             }
 
             // Удаление аватарки
             if (character.PictureId != null)
             {
-                await DeletionRepository.DeletePicture((int)character.PictureId, _context);
+                await DeletionRepository.DeletePicture((int)character.PictureId, Context);
             }
-            
+
             // Удаление связи
-            var connections = await _context.Connections.Where(c=> c.Character1Id==character.Id||c.Character2Id==character.Id).ToListAsync();
+            var connections = await Context.Connections.Where(c => c.Character1Id == character.Id || c.Character2Id == character.Id).ToListAsync();
             foreach (var connection in connections)
             {
-                await DeletionRepository.DeleteConnection(connection.Id, _context);
+                await DeletionRepository.DeleteConnection(connection.Id, Context);
             }
 
             // Удаление персонажа
-            _context.Characters.Remove(character);
-            await _context.SaveChangesAsync();
+            Context.Characters.Remove(character);
+            await Context.SaveChangesAsync();
 
             return character;
         }
@@ -168,24 +168,24 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если персонаж не найден.</exception>
         public async Task<CharacterWithAnswers> GetCharacter(int id, CancellationToken cancellationToken)
         {
-            var character = await _context.Characters.FindAsync(id);
+            var character = await Context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
-            var questions = await _context.Questions.ToListAsync(cancellationToken);
+            var questions = await Context.Questions.ToListAsync(cancellationToken);
             string[] answers = new string[questions.Count()];
             foreach (var question in questions)
             {
-                var answer = await _context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefaultAsync(cancellationToken);
+                var answer = await Context.Answers.Where(a => a.CharacterId == character.Id && a.QuestionId == question.Id).FirstOrDefaultAsync(cancellationToken);
                 if (answer == null)
                 {
                     throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Ответ", 1));
                 }
                 answers[question.Id - 1] = answer.AnswerText;
             }
-            
-            var characterWithAnswers = _mapper.Map<CharacterWithAnswers>(character);
+
+            var characterWithAnswers = Mapper.Map<CharacterWithAnswers>(character);
             characterWithAnswers.Answers = answers;
 
             return characterWithAnswers;
@@ -199,15 +199,15 @@ namespace WebAPI.BLL.Services
         /// <returns>Список персонажей с данными.</returns>
         public async Task<IEnumerable<CharacterAllData>> GetAllCharacters(int idBook, CancellationToken cancellationToken)
         {
-            var characters = await _context.Characters.Where(c => c.BookId == idBook).ToListAsync(cancellationToken);
+            var characters = await Context.Characters.Where(c => c.BookId == idBook).ToListAsync(cancellationToken);
             var charactersAllData = new List<CharacterAllData>();
-            
+
             foreach (var character in characters)
             {
-                var characterAllData = _mapper.Map<CharacterAllData>(character);
+                var characterAllData = Mapper.Map<CharacterAllData>(character);
                 characterAllData.Name = character.Name;
                 if (character.PictureId != null)
-                    characterAllData.PictureContent = _context.Pictures.Find((int)character.PictureId).PictureContent;
+                    characterAllData.PictureContent = (await Context.Pictures.FirstOrDefaultAsync(x => x.Id == (int)character.PictureId))?.PictureContent;
                 charactersAllData.Add(characterAllData);
             }
             return charactersAllData;
@@ -219,13 +219,13 @@ namespace WebAPI.BLL.Services
         /// <returns>Список всех вопросов.</returns>
         public async Task<IEnumerable<QuestionData>> GetQuestions()
         {
-            var questions = await _context.Questions.ToListAsync();
+            var questions = await Context.Questions.ToListAsync();
             var questionsData = new List<QuestionData>();
 
             foreach (var question in questions)
             {
-                var questionData = _mapper.Map<QuestionData>(question);
-                questionData.Block = _context.NumberBlocks.Find(question.Block).Name;
+                var questionData = Mapper.Map<QuestionData>(question);
+                questionData.Block = (await Context.NumberBlocks.FirstOrDefaultAsync(x => x.Id == question.Block))?.Name;
                 questionsData.Add(questionData);
             }
 

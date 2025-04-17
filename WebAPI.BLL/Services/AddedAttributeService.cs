@@ -21,8 +21,8 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class AddedAttributeService : IAddedAttributeService
     {
-        private readonly IContext _context;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly IMapper Mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="AddedAttributeService"/>.
@@ -31,8 +31,8 @@ namespace WebAPI.BLL.Services
         /// <param name="mapper">Объект для преобразования данных.</param>
         public AddedAttributeService(IContext context, IMapper mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            Context = context;
+            Mapper = mapper;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="ArgumentException">Если модель не валидна.</exception>
         public async Task<AddedAttribute> CreateAddedAttribute(int id,AddedAttributeData aa)
         {
-            var addedAttribute = _mapper.Map<AddedAttribute>(aa);
+            var addedAttribute = Mapper.Map<AddedAttribute>(aa);
             addedAttribute.ContentAttribute = String.Empty;
             addedAttribute.CharacterId = id;
 
@@ -56,8 +56,8 @@ namespace WebAPI.BLL.Services
                 throw new ArgumentException(TypesOfErrors.NotValidModel());
             }
 
-            _context.AddedAttributes.Add(addedAttribute);
-            await _context.SaveChangesAsync();
+            Context.AddedAttributes.Add(addedAttribute);
+            await Context.SaveChangesAsync();
 
             return addedAttribute;
         }
@@ -69,7 +69,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Обновленный добавленный атрибут.</returns>
         public async Task<AddedAttribute> UpdateAddedAttribute(int AttributeId, string content)
         {
-            var addedAttribute = await _context.AddedAttributes.FindAsync(AttributeId);
+            var addedAttribute = await Context.AddedAttributes.FirstOrDefaultAsync(x => x.Id == AttributeId);
             if (addedAttribute == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Атрибут", 1));
@@ -77,8 +77,8 @@ namespace WebAPI.BLL.Services
 
             addedAttribute.ContentAttribute = content;
 
-            _context.AddedAttributes.Update(addedAttribute);
-            await _context.SaveChangesAsync();
+            Context.AddedAttributes.Update(addedAttribute);
+            await Context.SaveChangesAsync();
 
             return addedAttribute;
         }
@@ -92,15 +92,15 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> DeleteAddedAttribute(int idc, int ida)
         {
-            var addedAttribute = await _context.AddedAttributes.Where(a=> a.Id==ida && a.CharacterId==idc).FirstOrDefaultAsync();
+            var addedAttribute = await Context.AddedAttributes.Where(a=> a.Id==ida && a.CharacterId==idc).FirstOrDefaultAsync();
 
             if (addedAttribute == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Атрибут", 1));
             }
 
-            _context.AddedAttributes.Remove(addedAttribute);
-            await _context.SaveChangesAsync();
+            Context.AddedAttributes.Remove(addedAttribute);
+            await Context.SaveChangesAsync();
 
             return addedAttribute;
 
@@ -114,7 +114,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если атрибут не найден.</exception>
         public async Task<AddedAttribute> GetAddedAttribute(int id, CancellationToken cancellationToken)
         {
-            var addedAttribute = await _context.AddedAttributes.FindAsync(id, cancellationToken);
+            var addedAttribute = await Context.AddedAttributes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (addedAttribute == null)
             {
@@ -132,7 +132,7 @@ namespace WebAPI.BLL.Services
         /// <returns>Список добавленных атрибутов для указанного персонажа.</returns>
         public async Task<IEnumerable<AddedAttribute>> GetAllAddedAttributes(int idCharacter, CancellationToken cancellationToken)
         {
-            var addedAttributes = await _context.AddedAttributes.Where(aa => aa.CharacterId == idCharacter).ToListAsync(cancellationToken);
+            var addedAttributes = await Context.AddedAttributes.Where(aa => aa.CharacterId == idCharacter).ToListAsync(cancellationToken);
 
             return addedAttributes;
         }

@@ -1,4 +1,5 @@
-﻿using WebAPI.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.DB;
 using WebAPI.DB.Entities;
 using WebAPI.Errors;
 
@@ -18,7 +19,7 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteBelongToBook(int BookId, IContext context)
         {
-            var belongToBook =  context.BelongToBooks.Where(b => b.BookId == BookId).FirstOrDefault();
+            var belongToBook = await context.BelongToBooks.Where(b => b.BookId == BookId).FirstOrDefaultAsync();
             if (belongToBook == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Книга", 0));
@@ -34,19 +35,19 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteScheme(int SchemeId, IContext context)
         {
-            var scheme =  context.Schemes.Find(SchemeId);
+            var scheme = await context.Schemes.FirstOrDefaultAsync(x => x.Id == SchemeId);
             if (scheme == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Схема", 0));
             }
             // Удаление всех связей схемы
-            var belongToSchemes =  context.BelongToSchemes.Where(b => b.SchemeId == scheme.Id).ToList();
+            var belongToSchemes = context.BelongToSchemes.Where(b => b.SchemeId == scheme.Id).ToList();
             foreach (var belongToScheme in belongToSchemes)
             {
-                DeleteBelongToScheme(belongToScheme, context);
+                await DeleteBelongToScheme(belongToScheme, context);
                 if (scheme.NameScheme == "Главная схема")
                 {
-                    DeleteConnection(belongToScheme.ConnectionId, context);
+                    await DeleteConnection(belongToScheme.ConnectionId, context);
                 }
             }
             context.Schemes.Remove(scheme);
@@ -67,18 +68,18 @@ namespace WebAPI.BLL.Additional
         /// </summary>
         /// <param name="ConnectionId">Идентификатор связи, которую необходимо удалить.</param>
         /// <param name="context">Контекст базы данных.</param>
-        public async Task DeleteConnection(int ConnectionId,IContext context)
+        public async Task DeleteConnection(int ConnectionId, IContext context)
         {
-            var connection =  context.Connections.Find(ConnectionId);
+            var connection = await context.Connections.FirstOrDefaultAsync(x => x.Id == ConnectionId);
             if (connection == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Связь", 0));
             }
             //если мы удаляем связь, то надо и все белонги удалить
-            var belongToSchemes =  context.BelongToSchemes.Where(b => b.ConnectionId == connection.Id).ToList();
+            var belongToSchemes = context.BelongToSchemes.Where(b => b.ConnectionId == connection.Id).ToList();
             foreach (var belongToScheme in belongToSchemes)
             {
-                await DeleteBelongToScheme(belongToScheme,context);
+                await DeleteBelongToScheme(belongToScheme, context);
             }
             context.Connections.Remove(connection);
             await context.SaveChangesAsync();
@@ -91,23 +92,23 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteTimeline(int TimelineId, IContext context)
         {
-            var timeline =  context.Timelines.Find(TimelineId);
+            var timeline = await context.Timelines.FirstOrDefaultAsync(x => x.Id == TimelineId);
             if (timeline == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Таймлайн", 1));
             }
             // Удаление всех связей таймлайна
-            var belongToTimelines =  context.BelongToTimelines.Where(b => b.TimelineId == timeline.Id).ToList();
+            var belongToTimelines = context.BelongToTimelines.Where(b => b.TimelineId == timeline.Id).ToList();
             foreach (var belongToTimeline in belongToTimelines)
             {
-                DeleteBelongToTimeline(belongToTimeline, context);
+                await DeleteBelongToTimeline(belongToTimeline, context);
                 if (timeline.NameTimeline == "Главный таймлайн")
                 {
-                    DeleteEvent(belongToTimeline.EventId, context);
+                    await DeleteEvent(belongToTimeline.EventId, context);
                 }
             }
             context.Timelines.Remove(timeline);
-             await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь между таймлайном и событием.
@@ -117,7 +118,7 @@ namespace WebAPI.BLL.Additional
         public async Task DeleteBelongToTimeline(BelongToTimeline belongToTimeline, IContext context)
         {
             context.BelongToTimelines.Remove(belongToTimeline);
-             await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет событие по заданному идентификатору и все связи, связанные с этим событием.
@@ -126,19 +127,19 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteEvent(int EventId, IContext context)
         {
-            var @event =  context.Events.Find(EventId);
+            var @event = await context.Events.FirstOrDefaultAsync(x => x.Id == EventId);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
             }
             //если мы удаляем событие, то надо и все белонги удалить
-            var belongToTimelines =  context.BelongToTimelines.Where(b => b.EventId == @event.Id).ToList();
+            var belongToTimelines = context.BelongToTimelines.Where(b => b.EventId == @event.Id).ToList();
             foreach (var belongToTimeline in belongToTimelines)
             {
-                DeleteBelongToTimeline(belongToTimeline, context);
+                await DeleteBelongToTimeline(belongToTimeline, context);
             }
             context.Events.Remove(@event);
-             await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет связь между событием и персонажем по идентификаторам события и персонажа.
@@ -148,25 +149,25 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteBelongToEvent(int EventId, int CharacterId, IContext context)
         {
-            var character = context.Characters.Find(CharacterId);
+            var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == CharacterId);
             if (character == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Персонаж", 1));
             }
 
-            var @event = context.Events.Find(EventId);
+            var @event = await context.Events.FirstOrDefaultAsync(x => x.Id == EventId);
             if (@event == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
             }
 
-            var belongToEvent = context.BelongToEvents.Where(b=>b.EventId == @event.Id && b.CharacterId==CharacterId).FirstOrDefault();
+            var belongToEvent = await context.BelongToEvents.Where(b => b.EventId == @event.Id && b.CharacterId == CharacterId).FirstOrDefaultAsync();
             if (belongToEvent == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Событие", 2));
             }
             context.BelongToEvents.Remove(belongToEvent);
-             await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет изображение по заданному идентификатору, а также устраняет все связи этого изображения
@@ -176,30 +177,30 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeletePicture(int PictureId, IContext context)
         {
-            var picture =  context.Pictures.Find(PictureId);
+            var picture = await context.Pictures.FirstOrDefaultAsync(x => x.Id == PictureId);
             if (picture == null)
             {
                 throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Изображение", 2));
             }
-            var belongToGallery = context.BelongToGalleries.Where(b => b.PictureId == PictureId).FirstOrDefault();
-            if(belongToGallery!=null)
+            var belongToGallery = await context.BelongToGalleries.Where(b => b.PictureId == PictureId).FirstOrDefaultAsync();
+            if (belongToGallery != null)
             {
                 context.BelongToGalleries.Remove(belongToGallery);
             }
-            var character = context.Characters.Where(b=>b.PictureId == PictureId).FirstOrDefault();
+            var character = await context.Characters.Where(b => b.PictureId == PictureId).FirstOrDefaultAsync();
             if (character != null)
             {
                 character.PictureId = null;
                 context.Characters.Update(character);
             }
-            var book = context.Books.Where(b => b.PictureId == PictureId).FirstOrDefault();
+            var book = await context.Books.Where(b => b.PictureId == PictureId).FirstOrDefaultAsync();
             if (book != null)
             {
                 book.PictureId = null;
                 context.Books.Update(book);
             }
             context.Pictures.Remove(picture);
-             await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         /// <summary>
         /// Удаляет все ответы, связанные с заданным идентификатором персонажа,
@@ -209,9 +210,9 @@ namespace WebAPI.BLL.Additional
         /// <param name="context">Контекст базы данных.</param>
         public async Task DeleteAllAnswerByCharacter(int CharacterId, IContext context)
         {
-            foreach (var question in  context.Questions.ToList())
+            foreach (var question in context.Questions.ToList())
             {
-                var answer =  context.Answers.Where(a => a.CharacterId == CharacterId && a.QuestionId == question.Id).FirstOrDefault();
+                var answer = await context.Answers.Where(a => a.CharacterId == CharacterId && a.QuestionId == question.Id).FirstOrDefaultAsync();
                 if (answer == null)
                 {
                     throw new KeyNotFoundException(TypesOfErrors.NotFoundById("Ответ", 1));

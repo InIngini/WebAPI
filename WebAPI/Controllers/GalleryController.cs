@@ -16,7 +16,7 @@ namespace WebAPI.Controllers
     [Route("User/Book/Character/[controller]")]
     public class GalleryController : ControllerBase
     {
-        private readonly IGalleryService _galleryService;
+        private readonly IGalleryService GalleryService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="GalleryController"/>.
@@ -24,7 +24,7 @@ namespace WebAPI.Controllers
         /// <param name="galleryService">Сервис для работы с галереями.</param>
         public GalleryController(IGalleryService galleryService)
         {
-            _galleryService = galleryService;
+            GalleryService = galleryService;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
            
-            var createdGallery = await _galleryService.CreateGallery(galleryData);
+            var createdGallery = await GalleryService.CreateGallery(galleryData);
 
             return CreatedAtAction(nameof(GetGallery), new { id = createdGallery.PictureId }, createdGallery);
         }
@@ -63,7 +63,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{idPicture}")]
         public async Task<IActionResult> DeletePictureFromGallery(int idPicture)
         {
-            await _galleryService.DeletePictureFromGallery(idPicture);
+            await GalleryService.DeletePictureFromGallery(idPicture);
 
             return Ok();
         }
@@ -78,7 +78,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(BelongToGallery), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGallery(int id, CancellationToken cancellationToken)
         {
-            var gallery = await _galleryService.GetGallery(id, cancellationToken);
+            var gallery = await GalleryService.GetGallery(id, cancellationToken);
 
             if (gallery == null)
             {
@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<BelongToGallery>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllGallery([FromBody] int id, CancellationToken cancellationToken)
         {
-            var galleries = await _galleryService.GetAllGalleries(id, cancellationToken);
+            var galleries = await GalleryService.GetAllGalleries(id, cancellationToken);
 
             if (galleries == null)
             {

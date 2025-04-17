@@ -19,7 +19,7 @@ namespace WebAPI.BLL.Token
     /// </summary>
     public class TokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        private readonly ITokenValidator _tokenValidator;
+        private readonly ITokenValidator TokenValidator;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TokenAuthenticationHandler"/>.
@@ -37,7 +37,7 @@ namespace WebAPI.BLL.Token
             ITokenValidator tokenValidator)
             : base(options, logger, encoder, clock)
         {
-            _tokenValidator = tokenValidator;
+            TokenValidator = tokenValidator;
             
         }
 
@@ -47,13 +47,11 @@ namespace WebAPI.BLL.Token
         /// <returns>Результат аутентификации.</returns>
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var request = Request;
-            string authorizationHeader = Request.Headers["Authorization"];
             // Получение токена из заголовка запроса
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             // Валидация токена
-            int userId = _tokenValidator.ValidateToken(token);
+            int userId = await TokenValidator.ValidateToken(token);
 
             if (userId > 0)
             {

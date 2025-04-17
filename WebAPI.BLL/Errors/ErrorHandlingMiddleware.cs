@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System.Net;
+using WebAPI.BLL.Errors;
 
 namespace WebAPI.Errors
 {
@@ -33,6 +35,10 @@ namespace WebAPI.Errors
             {
                 await _next(context);
             }
+            catch (ApiException ex)
+            {
+                await HandleApiExceptionAsync(context, ex);
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
@@ -52,6 +58,27 @@ namespace WebAPI.Errors
                 Message = "Произошла ошибка при выполнении запроса.",
                 Code = exception.GetType().Name,
                 Details = new List<string> { exception.Message }
+            };
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(apiError));
+        }
+
+        /// <summary>
+        /// Обрабатывает возникшее исключение для АПИ и формирует ответ с информацией об ошибке.
+        /// </summary>
+        /// <param name="context">Контекст текущего HTTP-запроса.</param>
+        /// <param name="exception">Возникшее исключение апи.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        private Task HandleApiExceptionAsync(HttpContext context, ApiException exception)
+        {
+            var apiError = new ApiError
+            {
+                Message = "Произошла ошибка при выполнении запроса.",
+                Code = exception.GetType().Name,
+                Details = new List<string> { exception.ApiError.Message, string.Join(", ", exception.ApiError.Details) }
             };
 
             context.Response.ContentType = "application/json";

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebAPI.BLL.Interfaces;
 using WebAPI.BLL.DTO;
 using WebAPI.BLL.Token;
@@ -20,21 +15,21 @@ namespace WebAPI.BLL.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly IContext _context;
-        private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
+        private readonly IContext Context;
+        private readonly ITokenService TokenService;
+        private readonly IMapper Mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="UserService"/>.
         /// </summary>
-        /// <param name="context">Юнит оф ворк для работы с репозиториями.</param>
+        /// <param name="context">Контекст бд.</param>
         /// <param name="tokenService">Сервис для работы с токенами.</param>
         /// <param name="mapper">Объект для преобразования данных.</param>
         public UserService(IContext context, ITokenService tokenService, IMapper mapper)
         {
-            _context = context;
-            _tokenService = tokenService;
-            _mapper = mapper;
+            Context = context;
+            TokenService = tokenService;
+            Mapper = mapper;
         }
 
         /// <summary>
@@ -54,15 +49,15 @@ namespace WebAPI.BLL.Services
             }
 
             // Используем AutoMapper для маппинга LoginData в User
-            User user = _mapper.Map<User>(loginData);
+            User user = Mapper.Map<User>(loginData);
 
-            if (await _context.Users.Where(u => u.Login==user.Login).FirstOrDefaultAsync() != null)
+            if (await Context.Users.Where(u => u.Login == user.Login).FirstOrDefaultAsync() != null)
             {
                 throw new ArgumentException(TypesOfErrors.UserFound(loginData.Login));
             }
-            
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+
+            Context.Users.Add(user);
+            await Context.SaveChangesAsync();
 
             return user;
         }
@@ -75,7 +70,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="UnauthorizedAccessException">Если пользователь не найден.</exception>
         public async Task<UserTokenData> Login(LoginData loginData, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.Where(u => u.Login == loginData.Login && u.Password == loginData.Password)
+            var user = await Context.Users.Where(u => u.Login == loginData.Login && u.Password == loginData.Password)
                                               .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
@@ -83,10 +78,10 @@ namespace WebAPI.BLL.Services
                 throw new UnauthorizedAccessException(TypesOfErrors.UserNotFound(loginData.Login));
             }
 
-            var token = _tokenService.CreateToken(user);
+            var token = TokenService.CreateToken(user);
 
             // Возвращаем пользователя с токеном
-            var userTokenData = _mapper.Map<UserTokenData>(user); // 'user' - это объект класса User
+            var userTokenData = Mapper.Map<UserTokenData>(user); // 'user' - это объект класса User
             userTokenData.Token = token; // Устанавливаем токен
 
             return userTokenData;
@@ -100,7 +95,7 @@ namespace WebAPI.BLL.Services
         /// <exception cref="KeyNotFoundException">Если пользователь не найден.</exception>
         public async Task<User> GetUser(int id, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(id,cancellationToken);
+            var user = await Context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
             if (user == null)
             {

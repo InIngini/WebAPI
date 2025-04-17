@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
     [Route("User/Book/[controller]")]
     public class SchemeController : ControllerBase
     {
-        private readonly ISchemeService _schemeService;
+        private readonly ISchemeService SchemeService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="SchemeController"/>.
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         /// <param name="schemeService">Сервис для работы с схемами.</param>
         public SchemeController(ISchemeService schemeService)
         {
-            _schemeService = schemeService;
+            SchemeService = schemeService;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
             
-            var createdScheme = await _schemeService.CreateScheme(schemedata);
+            var createdScheme = await SchemeService.CreateScheme(schemedata);
 
             return CreatedAtAction(nameof(GetScheme), new { id = createdScheme.Id }, createdScheme);
 
@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Scheme), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateScheme(int id, [FromBody] int idConnection,CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.UpdateScheme(id,idConnection);
+            var scheme = await SchemeService.UpdateScheme(id,idConnection);
 
             if (scheme == null)
             {
@@ -89,7 +89,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteScheme(int id,CancellationToken cancellationToken)
         {
-            await _schemeService.DeleteScheme(id);
+            await SchemeService.DeleteScheme(id);
 
             return Ok();
         }
@@ -104,7 +104,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Scheme), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetScheme(int id, CancellationToken cancellationToken)
         {
-            var scheme = await _schemeService.GetScheme(id,cancellationToken);
+            var scheme = await SchemeService.GetScheme(id,cancellationToken);
 
             if (scheme == null)
             {
@@ -124,7 +124,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<Scheme>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllScheme([FromBody] int id, CancellationToken cancellationToken)
         {
-            var schemes = await _schemeService.GetAllSchemes(id,cancellationToken);
+            var schemes = await SchemeService.GetAllSchemes(id,cancellationToken);
 
             if (schemes == null)
             {

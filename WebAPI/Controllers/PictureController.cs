@@ -17,7 +17,7 @@ namespace WebAPI.Controllers
     [Route("User/[controller]")]
     public class PictureController : ControllerBase
     {
-        private readonly IPictureService _pictureService;
+        private readonly IPictureService PictureService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="PictureController"/>.
@@ -25,7 +25,7 @@ namespace WebAPI.Controllers
         /// <param name="pictureService">Сервис для работы с изображениями.</param>
         public PictureController(IPictureService pictureService)
         {
-            _pictureService = pictureService;
+            PictureService = pictureService;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
-            var createdPicture = await _pictureService.CreatePicture(picture);
+            var createdPicture = await PictureService.CreatePicture(picture);
 
             return CreatedAtAction(nameof(GetPicture), new { id = createdPicture.Id }, createdPicture);
         }
@@ -56,7 +56,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id, CancellationToken cancellationToken)
         {
-            await _pictureService.DeletePicture(id);
+            await PictureService.DeletePicture(id);
 
             return Ok();
         }
@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Picture), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPicture(int id, CancellationToken cancellationToken)
         {
-            var picture = await _pictureService.GetPicture(id, cancellationToken);
+            var picture = await PictureService.GetPicture(id, cancellationToken);
 
             if (picture == null)
             {

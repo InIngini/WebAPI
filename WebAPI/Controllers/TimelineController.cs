@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
     [Route("User/Book/[controller]")]
     public class TimelineController : ControllerBase
     {
-        private readonly ITimelineService _timelineService;
+        private readonly ITimelineService TimelineService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TimelineController"/>.
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         /// <param name="timelineService">Сервис для работы с таймлайнами.</param>
         public TimelineController(ITimelineService timelineService)
         {
-            _timelineService = timelineService;
+            TimelineService = timelineService;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
                 return BadRequest(TypesOfErrors.NotValidModel(ModelState));
             }
 
-            var createdTimeline = await _timelineService.CreateTimeline(timelinedata);
+            var createdTimeline = await TimelineService.CreateTimeline(timelinedata);
             return CreatedAtAction(nameof(GetTimeline), new { id = createdTimeline.Id }, createdTimeline);
         }
 
@@ -68,7 +68,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Timeline), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateTimeline(int id, [FromBody] int idEvent,CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.UpdateTimeline(id, idEvent);
+            var timeline = await TimelineService.UpdateTimeline(id, idEvent);
             
             if (timeline == null)
             {
@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTimeline(int id)
         {
-            await _timelineService.DeleteTimeline(id);
+            await TimelineService.DeleteTimeline(id);
 
             return Ok();
         }
@@ -100,7 +100,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(Timeline), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTimeline(int id, CancellationToken cancellationToken)
         {
-            var timeline = await _timelineService.GetTimeline(id,cancellationToken);
+            var timeline = await TimelineService.GetTimeline(id,cancellationToken);
             if (timeline == null)
             {
                 return NotFound(TypesOfErrors.NotFoundById("Таймлайн", 1));
@@ -119,7 +119,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<Timeline>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTimeline([FromBody] int id,CancellationToken cancellationToken)
         {
-            var timelines = await _timelineService.GetAllTimelines(id,cancellationToken);
+            var timelines = await TimelineService.GetAllTimelines(id,cancellationToken);
 
             if (timelines == null)
             {

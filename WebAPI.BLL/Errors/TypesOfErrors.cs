@@ -50,6 +50,25 @@ namespace WebAPI.Errors
         }
 
         /// <summary>
+        /// Для ошибки, когда объект не принадлежит пользователю.
+        /// </summary>
+        /// <param name="objName">Название объекта, который не найден.</param>
+        /// <param name="genderOrNumber">Род или число, чтобы склонять сообщение (0 - ж род, 1 - м род, 2 - ср род, 3 - мн число).</param>
+        /// <returns>Строка с пояснением ошибки.</returns>
+        public static string NotYour(string objName,int genderOrNumber)
+        {
+            switch (genderOrNumber)
+            {
+                case 0: return $"Эта {objName} не ваша."; //ж род, ед число
+                case 1: return $"Этот {objName} не ваш.";  //м род, ед число 
+                case 2: return $"Это {objName} не ваше."; //ср род, ед число
+                case 3: return $"Эти {objName} не ваши."; //мн число
+                default: return $"Объект не ваш."; 
+            }
+            
+        }
+
+        /// <summary>
         /// Для ошибки, когда пользователь не найден.
         /// </summary>
         /// <param name="userName">Логин пользователя, который не найден.</param>
