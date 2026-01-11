@@ -14,7 +14,7 @@ using WebAPI.Errors;
 namespace WebAPI
 {
     public class Program
-    {
+    { 
         //dotnet ef migrations add InitialCreate --project WebAPI.DB --startup-project WebAPI - писала в консольку для создания миграции
         //не забывать менять имя InitialCreate
 
